@@ -54,8 +54,6 @@ void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 void ABsScythe::NextWeaponMode()
 {
 	WeaponMode = WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee;
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Current Weapon Mode is = %s"), *UEnum::GetValueAsString(WeaponMode)));
-	
 }
 
 EScytheWeaponMode ABsScythe::GetWeaponMode() const

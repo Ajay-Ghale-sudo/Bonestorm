@@ -153,7 +153,6 @@ void ABsCharacter::NextWeaponMode()
 	if (Weapon)
 	{
 		Weapon->NextWeaponMode();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Weapon mode changed."));
 	}
 }
 

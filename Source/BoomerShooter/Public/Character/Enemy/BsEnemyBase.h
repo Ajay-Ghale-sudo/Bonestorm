@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "BsEnemyBase.generated.h"
 
+class UBsHealthComponent;
 UCLASS()
 class BOOMERSHOOTER_API ABsEnemyBase : public ACharacter
 {
@@ -19,6 +20,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void Die();
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UBsHealthComponent* HealthComponent;
+	
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

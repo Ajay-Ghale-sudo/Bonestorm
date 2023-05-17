@@ -8,6 +8,8 @@
 #include "BsCharacter.generated.h"
 
 
+class ABsWeaponBase;
+class UCameraComponent;
 class UInputAction;
 
 // A structure to hold the default input configuration for the game.
@@ -35,6 +37,10 @@ struct FBsInputConfig
 	// The input action for dashing.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DashAction;
+
+	// The input action for attacking
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
 	
 };
 
@@ -80,6 +86,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeapon(ABsWeaponBase* InWeapon);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -111,6 +120,12 @@ protected:
 	 */
 	void EnableDash();
 
+	/**
+	 * @brief Attacks with the weapon.
+	 */
+	void Attack();
+	
+	
 protected:
 	/**
 	 * @brief The default input configuration for the Character.
@@ -123,6 +138,12 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	FBsDashConfig DashConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
+	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	ABsWeaponBase* Weapon;
 
 public:
 

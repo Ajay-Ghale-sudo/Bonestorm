@@ -4,13 +4,21 @@
 #include "Character/BsCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Weapon/BsWeaponBase.h"
 
 // Sets default values
 ABsCharacter::ABsCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(GetCapsuleComponent());
+	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	CameraComponent->bUsePawnControlRotation = true;
 }
 
 // Called when the game starts or when spawned
@@ -55,9 +63,19 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Dash
 		EnhancedInputComponent->BindAction(InputConfig.DashAction, ETriggerEvent::Started, this, &ABsCharacter::Dash);
+
+		// Attack
+		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
+
+		// Switch weapon attack mode
+		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 	}
 }
 
+void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
+{
+	Weapon = InWeapon;
+}
 
 
 void ABsCharacter::Move(const FInputActionValue& Value)
@@ -121,4 +139,22 @@ void ABsCharacter::EnableDash()
 {
 	DashConfig.bDashEnabled = true;
 }
+
+void ABsCharacter::Attack()
+{
+	if (Weapon)
+	{
+		Weapon->Fire();
+	}
+}
+
+void ABsCharacter::NextWeaponMode()
+{
+	if (Weapon)
+	{
+		Weapon->NextWeaponMode();
+	}
+}
+
+
 

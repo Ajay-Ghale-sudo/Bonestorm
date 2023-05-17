@@ -66,6 +66,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Attack
 		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
+
+		// Switch weapon attack mode
+		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 	}
 }
 
@@ -144,4 +147,15 @@ void ABsCharacter::Attack()
 		Weapon->Fire();
 	}
 }
+
+void ABsCharacter::NextWeaponMode()
+{
+	if (Weapon)
+	{
+		Weapon->NextWeaponMode();
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("Weapon mode changed."));
+	}
+}
+
+
 

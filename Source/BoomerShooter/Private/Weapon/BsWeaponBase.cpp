@@ -34,6 +34,11 @@ void ABsWeaponBase::Fire()
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsWeaponBase::EnableAttack, AttackRate, false);
 }
 
+void ABsWeaponBase::NextWeaponMode()
+{
+		
+}
+
 
 
 

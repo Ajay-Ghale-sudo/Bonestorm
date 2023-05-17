@@ -16,6 +16,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire();
+	UFUNCTION(BlueprintCallable)
+	virtual void NextWeaponMode();
 
 protected:
 	// Called when the game starts or when spawned

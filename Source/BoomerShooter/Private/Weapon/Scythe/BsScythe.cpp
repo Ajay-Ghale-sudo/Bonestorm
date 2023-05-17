@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Weapon/Scythe/BsScythe.h"
 
 #include "Weapon/Projectile/BsProjectileBase.h"
@@ -23,6 +20,7 @@ void ABsScythe::Fire()
 void ABsScythe::RangeAttack()
 {
 	// Spawn Projectile
+	OnRangedAttack();
 	UWorld* World = GetWorld();
 	if (ProjectileClass && World)
 	{
@@ -43,7 +41,24 @@ void ABsScythe::OnMeleeAttack_Implementation()
 	
 }
 
+void ABsScythe::OnRangedAttack_Implementation()
+{
+	
+}
+
 void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 {
 	WeaponMode = NewMode;
+}
+
+void ABsScythe::NextWeaponMode()
+{
+	WeaponMode = WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee;
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Orange, FString::Printf(TEXT("Current Weapon Mode is = %s"), *UEnum::GetValueAsString(WeaponMode)));
+	
+}
+
+EScytheWeaponMode ABsScythe::GetWeaponMode() const
+{
+	return WeaponMode;
 }

@@ -36,8 +36,16 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnMeleeAttack();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRangedAttack();
+
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMode(EScytheWeaponMode NewMode);
+	
+
+	virtual void NextWeaponMode() override;
+
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
@@ -45,5 +53,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	EScytheWeaponMode RangedWeaponMode = EScytheWeaponMode::ESWM_Range;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE EScytheWeaponMode GetWeaponMode() const;
 	
 };

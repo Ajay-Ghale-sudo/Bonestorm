@@ -41,6 +41,9 @@ struct FBsInputConfig
 	// The input action for attacking
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackModeSwitchAction;
 	
 };
 
@@ -124,6 +127,11 @@ protected:
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+	/**
+	 *
+	 */
+	void NextWeaponMode();
+
 	
 	
 protected:

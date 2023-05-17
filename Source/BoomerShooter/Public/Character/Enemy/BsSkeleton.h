@@ -23,6 +23,8 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void TriggerRagdoll();
 
+	virtual void Die() override;
+
 public:
 
 

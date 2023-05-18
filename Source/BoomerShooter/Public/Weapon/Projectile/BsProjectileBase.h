@@ -8,6 +8,20 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 
+
+USTRUCT(BlueprintType)
+struct FProjectileDamageProperties
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float ProjectileDamage = 10.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float ProjectileSpeed = 1000.0f;
+	
+};
+
 UCLASS()
 class BOOMERSHOOTER_API ABsProjectileBase : public AActor
 {
@@ -21,6 +35,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnProjectileHit(UPrimitiveComponent* OnComponentHit, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+	                     const FHitResult& Hit);
+
+	virtual void OnProjectileHitInternal(UPrimitiveComponent* OnComponentHit, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
+						 const FHitResult& Hit);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnProjectileOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	                         bool bFromSweep, const FHitResult& SweepResult);
+	
+	virtual void OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+							 bool bFromSweep, const FHitResult& SweepResult);
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	UStaticMeshComponent* ProjectileMesh;
@@ -32,10 +61,7 @@ protected:
 	UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	float ProjectileSpeed = 1000.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	float ProjectileDamage = 10.0f;
+	FProjectileDamageProperties ProjectileDamageProperties;
 
 public:
 

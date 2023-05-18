@@ -18,6 +18,9 @@ public:
 	// Sets default values for this character's properties
 	ABsEnemyBase();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 	// IReceive Damage Interface \\
 
 	virtual void ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,
@@ -37,8 +40,10 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBsHealthComponent* HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	bool bIsAlive = true;
 	
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FORCEINLINE bool GetIsAlive() const { return bIsAlive; }
 };

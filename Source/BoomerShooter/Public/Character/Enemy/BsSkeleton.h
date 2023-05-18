@@ -26,8 +26,4 @@ protected:
 	virtual void Die() override;
 
 public:
-
-
-	
-	
 };

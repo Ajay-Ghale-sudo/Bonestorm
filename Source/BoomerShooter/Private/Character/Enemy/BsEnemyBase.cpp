@@ -33,7 +33,7 @@ void ABsEnemyBase::BeginPlay()
 
 void ABsEnemyBase::Die()
 {
-	
+	bIsAlive = false;
 }
 
 // Called every frame

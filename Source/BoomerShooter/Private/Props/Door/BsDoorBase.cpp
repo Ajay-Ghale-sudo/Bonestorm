@@ -1,0 +1,65 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Props/Door/BsDoorBase.h"
+
+
+// Sets default values
+ABsDoorBase::ABsDoorBase()
+{
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = false;
+
+	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
+	SetRootComponent(DoorMesh);
+}
+
+void ABsDoorBase::Interact(AActor* Interactor)
+{
+	if (bOpenedElsewhere) return;
+	ToggleDoor();
+}
+
+// Called when the game starts or when spawned
+void ABsDoorBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (DoorMesh)
+	{
+		StartingRotation = DoorMesh->GetRelativeRotation();
+	}
+}
+
+void ABsDoorBase::ToggleDoor()
+{	
+	if (bIsOpen)
+	{
+		CloseDoor();
+	}
+	else
+	{
+		OpenDoor();
+	}
+}
+
+void ABsDoorBase::OpenDoor()
+{
+	if (!CanOpen()) return;
+	bIsOpen = true;
+	OnDoorStateChanged.Broadcast();
+}
+
+void ABsDoorBase::CloseDoor()
+{
+	bIsOpen = false;
+	OnDoorStateChanged.Broadcast();
+}
+
+
+bool ABsDoorBase::CanOpen()
+{
+	return !bLocked;
+}
+
+

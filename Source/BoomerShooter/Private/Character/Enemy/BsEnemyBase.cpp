@@ -4,6 +4,9 @@
 #include "Character/Enemy/BsEnemyBase.h"
 
 #include "Component/BsHealthComponent.h"
+#include "Engine/DamageEvents.h"
+#include "Weapon/BsWeaponBase.h"
+#include "Weapon/Projectile/BsProjectileBase.h"
 
 
 // Sets default values
@@ -38,5 +41,21 @@ void ABsEnemyBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ABsEnemyBase::ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,
+	const float Damage)
+{
+	if (!Projectile) return;
+
+	// TODO: DamageEvent should come from the projectile
+	TakeDamage(Damage, FDamageEvent(), Projectile->GetInstigatorController(), Cast<AActor>(Projectile));
+}
+
+void ABsEnemyBase::ReceiveMeleeDamage(const FHitResult& HitResult, ABsWeaponBase* AttackingWeapon, const float Damage)
+{
+	if (!AttackingWeapon) return;
+	
+	// TODO: DamageEvent should come from the AttackingWeapon
+	TakeDamage(Damage, FDamageEvent(), AttackingWeapon->GetInstigatorController(), AttackingWeapon);
+}
 
 

@@ -6,6 +6,7 @@
 #include "Component/BsHealthComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Hazard/BsHazardBase.h"
+#include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 
@@ -34,6 +35,29 @@ void ABsEnemyBase::BeginPlay()
 void ABsEnemyBase::Die()
 {
 	bIsAlive = false;
+	SeverHead();
+}
+
+void ABsEnemyBase::SeverHead()
+{
+	UWorld* World = GetWorld();
+	USkeletalMeshComponent* CurrentMesh = GetMesh();
+	if (SeveredHeadClass && World && CurrentMesh) 
+	{
+		CurrentMesh->HideBoneByName(FName("Head"), EPhysBodyOp::PBO_None);
+		
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		
+		FTransform SpawnTransform = CurrentMesh->GetSocketTransform(FName("Head"));
+		SpawnTransform.SetScale3D(CurrentMesh->GetComponentScale());
+		if (ABsSeveredHeadBase* SeveredHead = World->SpawnActor<ABsSeveredHeadBase>(SeveredHeadClass, SpawnTransform, SpawnParams))
+		{
+			// TODO: Launch Vector should be determined by the attack.
+			const FVector LaunchVector = FVector(0.f, 0.f, 600.f);
+			SeveredHead->GetHeadMesh()->AddImpulse(LaunchVector, NAME_None, true);
+		}
+	}
 }
 
 // Called every frame

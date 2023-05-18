@@ -75,6 +75,10 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 {
 	Weapon = InWeapon;
+	if (Weapon)
+	{
+		Weapon->SetOwner(this);
+	}
 }
 
 
@@ -114,7 +118,12 @@ void ABsCharacter::Dash()
 		return;
 	}
 	
-	FVector Direction = GetVelocity();
+	// Get input from Player, otherwise dash to our current direction
+	FVector Direction = GetLastMovementInputVector();
+	if (Direction.IsZero())
+	{
+		Direction = GetVelocity();
+	}
 	Direction.Normalize();
 	
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);

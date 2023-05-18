@@ -5,6 +5,7 @@
 
 #include "Component/BsHealthComponent.h"
 #include "Engine/DamageEvents.h"
+#include "Hazard/BsHazardBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 
@@ -56,6 +57,13 @@ void ABsEnemyBase::ReceiveMeleeDamage(const FHitResult& HitResult, ABsWeaponBase
 	
 	// TODO: DamageEvent should come from the AttackingWeapon
 	TakeDamage(Damage, FDamageEvent(), AttackingWeapon->GetInstigatorController(), AttackingWeapon);
+}
+
+void ABsEnemyBase::ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage)
+{
+	if (!Hazard) return;
+	
+	TakeDamage(Damage, FDamageEvent(), Hazard->GetInstigatorController(), Hazard);
 }
 
 

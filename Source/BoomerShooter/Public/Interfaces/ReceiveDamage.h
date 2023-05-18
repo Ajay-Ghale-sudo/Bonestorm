@@ -5,6 +5,7 @@
 #include "UObject/Interface.h"
 #include "ReceiveDamage.generated.h"
 
+class ABsHazardBase;
 class ABsWeaponBase;
 class ABsProjectileBase;
 // This class does not need to be modified.
@@ -25,6 +26,10 @@ class BOOMERSHOOTER_API IReceiveDamage
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual void ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile, const float Damage);
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void ReceiveMeleeDamage(const FHitResult& HitResult, ABsWeaponBase* AttackingWeapon, const float Damage);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage);
 };

@@ -8,6 +8,7 @@
 #include "BsCharacter.generated.h"
 
 
+class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
@@ -44,6 +45,9 @@ struct FBsInputConfig
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* AttackModeSwitchAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
 	
 };
 
@@ -71,6 +75,15 @@ struct FBsDashConfig
 	// A flag to indicate if dashing is currently enabled.
 	bool bDashEnabled = true;
 	
+};
+
+USTRUCT(BlueprintType)
+struct FBsInteractConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
+	float InteractRange = 200.f;	
 };
 
 
@@ -127,10 +140,16 @@ protected:
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+	
 	/**
-	 *
+	 * @brief Change the Weapon Mode to the next available.
 	 */
 	void NextWeaponMode();
+
+	/**
+	 * @brief Attempt to interact with an object in front of the character.
+	 */
+	void Interact();
 
 	
 	
@@ -147,8 +166,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	FBsDashConfig DashConfig;
 
+	/**
+	 * @brief Interaction configuration for the Character.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
+	FBsInteractConfig InteractConfig;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* CameraComponent;
+
+	/**
+	 * @brief Inventory Component of the Character.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
+	UBsInventoryComponent* InventoryComponent;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	ABsWeaponBase* Weapon;

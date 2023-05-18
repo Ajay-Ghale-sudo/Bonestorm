@@ -5,8 +5,10 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interfaces/Interactable.h"
 #include "Weapon/BsWeaponBase.h"
 
 // Sets default values
@@ -19,6 +21,8 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->SetupAttachment(GetCapsuleComponent());
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 	CameraComponent->bUsePawnControlRotation = true;
+
+	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -69,6 +73,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Switch weapon attack mode
 		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
+
+		// Interact
+		EnhancedInputComponent->BindAction(InputConfig.InteractAction, ETriggerEvent::Started, this, &ABsCharacter::Interact);
 	}
 }
 
@@ -162,6 +169,28 @@ void ABsCharacter::NextWeaponMode()
 	if (Weapon)
 	{
 		Weapon->NextWeaponMode();
+	}
+}
+
+void ABsCharacter::Interact()
+{
+	if (const UWorld* World = GetWorld())
+	{
+		FHitResult InteractTraceResult;
+		World->LineTraceSingleByChannel(
+			InteractTraceResult,
+			CameraComponent->GetComponentLocation(),
+			CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * InteractConfig.InteractRange,
+			ECollisionChannel::ECC_Visibility
+		);
+
+		if (InteractTraceResult.bBlockingHit)
+		{
+			if (IInteractable* Interactable = Cast<IInteractable>(InteractTraceResult.GetActor()))
+			{
+				Interactable->Interact(this);
+			}
+		}
 	}
 }
 

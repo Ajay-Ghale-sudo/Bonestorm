@@ -32,6 +32,7 @@ void ABsEnemyBase::BeginPlay()
 
 void ABsEnemyBase::Die()
 {
+	
 }
 
 // Called every frame

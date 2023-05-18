@@ -30,7 +30,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void Die();
+	virtual void Die();
 
 
 protected:

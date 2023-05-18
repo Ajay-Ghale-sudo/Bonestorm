@@ -85,7 +85,4 @@ protected:
 	
 
 public:
-	UFUNCTION(BlueprintCallable)
-	FORCEINLINE EScytheWeaponMode GetWeaponMode() const;
-	
 };

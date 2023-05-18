@@ -110,8 +110,3 @@ FTransform ABsScythe::GetProjectileSpawnTransform() const
 
 	return SpawnTransform;
 }
-
-EScytheWeaponMode ABsScythe::GetWeaponMode() const
-{
-	return WeaponMode;
-}

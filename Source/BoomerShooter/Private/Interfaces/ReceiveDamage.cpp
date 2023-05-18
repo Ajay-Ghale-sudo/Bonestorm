@@ -14,3 +14,7 @@ void IReceiveDamage::ReceiveProjectileDamage(const FHitResult& HitResult, ABsPro
 void IReceiveDamage::ReceiveMeleeDamage(const FHitResult& HitResult, ABsWeaponBase* AttackingWeapon, const float Damage)
 {
 }
+
+void IReceiveDamage::ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage)
+{
+}

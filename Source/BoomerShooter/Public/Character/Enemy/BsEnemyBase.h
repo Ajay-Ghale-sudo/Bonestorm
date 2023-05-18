@@ -23,6 +23,7 @@ public:
 	virtual void ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,
 	                                     const float Damage) override;
 	virtual void ReceiveMeleeDamage(const FHitResult& HitResult, ABsWeaponBase* AttackingWeapon, const float Damage) override;
+	virtual void ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage) override;
 	//	                   		 \\
 
 protected:

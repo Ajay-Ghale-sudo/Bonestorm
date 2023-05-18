@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "BsEnemyBase.generated.h"
 
+class ABsSeveredHeadBase;
 class ABsWeaponBase;
 class UBsHealthComponent;
+
 UCLASS()
 class BOOMERSHOOTER_API ABsEnemyBase : public ACharacter, public IReceiveDamage
 {
@@ -36,11 +37,16 @@ protected:
 	UFUNCTION()
 	virtual void Die();
 
+	virtual void SeverHead();
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBsHealthComponent* HealthComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	TSubclassOf<ABsSeveredHeadBase> SeveredHeadClass;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	bool bIsAlive = true;
 	

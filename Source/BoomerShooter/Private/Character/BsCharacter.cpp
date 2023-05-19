@@ -37,6 +37,12 @@ void ABsCharacter::BeginPlay()
 			Subsystem->AddMappingContext(InputConfig.DefaultInputContext, 0);
 		}
 	}
+
+	if (const UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+
+		SlideConfig.PreSlideHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+	}
 	
 	JumpMaxCount = 2;
 }
@@ -103,7 +109,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		Rotation.Pitch = 0.f;
 		const FVector FacingDirection = Rotation.GetNormalized().Vector();
 
-		float MovementScale = bSliding ? 0.3f : 1.f;
+		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);		
@@ -206,30 +212,30 @@ void ABsCharacter::Interact()
 
 void ABsCharacter::StartSliding()
 {
+	if (SlideConfig.bSliding) return;
 	
-	if (GetVelocity().Size() >= VelocityToSlide)
+	if (GetVelocity().Size() >= SlideConfig.VelocityToStartSlide)
 	{
 		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 		{
 			// Can't slide mid-air
 			if (MovementComponent->IsFalling()) return;
 			
-			PreSlideGroundFriction = MovementComponent->GroundFriction;
-			MovementComponent->GroundFriction = SlideFriction;
+			SlideConfig.PreSlideGroundFriction = MovementComponent->GroundFriction;
+			MovementComponent->GroundFriction = SlideConfig.SlideFriction;
 		}
 		
-		bSliding = true;
+		SlideConfig.bSliding = true;
 
 		if (UCapsuleComponent* Capsule = GetCapsuleComponent())
 		{
-			PreSlideHeight = Capsule->GetUnscaledCapsuleHalfHeight();
-			Capsule->SetCapsuleHalfHeight(SlideHeight, true);
+			Capsule->SetCapsuleHalfHeight(SlideConfig.SlideHeight, true);
 		}
 
 		FVector Direction = GetVelocity();
 		Direction.Z = 0.f;
 		Direction.Normalize();
-		LaunchCharacter(Direction * SlideStrength, false, false);
+		LaunchCharacter(Direction * SlideConfig.SlideStrength, false, false);
 	}
 }
 
@@ -237,22 +243,22 @@ void ABsCharacter::StopSliding()
 {
 	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
-		MovementComponent->GroundFriction = PreSlideGroundFriction;
+		MovementComponent->GroundFriction = SlideConfig.PreSlideGroundFriction;
 	}
 	
-	bSliding = false;
+	SlideConfig.bSliding = false;
 }
 
 void ABsCharacter::SlideTick(float DeltaTime)
 {
-	if (bSliding && GetVelocity().Size() < VelocityToStopSliding)
+	if (SlideConfig.bSliding && GetVelocity().Size() < SlideConfig.VelocityToStopSlide)
 	{	
 		StopSliding();
 	}
 	
 	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
-		const float DesiredHeight = bSliding ? SlideHeight : PreSlideHeight;
+		const float DesiredHeight = SlideConfig.bSliding ? SlideConfig.SlideHeight :SlideConfig.PreSlideHeight;
 		if (!FMath::IsNearlyEqual(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight))
 		{
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);

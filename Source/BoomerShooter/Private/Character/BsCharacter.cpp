@@ -245,7 +245,6 @@ void ABsCharacter::StopSliding()
 
 void ABsCharacter::SlideTick(float DeltaTime)
 {
-	GEngine->AddOnScreenDebugMessage(123, 1.f, FColor::Red, FString::Printf(TEXT("Velocity: %f"), GetVelocity().Size()));
 	if (bSliding && GetVelocity().Size() < VelocityToStopSliding)
 	{	
 		StopSliding();

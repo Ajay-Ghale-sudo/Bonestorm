@@ -218,11 +218,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	ABsWeaponBase* Weapon;
-
-	
-
-	
-
 public:
 
 };

@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
 
@@ -12,82 +13,6 @@ class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
-
-// A structure to hold the default input configuration for the game.
-USTRUCT(BlueprintType)
-struct FBsInputConfig
-{
-	GENERATED_BODY()
-
-	// The default context for the input mapping.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultInputContext;
-
-	// The input action for moving the character.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
-
-	// The input action for changing the character's view direction.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* LookAction;
-
-	// The input action for making the character jump.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
-
-	// The input action for dashing.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* DashAction;
-
-	// The input action for attacking
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* AttackAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* AttackModeSwitchAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* InteractAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* SlideAction;
-	
-};
-
-// A structure to hold the configuration for the dash mechanic.
-USTRUCT(BlueprintType)
-struct FBsDashConfig
-{
-	GENERATED_BODY()
-
-	// The base strength of the dash.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float BaseDashStrength = 2000.f;
-
-	// The strength of the dash when the character is on the ground.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float GroundDashStrength = 4000.f;
-
-	// The cooldown time between dashes.
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float DashCooldown = 0.5f;
-
-	// A timer handle for the dash cooldown.
-	FTimerHandle DashCooldownTimerHandle;
-
-	// A flag to indicate if dashing is currently enabled.
-	bool bDashEnabled = true;
-	
-};
-
-USTRUCT(BlueprintType)
-struct FBsInteractConfig
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
-	float InteractRange = 200.f;	
-};
 
 
 UCLASS()
@@ -105,6 +30,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	/**
+	 * @brief Sets the Character's Weapon to the specified Weapon.
+	 * @param InWeapon New Weapon to equip.
+	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ABsWeaponBase* InWeapon);
 	
@@ -154,8 +83,26 @@ protected:
 	 */
 	void Interact();
 
+	/**
+	 * @brief Attempt to Start Sliding.
+	 */
 	void StartSliding();
+
+	/**
+	 * @brief Stop Sliding if the character is sliding.
+	 */
 	void StopSliding();
+
+	/**
+	 * @brief This function handles the per-frame behavior during sliding.
+	 *
+	 * This function is called every frame and it performs several checks and operations related to sliding.
+	 * If the character is currently sliding but their velocity is below the velocity needed to stop the slide,
+	 * the character will stop sliding. Additionally, the function adjusts the character's capsule half-height
+	 * to smoothly transition between the pre-slide height and the sliding height.
+	 *
+	 * @param DeltaTime The time passed since the last frame.
+	 */
 	void SlideTick(float DeltaTime);
 
 	
@@ -170,35 +117,14 @@ protected:
 	/**
 	 * @brief The dash configuration for the Character.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	FBsDashConfig DashConfig;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
-	bool bSliding = false;
-
 	/**
-	 * @brief The velocity required to start sliding.
+	 * @brief The slide configuration for the Character.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float VelocityToSlide = 1500.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float VelocityToStopSliding = 1200.f;
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
-	float PreSlideGroundFriction = 1.f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float SlideFriction = 0.1f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
-	float SlideStrength = 1000.f;
-	
-	FTimerHandle SlideTimerHandle;
-
-	float PreSlideHeight = 88.f;
-	float SlideHeight = 44.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
+	FBsSlideConfig SlideConfig;
 	
 	/**
 	 * @brief Interaction configuration for the Character.
@@ -206,6 +132,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
 	FBsInteractConfig InteractConfig;
 
+	/**
+	 * @brief The Camera Component of the Character.
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
 	UCameraComponent* CameraComponent;
 
@@ -214,9 +143,11 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	UBsInventoryComponent* InventoryComponent;
-	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
+	/**
+	 * @brief Currently Equipped Weapon.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
 public:
 

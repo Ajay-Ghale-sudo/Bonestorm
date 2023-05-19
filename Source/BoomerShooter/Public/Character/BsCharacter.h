@@ -48,6 +48,9 @@ struct FBsInputConfig
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SlideAction;
 	
 };
 
@@ -151,6 +154,10 @@ protected:
 	 */
 	void Interact();
 
+	void StartSliding();
+	void StopSliding();
+	void SlideTick(float DeltaTime);
+
 	
 	
 protected:
@@ -166,6 +173,33 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
 	FBsDashConfig DashConfig;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
+	bool bSliding = false;
+
+	/**
+	 * @brief The velocity required to start sliding.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float VelocityToSlide = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float VelocityToStopSliding = 1200.f;
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement)
+	float PreSlideGroundFriction = 1.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float SlideFriction = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Movement)
+	float SlideStrength = 1000.f;
+	
+	FTimerHandle SlideTimerHandle;
+
+	float PreSlideHeight = 88.f;
+	float SlideHeight = 44.f;
+	
 	/**
 	 * @brief Interaction configuration for the Character.
 	 */
@@ -184,7 +218,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
 	ABsWeaponBase* Weapon;
-
 public:
 
 };

@@ -39,6 +39,14 @@ void ABsScythe::Fire()
 	}
 }
 
+void ABsScythe::SecondaryFire()
+{
+	if (!bCanAttack) return;
+	Super::SecondaryFire();
+	SecondaryAttack();
+	UE_LOG(LogTemp, Log, TEXT("Firing secondary"))
+}
+
 void ABsScythe::RangeAttack()
 {
 	// Spawn Projectile
@@ -63,12 +71,36 @@ void ABsScythe::MeleeAttack()
 	OnMeleeAttack();
 }
 
+void ABsScythe::SecondaryAttack()
+{
+	// Spawn projectile
+	OnSecondaryAttack();
+	UWorld* World = GetWorld();
+	if (GrappleHookClass && World)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.Owner = GetOwner();
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Instigator = GetInstigator();
+		FTransform StartTransform = GetProjectileSpawnTransform();
+		if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(World->SpawnActor(GrappleHookClass, &StartTransform, SpawnParams)))
+		{
+			Projectile->SetOwner(GetOwner());
+		}
+	}	
+}
+
 void ABsScythe::OnMeleeAttack_Implementation()
 {
 	
 }
 
 void ABsScythe::OnRangedAttack_Implementation()
+{
+	
+}
+
+void ABsScythe::OnSecondaryAttack_Implementation()
 {
 	
 }

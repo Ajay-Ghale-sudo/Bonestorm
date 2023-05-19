@@ -12,6 +12,7 @@ enum class EScytheWeaponMode : uint8
 {
 	ESWM_Melee UMETA(DisplayName = "Melee"),
 	ESWM_Range UMETA(DisplayName = "Range"),
+	ESWM_Thrown UMETA(DisplayName = "Thrown"),
 
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -32,9 +33,19 @@ public:
 	ABsScythe();
 	
 	virtual void Fire() override;
+	virtual void SecondaryFire() override;
+
+	/**
+	 * C++ Attack firing functions
+	 */
 	
 	void RangeAttack();
 	void MeleeAttack();
+	void SecondaryAttack();
+
+	/**
+	 * Blueprint-implementable attack functions
+	 */
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnMeleeAttack();
@@ -42,6 +53,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRangedAttack();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnSecondaryAttack();
+	
+
+	/**
+	 * ENUM Weapon Mode switching (may be replaced with bools later
+	 */
+	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMode(EScytheWeaponMode NewMode);
 	
@@ -66,6 +85,9 @@ protected:
 	TSubclassOf<ABsProjectileBase> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	TSubclassOf<ABsProjectileBase> GrappleHookClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
@@ -83,6 +105,4 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float AttackDuration = 0.5f;
 	
-
-public:
 };

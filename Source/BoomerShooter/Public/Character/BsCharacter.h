@@ -72,6 +72,12 @@ protected:
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+
+	/**
+	 * @brief Uses secondary attack with the weapon
+	 */
+
+	void SecondaryAttack();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.

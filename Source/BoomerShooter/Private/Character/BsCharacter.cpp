@@ -79,6 +79,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Attack
 		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
 
+		// Secondary Attack
+		EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+
 		// Switch weapon attack mode
 		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 
@@ -177,6 +180,14 @@ void ABsCharacter::Attack()
 	if (Weapon)
 	{
 		Weapon->Fire();
+	}
+}
+
+void ABsCharacter::SecondaryAttack()
+{
+	if (Weapon)
+	{
+		Weapon->SecondaryFire();
 	}
 }
 

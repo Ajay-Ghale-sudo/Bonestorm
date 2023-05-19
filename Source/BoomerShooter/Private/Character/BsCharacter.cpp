@@ -38,6 +38,12 @@ void ABsCharacter::BeginPlay()
 		}
 	}
 
+	if (const UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+
+		SlideConfig.PreSlideHeight = Capsule->GetUnscaledCapsuleHalfHeight();
+	}
+	
 	JumpMaxCount = 2;
 }
 
@@ -45,6 +51,8 @@ void ABsCharacter::BeginPlay()
 void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	SlideTick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -76,6 +84,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Interact
 		EnhancedInputComponent->BindAction(InputConfig.InteractAction, ETriggerEvent::Started, this, &ABsCharacter::Interact);
+
+		// Sliding
+		EnhancedInputComponent->BindAction(InputConfig.SlideAction, ETriggerEvent::Started, this, &ABsCharacter::StartSliding);
 	}
 }
 
@@ -97,8 +108,11 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		FRotator Rotation = GetActorRotation();
 		Rotation.Pitch = 0.f;
 		const FVector FacingDirection = Rotation.GetNormalized().Vector();
-		AddMovementInput(FacingDirection, MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);		
+
+		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
+		
+		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
+		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);		
 	}
 }
 
@@ -116,6 +130,7 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 void ABsCharacter::Jump()
 {
 	Super::Jump();
+	StopSliding();
 }
 
 void ABsCharacter::Dash()
@@ -124,7 +139,8 @@ void ABsCharacter::Dash()
 	{
 		return;
 	}
-	
+
+	StopSliding();
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
 	if (Direction.IsZero())
@@ -136,7 +152,7 @@ void ABsCharacter::Dash()
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down
 
-	LaunchCharacter(Direction, true, true);
+	LaunchCharacter(Direction, false, false);
 
 	DashConfig.bDashEnabled = false;
 	if (const UWorld* World = GetWorld())
@@ -191,6 +207,64 @@ void ABsCharacter::Interact()
 				Interactable->Interact(this);
 			}
 		}
+	}
+}
+
+void ABsCharacter::StartSliding()
+{
+	if (SlideConfig.bSliding) return;
+	
+	if (GetVelocity().Size() >= SlideConfig.VelocityToStartSlide)
+	{
+		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			// Can't slide mid-air
+			if (MovementComponent->IsFalling()) return;
+			
+			SlideConfig.PreSlideGroundFriction = MovementComponent->GroundFriction;
+			MovementComponent->GroundFriction = SlideConfig.SlideFriction;
+		}
+		
+		SlideConfig.bSliding = true;
+
+		if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+		{
+			Capsule->SetCapsuleHalfHeight(SlideConfig.SlideHeight, true);
+		}
+
+		FVector Direction = GetVelocity();
+		Direction.Z = 0.f;
+		Direction.Normalize();
+		LaunchCharacter(Direction * SlideConfig.SlideStrength, false, false);
+	}
+}
+
+void ABsCharacter::StopSliding()
+{
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->GroundFriction = SlideConfig.PreSlideGroundFriction;
+	}
+	
+	SlideConfig.bSliding = false;
+}
+
+void ABsCharacter::SlideTick(float DeltaTime)
+{
+	if (SlideConfig.bSliding && GetVelocity().Size() < SlideConfig.VelocityToStopSlide)
+	{	
+		StopSliding();
+	}
+	
+	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
+	{
+		const float DesiredHeight = SlideConfig.bSliding ? SlideConfig.SlideHeight :SlideConfig.PreSlideHeight;
+		if (!FMath::IsNearlyEqual(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight))
+		{
+			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
+			Capsule->SetCapsuleHalfHeight(NewHeight, true);
+		}
+
 	}
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Weapon/BsWeaponBase.h"
+#include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "BsScythe.generated.h"
 
 
@@ -75,6 +76,9 @@ protected:
 	virtual void BeginPlay() override;
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
+
+	UFUNCTION()
+	void GrappleToLocation(FVector Location);
 	
 	UFUNCTION()
 	void OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -85,7 +89,7 @@ protected:
 	TSubclassOf<ABsProjectileBase> ProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	TSubclassOf<ABsProjectileBase> GrappleHookClass;
+	TSubclassOf<ABsGrappleProjectile> GrappleHookClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;

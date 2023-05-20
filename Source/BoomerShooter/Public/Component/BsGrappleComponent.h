@@ -3,14 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SphereComponent.h"
 #include "BsGrappleComponent.generated.h"
 
-class USphereComponent;
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class BOOMERSHOOTER_API UBsGrappleComponent : public UActorComponent
+class BOOMERSHOOTER_API UBsGrappleComponent : public USphereComponent
 {
 	GENERATED_BODY()
 
@@ -31,16 +30,7 @@ protected:
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
 
-
-protected:
-	/*
-	 * Protected UProperties
-	 */
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grapple")
-	USphereComponent* SphereComponent;
 
 
 	

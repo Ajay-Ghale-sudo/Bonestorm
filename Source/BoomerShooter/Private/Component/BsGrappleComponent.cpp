@@ -2,7 +2,6 @@
 
 
 #include "BoomerShooter/Public/Component/BsGrappleComponent.h"
-
 #include "Components/SphereComponent.h"
 
 
@@ -12,7 +11,6 @@ UBsGrappleComponent::UBsGrappleComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("GrappleCollision"));
 	
 
 	// ...
@@ -23,6 +21,8 @@ UBsGrappleComponent::UBsGrappleComponent()
 void UBsGrappleComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereOverlap);
+	OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
 	
 	
 }
@@ -30,11 +30,11 @@ void UBsGrappleComponent::BeginPlay()
 void UBsGrappleComponent::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Log, TEXT("Overlapped with grapple sphere component"));
+	
 }
 
 void UBsGrappleComponent::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	UE_LOG(LogTemp, Log, TEXT("Stopped overlapping with grapple sphere component"));
+
 }

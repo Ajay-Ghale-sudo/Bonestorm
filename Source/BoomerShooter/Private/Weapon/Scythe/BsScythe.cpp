@@ -2,6 +2,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Interfaces/ReceiveDamage.h"
+#include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 
 ABsScythe::ABsScythe()
@@ -83,9 +84,10 @@ void ABsScythe::SecondaryAttack()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = GetInstigator();
 		FTransform StartTransform = GetProjectileSpawnTransform();
-		if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(World->SpawnActor(GrappleHookClass, &StartTransform, SpawnParams)))
+		if (ABsGrappleProjectile* Projectile = Cast<ABsGrappleProjectile>(World->SpawnActor(GrappleHookClass, &StartTransform, SpawnParams)))
 		{
 			Projectile->SetOwner(GetOwner());
+			Projectile->OnGrappleComponentHit.AddDynamic(this, &ABsScythe::GrappleToLocation);
 		}
 	}	
 }
@@ -141,4 +143,9 @@ FTransform ABsScythe::GetProjectileSpawnTransform() const
 	SpawnTransform.SetLocation(Location);
 
 	return SpawnTransform;
+}
+
+void ABsScythe::GrappleToLocation(FVector Location)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Hit Location"))
 }

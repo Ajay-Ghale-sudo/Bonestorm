@@ -156,6 +156,7 @@ void ABsCharacter::Dash()
 
 	LaunchCharacter(Direction, false, false);
 	DashConfig.DashCharges--;
+	OnDashAmountChanged.Broadcast();
 	
 	DashConfig.bDashEnabled = false;
 	
@@ -192,6 +193,7 @@ void ABsCharacter::AddDashCharge()
 	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
 	{
 		DashConfig.DashCharges++;
+		OnDashAmountChanged.Broadcast();
 	}
 
 	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)

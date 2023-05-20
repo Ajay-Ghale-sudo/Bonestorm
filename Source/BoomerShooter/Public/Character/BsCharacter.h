@@ -14,6 +14,7 @@ class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
 
+DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -36,6 +37,9 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ABsWeaponBase* InWeapon);
+
+public:
+	FBsCharacterEvent OnDashAmountChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -156,4 +160,5 @@ protected:
 	ABsWeaponBase* Weapon;
 public:
 
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
 };

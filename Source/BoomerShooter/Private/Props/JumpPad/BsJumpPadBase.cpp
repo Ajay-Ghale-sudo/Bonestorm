@@ -44,13 +44,20 @@ void ABsJumpPadBase::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, A
 {
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		FVector LaunchVector = LaunchDirection->GetForwardVector() * JumpForce;
-		Character->LaunchCharacter(LaunchVector, false, false);
+		JumpPadEffect(Character);
 	}
 }
 
 void ABsJumpPadBase::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+}
+
+void ABsJumpPadBase::JumpPadEffect(ACharacter* Character)
+{
+	if (!Character || !bIsJumpPadActive) return;
+	
+	FVector LaunchVector = LaunchDirection->GetForwardVector() * JumpForce;
+	Character->LaunchCharacter(LaunchVector, bOverrideXYVelocity, bOverrideZVelocity);
 }
 

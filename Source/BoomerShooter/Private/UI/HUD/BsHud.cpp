@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Character/BsCharacter.h"
+#include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 
 
@@ -21,7 +22,7 @@ void ABsHud::BeginPlay()
 	Super::BeginPlay();
 
 	PlayerCharacter = Cast<ABsCharacter>(GetOwningPawn());
-	BindWidgets();
+	InitWidgets();
 }
 
 // Called every frame
@@ -30,17 +31,23 @@ void ABsHud::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ABsHud::BindWidgets()
+void ABsHud::InitWidgets()
 {
 	if (DashAmountWidgetClass)
 	{
-		DashAmountWidget = Cast<UBsDashAmountWidget>(CreateWidget<UBsDashAmountWidget>(GetWorld(), DashAmountWidgetClass));
+		DashAmountWidget = CreateWidget<UBsDashAmountWidget>(GetWorld(), DashAmountWidgetClass);
 		if (DashAmountWidget && PlayerCharacter)
 		{
 			DashAmountWidget->AddToViewport();
 			DashAmountWidget->SetOwningPlayer(GetOwningPlayerController());
 			PlayerCharacter->OnDashAmountChanged.AddUObject(this, &ABsHud::UpdateDashAmount);
 		}
+	}
+
+	if (CrosshairWidgetClass)
+	{
+		CrosshairWidget = CreateWidget<UBsCrosshairWidget>(GetWorld(), CrosshairWidgetClass);
+		CrosshairWidget->AddToViewport();
 	}
 }
 

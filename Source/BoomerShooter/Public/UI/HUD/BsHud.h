@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class UBsCrosshairWidget;
 class UBsDashAmountWidget;
 class ABsCharacter;
 class UUserWidget;
@@ -24,7 +25,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void BindWidgets();
+	void InitWidgets();
 	
 	UFUNCTION()
 	void UpdateDashAmount();
@@ -36,8 +37,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsDashAmountWidget"))
 	TSubclassOf<UUserWidget> DashAmountWidgetClass;
 
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	UBsDashAmountWidget* DashAmountWidget;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsCrosshairWidget"))
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsCrosshairWidget* CrosshairWidget;
 	
 public:
 

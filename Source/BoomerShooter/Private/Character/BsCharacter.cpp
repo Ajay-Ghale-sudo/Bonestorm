@@ -45,6 +45,8 @@ void ABsCharacter::BeginPlay()
 	}
 	
 	JumpMaxCount = 2;
+
+	DashConfig.DashCharges = DashConfig.MaxDashCharges;
 }
 
 // Called every frame
@@ -135,7 +137,7 @@ void ABsCharacter::Jump()
 
 void ABsCharacter::Dash()
 {
-	if (!DashConfig.bDashEnabled)
+	if (!DashConfig.bDashEnabled || DashConfig.DashCharges <= 0)
 	{
 		return;
 	}
@@ -153,15 +155,28 @@ void ABsCharacter::Dash()
 	Direction.Z = 0.f; // No Dashing Up/Down
 
 	LaunchCharacter(Direction, false, false);
-
+	DashConfig.DashCharges--;
+	
 	DashConfig.bDashEnabled = false;
+	
 	if (const UWorld* World = GetWorld())
 	{
-		World->GetTimerManager().SetTimer(
+		FTimerManager& TimerManager = World->GetTimerManager();
+		
+		TimerManager.SetTimer(
 			DashConfig.DashCooldownTimerHandle,
 			this,
 			&ABsCharacter::EnableDash,
 			DashConfig.DashCooldown,
+			false
+		);
+
+		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
+		TimerManager.SetTimer(
+			DashConfig.DashChargeTimerHandle,
+			this,
+			&ABsCharacter::AddDashCharge,
+			DashConfig.DashChargeRate,
 			false
 		);
 	}
@@ -170,6 +185,25 @@ void ABsCharacter::Dash()
 void ABsCharacter::EnableDash()
 {
 	DashConfig.bDashEnabled = true;
+}
+
+void ABsCharacter::AddDashCharge()
+{
+	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	{
+		DashConfig.DashCharges++;
+	}
+
+	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	{
+		GetWorldTimerManager().SetTimer(	
+			DashConfig.DashChargeTimerHandle,
+			this,
+			&ABsCharacter::AddDashCharge,
+			DashConfig.DashChargeRate,
+			false
+		);
+	}
 }
 
 void ABsCharacter::Attack()

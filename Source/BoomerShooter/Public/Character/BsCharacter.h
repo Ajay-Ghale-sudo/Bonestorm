@@ -69,6 +69,11 @@ protected:
 	void EnableDash();
 
 	/**
+	 * @brief Add Dash Charge
+	 */
+	void AddDashCharge();
+
+	/**
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();

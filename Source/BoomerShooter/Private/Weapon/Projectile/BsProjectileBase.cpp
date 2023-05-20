@@ -3,6 +3,7 @@
 
 #include "Weapon/Projectile/BsProjectileBase.h"
 
+#include "BoomerShooter.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -16,10 +17,13 @@ ABsProjectileBase::ABsProjectileBase()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("ProjectileMesh");
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SetRootComponent(ProjectileMesh);
-
+	
 	ProjectileCollision = CreateDefaultSubobject<USphereComponent>("ProjectileCollision");
 	ProjectileCollision->SetupAttachment(ProjectileMesh);
+	ProjectileCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ProjectileCollision->SetCollisionObjectType(ECC_Projectile);	
 }
 
 // Called when the game starts or when spawned

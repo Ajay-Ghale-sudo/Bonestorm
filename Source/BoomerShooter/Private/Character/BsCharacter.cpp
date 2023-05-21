@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Weapon/BsWeaponBase.h"
+#include "Weapon/Scythe/BsScythe.h"
 
 // Sets default values
 ABsCharacter::ABsCharacter()
@@ -51,6 +52,10 @@ void ABsCharacter::BeginPlay()
 void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (isGrappling)
+	{
+		Grappling();
+	}
 
 	SlideTick(DeltaTime);
 }
@@ -100,6 +105,10 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		Weapon->SetOwner(this);
 	}
+	if (ABsScythe* Scythe = Cast<ABsScythe>(Weapon))
+	{
+		Scythe->OnGrappleAttached.AddDynamic(this, &ABsCharacter::GrappleToLocation);
+	}
 }
 
 
@@ -132,6 +141,7 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
+	isGrappling = false;
 	Super::Jump();
 	StopSliding();
 }
@@ -142,7 +152,7 @@ void ABsCharacter::Dash()
 	{
 		return;
 	}
-
+	isGrappling = false;
 	StopSliding();
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
@@ -173,6 +183,32 @@ void ABsCharacter::Dash()
 void ABsCharacter::EnableDash()
 {
 	DashConfig.bDashEnabled = true;
+}
+
+void ABsCharacter::Grappling()
+{
+	
+	if (UWorld* World = GetWorld())
+	{
+		FVector CurrentVelocity = GetCharacterMovement()->GetLastUpdateVelocity();
+		CurrentVelocity.Z = 0.f;
+		GetCharacterMovement()->Velocity.Z = 0; 
+		FVector StartLocation = GetActorLocation();
+		FVector EndLocation = GrappleLocation;
+		FVector NewLocation = FMath::VInterpTo(StartLocation, EndLocation, World->GetDeltaSeconds(), 10.f);
+		SetActorLocation(NewLocation);
+		if (StartLocation.Equals(EndLocation))
+		{
+			isGrappling = false;
+		}
+	}
+}
+
+void ABsCharacter::GrappleToLocation(FVector Location)
+{
+	isGrappling = true;
+	GrappleLocation = Location;
+	Grappling();
 }
 
 void ABsCharacter::Attack()
@@ -278,6 +314,8 @@ void ABsCharacter::SlideTick(float DeltaTime)
 
 	}
 }
+
+
 
 
 

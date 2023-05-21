@@ -36,6 +36,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ABsWeaponBase* InWeapon);
+
+	/**
+	 * @brief Set Grapple Location
+	 */
+	UFUNCTION()
+	void GrappleToLocation(FVector Location);
 	
 protected:
 	// Called when the game starts or when spawned
@@ -67,6 +73,13 @@ protected:
 	 * @brief Enables dashing.
 	 */
 	void EnableDash();
+
+	/**
+	 * @brief Enables grapple
+	 */
+	void Grappling();
+
+	
 
 	/**
 	 * @brief Attacks with the weapon.
@@ -112,6 +125,8 @@ protected:
 	void SlideTick(float DeltaTime);
 
 	
+
+	
 	
 protected:
 	/**
@@ -155,6 +170,9 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
+
+	FVector GrappleLocation;
+	bool isGrappling = false;
 public:
 
 };

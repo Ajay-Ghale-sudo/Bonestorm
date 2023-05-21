@@ -6,8 +6,10 @@
 #include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "BsScythe.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsScytheGrappleAttachedEvent, FVector, Location);
 
 class UBoxComponent;
+class ABsProjectileBase;
 UENUM(BlueprintType)
 enum class EScytheWeaponMode : uint8
 {
@@ -18,7 +20,7 @@ enum class EScytheWeaponMode : uint8
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
-class ABsProjectileBase;
+
 
 /**
  * 
@@ -72,13 +74,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetAttacking(bool bNewAttacking);
 
+	/**
+	 * @brief Functions determining logic on grapple event
+	 */
+	UFUNCTION()
+	void SetGrappling(FVector Location);
+
+	FBsScytheGrappleAttachedEvent OnGrappleAttached;
+
+
 protected:
 	virtual void BeginPlay() override;
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
 
-	UFUNCTION()
-	void GrappleToLocation(FVector Location);
+	
 	
 	UFUNCTION()
 	void OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

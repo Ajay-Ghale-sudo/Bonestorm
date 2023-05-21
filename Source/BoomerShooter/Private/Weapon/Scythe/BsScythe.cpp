@@ -87,7 +87,7 @@ void ABsScythe::SecondaryAttack()
 		if (ABsGrappleProjectile* Projectile = Cast<ABsGrappleProjectile>(World->SpawnActor(GrappleHookClass, &StartTransform, SpawnParams)))
 		{
 			Projectile->SetOwner(GetOwner());
-			Projectile->OnGrappleComponentHit.AddDynamic(this, &ABsScythe::GrappleToLocation);
+			Projectile->OnGrappleComponentHit.AddDynamic(this, &ABsScythe::SetGrappling);
 		}
 	}	
 }
@@ -122,6 +122,12 @@ void ABsScythe::SetAttacking(bool bNewAttacking)
 	bIsAttacking = bNewAttacking;
 }
 
+void ABsScythe::SetGrappling(FVector Location)
+{
+	OnGrappleAttached.Broadcast(Location);
+}
+
+
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
@@ -143,9 +149,4 @@ FTransform ABsScythe::GetProjectileSpawnTransform() const
 	SpawnTransform.SetLocation(Location);
 
 	return SpawnTransform;
-}
-
-void ABsScythe::GrappleToLocation(FVector Location)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Hit Location"))
 }

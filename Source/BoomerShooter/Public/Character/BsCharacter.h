@@ -40,6 +40,7 @@ public:
 
 public:
 	FBsCharacterEvent OnDashAmountChanged;
+	FBsCharacterEvent OnDashEnabledChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -78,8 +79,13 @@ protected:
 	void AddDashCharge();
 
 	/**
+	 * @brief Checks if the player can dash
+	 */
+	bool CanDash();
+	/**
 	 * @brief Attacks with the weapon.
 	 */
+	
 	void Attack();
 	
 	/**
@@ -158,7 +164,10 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
+
+	
 public:
 
-	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }
+	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 };

@@ -8,6 +8,7 @@ class UBsCrosshairWidget;
 class UBsDashAmountWidget;
 class ABsCharacter;
 class UUserWidget;
+class UProgressBar;
 
 UCLASS()
 class BOOMERSHOOTER_API ABsHud : public AHUD
@@ -30,6 +31,13 @@ protected:
 	UFUNCTION()
 	void UpdateDashAmount();
 
+	UFUNCTION()
+	void UpdateDashCooldown();
+
+	UFUNCTION()
+	void RefreshDashWidget();
+
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	ABsCharacter* PlayerCharacter;
@@ -46,6 +54,8 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsCrosshairWidget* CrosshairWidget;
+
+	
 	
 public:
 

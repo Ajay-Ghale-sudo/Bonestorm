@@ -170,15 +170,15 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
-		AddDashCharge();
-	/*	TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
+		
+		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
 			this,
 			&ABsCharacter::AddDashCharge,
 			DashConfig.DashChargeRate,
 			false
-		); */
+		); 
 	}
 }
 
@@ -197,17 +197,22 @@ void ABsCharacter::AddDashCharge()
 	}
 
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
-	{/*
+	{
 		GetWorldTimerManager().SetTimer(	
 			DashConfig.DashChargeTimerHandle,
 			this,
 			&ABsCharacter::AddDashCharge,
 			DashConfig.DashChargeRate,
 			false
-		);*/
-		DashConfig.DashChargeTimerHandle = GetWorldTimerManager().SetTimerForNextTick(this, &ABsCharacter::AddDashCharge);
+		);
 		
 	}
+	/*	
+	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
+	{
+		DashConfig.DashChargeTimerHandle = GetWorldTimerManager().SetTimerForNextTick(this, &ABsCharacter::AddDashCharge);
+	}
+	*/
 	else
 	{
 		DashConfig.DashChargeTimerHandle.Invalidate();

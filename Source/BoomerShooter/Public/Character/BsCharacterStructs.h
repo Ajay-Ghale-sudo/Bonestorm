@@ -82,7 +82,7 @@ struct FBsDashConfig
 	float DashChargeRate = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	float DashChargeAmount = 2.0f;
+	float DashChargeAmount = 50.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashMinAmount = 0.f;

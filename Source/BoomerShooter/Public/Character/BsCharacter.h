@@ -14,6 +14,7 @@ class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
 
+DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -42,6 +43,9 @@ public:
 	 */
 	UFUNCTION()
 	void GrappleToLocation(FVector Location);
+
+public:
+	FBsCharacterEvent OnDashAmountChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -73,6 +77,11 @@ protected:
 	 * @brief Enables dashing.
 	 */
 	void EnableDash();
+
+	/**
+	 * @brief Add Dash Charge
+	 */
+	void AddDashCharge();
 
 	/**
 	 * @brief Enables grapple
@@ -175,4 +184,5 @@ protected:
 	bool isGrappling = false;
 public:
 
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
 };

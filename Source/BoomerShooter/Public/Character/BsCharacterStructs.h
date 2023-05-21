@@ -71,6 +71,17 @@ struct FBsDashConfig
 
 	// A flag to indicate if dashing is currently enabled.
 	bool bDashEnabled = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	int32 DashCharges = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	int32 MaxDashCharges = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeRate = 2.f;
+
+	FTimerHandle DashChargeTimerHandle;
 	
 };
 

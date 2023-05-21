@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -23,6 +24,7 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->bUsePawnControlRotation = true;
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
+	PlayerHealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("PlayerHealthComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -302,6 +304,11 @@ void ABsCharacter::SlideTick(float DeltaTime)
 		}
 
 	}
+}
+
+void ABsCharacter::SetHealth(float Value)
+{
+	
 }
 
 

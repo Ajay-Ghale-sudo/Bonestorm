@@ -13,6 +13,7 @@ class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
+class UBsHealthComponent;
 
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
@@ -114,6 +115,11 @@ protected:
 	 */
 	void SlideTick(float DeltaTime);
 
+	/**
+	 * @todo Have player health set upon take damage, or set upon healing
+	 */
+	void SetHealth(float Value);
+
 	
 	
 protected:
@@ -152,7 +158,19 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	UBsInventoryComponent* InventoryComponent;
+	
+	/**
+     * @brief Player Health Component
+     */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
+	UBsHealthComponent* PlayerHealthComponent;
 
+	/**
+	 * @todo For testing purposes only, will be replaced on health refactor
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
+	float PlayerHealth = 200.f;
+	
 	/**
 	 * @brief Currently Equipped Weapon.
 	 */

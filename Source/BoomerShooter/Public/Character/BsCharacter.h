@@ -38,12 +38,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ABsWeaponBase* InWeapon);
 
-	/**
-	 * @brief Set Grapple Location
-	 */
-	UFUNCTION()
-	void GrappleToLocation(FVector Location);
-
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	
@@ -86,7 +80,9 @@ protected:
 	/**
 	 * @brief Enables grapple
 	 */
-	void Grappling();
+	void StartGrapple();
+
+	void StopGrapple();
 
 	
 
@@ -181,7 +177,7 @@ protected:
 	ABsWeaponBase* Weapon;
 
 	FVector GrappleLocation;
-	bool isGrappling = false;
+	bool bGrappling = false;
 public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }

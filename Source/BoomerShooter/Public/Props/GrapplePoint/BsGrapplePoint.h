@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BsGrapplePoint.generated.h"
 
-class UBsGrappleComponent;
+class UBsGrapplePointComponent;
 
 UCLASS()
 class BOOMERSHOOTER_API ABsGrapplePoint : public AActor
@@ -22,7 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Grapple")
-	UBsGrappleComponent* GrappleComponent;
+	UBsGrapplePointComponent* GrappleArea;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Grapple")
 	UStaticMeshComponent* Mesh;

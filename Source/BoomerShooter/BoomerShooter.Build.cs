@@ -16,7 +16,6 @@ public class BoomerShooter : ModuleRules
 			"InputCore",
 			"UMG",
 			"SlateCore"
-			
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput" });

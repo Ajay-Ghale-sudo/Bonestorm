@@ -1,5 +1,7 @@
 #include "Weapon/Scythe/BsScythe.h"
 
+#include "Camera/CameraComponent.h"
+#include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "Weapon/Projectile/BsGrappleProjectile.h"
@@ -11,6 +13,9 @@ ABsScythe::ABsScythe()
 	MeleeCollision->SetupAttachment(WeaponMesh, FName("BladeSocket"));
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeleeCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+
+	GrappleHookComponent = CreateDefaultSubobject<UBsGrappleHookComponent>(TEXT("GrappleHookComponent"));
+	
 }
 
 
@@ -76,20 +81,19 @@ void ABsScythe::SecondaryAttack()
 {
 	// Spawn projectile
 	OnSecondaryAttack();
-	UWorld* World = GetWorld();
-	if (GrappleHookClass && World)
+	UWorld* World = GetWorld();	
+	
+	if (GrappleHookComponent && GetOwner())
 	{
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.Owner = GetOwner();
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = GetInstigator();
-		FTransform StartTransform = GetProjectileSpawnTransform();
-		if (ABsGrappleProjectile* Projectile = Cast<ABsGrappleProjectile>(World->SpawnActor(GrappleHookClass, &StartTransform, SpawnParams)))
+		GrappleHookComponent->DetachGrappleHook();
+		// TODO: Not guaranteed to get the FPS camera. The grapple hook needs to know to spawn relative to the camera's aim.
+		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
 		{
-			Projectile->SetOwner(GetOwner());
-			Projectile->OnGrappleComponentHit.AddDynamic(this, &ABsScythe::SetGrappling);
+			FVector StartLocation = CameraComponent->GetComponentLocation() + (CameraComponent->GetForwardVector() * 100.f);
+			GrappleHookComponent->FireGrappleHook(StartLocation, CameraComponent->GetForwardVector());
 		}
-	}	
+		
+	}
 }
 
 void ABsScythe::OnMeleeAttack_Implementation()
@@ -122,9 +126,19 @@ void ABsScythe::SetAttacking(bool bNewAttacking)
 	bIsAttacking = bNewAttacking;
 }
 
-void ABsScythe::SetGrappling(FVector Location)
+void ABsScythe::SetGrappling(bool bIsGrappling)
 {
-	OnGrappleAttached.Broadcast(Location);
+	bGrappling = bIsGrappling;
+}
+
+void ABsScythe::StartGrappling()
+{
+	bGrappling = true;
+}
+
+void ABsScythe::StopGrappling()
+{
+	bGrappling = false;
 }
 
 

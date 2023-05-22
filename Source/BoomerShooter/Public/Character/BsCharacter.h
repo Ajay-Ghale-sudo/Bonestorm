@@ -39,6 +39,7 @@ public:
 
 public:
 	FBsCharacterEvent OnDashAmountChanged;
+	FBsCharacterEvent OnDashEnabledChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -75,6 +76,11 @@ protected:
 	 * @brief Add Dash Charge
 	 */
 	void AddDashCharge();
+
+	/**
+	 * @brief Checks if the player can dash
+	 */
+	bool CanDash();
 
 	/**
 	 * @brief Enables grapple
@@ -173,5 +179,7 @@ protected:
 	
 	bool bGrappling = false;
 public:
-	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
+
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }
+	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 };

@@ -20,10 +20,10 @@ public:
 
 	virtual void Interact(AActor* Interactor) override;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	virtual void OpenDoor();
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	virtual void CloseDoor();
 
 public:
@@ -34,7 +34,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	void ToggleDoor();
 
 	

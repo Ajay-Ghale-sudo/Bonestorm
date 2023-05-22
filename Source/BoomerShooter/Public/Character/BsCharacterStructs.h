@@ -73,13 +73,26 @@ struct FBsDashConfig
 	bool bDashEnabled = true;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	int32 DashCharges = 0;
+	float DashCost = 33.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	int32 MaxDashCharges = 3;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashCurrentAmount;
 
+	// Maximum dash "stamina"
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	float DashChargeRate = 2.f;
+	float DashMaxAmount = 100.f;
+	
+	// Minimum dash "stamina"
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashMinAmount = 0.f;
+
+	// Dash recharge rate interval
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeRate = 0.005f;
+
+	// Base dash recharge amount per second
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeAmount = 25.f;
 
 	FTimerHandle DashChargeTimerHandle;
 	

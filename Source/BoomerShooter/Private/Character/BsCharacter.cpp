@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Component/BsGrappleHookComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -54,11 +55,6 @@ void ABsCharacter::BeginPlay()
 void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (isGrappling)
-	{
-		Grappling();
-	}
-
 	SlideTick(DeltaTime);
 }
 
@@ -107,9 +103,11 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		Weapon->SetOwner(this);
 	}
-	if (ABsScythe* Scythe = Cast<ABsScythe>(Weapon))
+	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
-		Scythe->OnGrappleAttached.AddDynamic(this, &ABsCharacter::GrappleToLocation);
+		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
+		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
 }
 
@@ -126,7 +124,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
-		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);		
+		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
 	}
 }
 
@@ -143,9 +141,10 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	isGrappling = false;
-	Super::Jump();
 	StopSliding();
+	StopGrapple();
+	
+	Super::Jump();
 }
 
 void ABsCharacter::Dash()
@@ -154,8 +153,10 @@ void ABsCharacter::Dash()
 	{
 		return;
 	}
-	isGrappling = false;
+
+	StopGrapple();
 	StopSliding();
+	
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
 	if (Direction.IsZero())
@@ -221,31 +222,27 @@ void ABsCharacter::AddDashCharge()
 	}
 }
 
-void ABsCharacter::Grappling()
+void ABsCharacter::StartGrapple()
 {
-	
-	if (UWorld* World = GetWorld())
+	StopSliding();
+	StopJumping();
+	bGrappling = true;
+}
+
+void ABsCharacter::StopGrapple()
+{
+	bGrappling = false;
+
+	if (Weapon)
 	{
-		FVector CurrentVelocity = GetCharacterMovement()->GetLastUpdateVelocity();
-		CurrentVelocity.Z = 0.f;
-		GetCharacterMovement()->Velocity.Z = 0; 
-		FVector StartLocation = GetActorLocation();
-		FVector EndLocation = GrappleLocation;
-		FVector NewLocation = FMath::VInterpTo(StartLocation, EndLocation, World->GetDeltaSeconds(), 10.f);
-		SetActorLocation(NewLocation);
-		if (StartLocation.Equals(EndLocation))
+		if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 		{
-			isGrappling = false;
+			GrappleHookComponent->DetachGrappleHook();
 		}
 	}
 }
 
-void ABsCharacter::GrappleToLocation(FVector Location)
-{
-	isGrappling = true;
-	GrappleLocation = Location;
-	Grappling();
-}
+
 
 void ABsCharacter::Attack()
 {

@@ -6,10 +6,11 @@
 #include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "BsScythe.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsScytheGrappleAttachedEvent, FVector, Location);
+class UBsGrappleHookComponent;
 
 class UBoxComponent;
 class ABsProjectileBase;
+
 UENUM(BlueprintType)
 enum class EScytheWeaponMode : uint8
 {
@@ -37,17 +38,13 @@ public:
 	
 	virtual void Fire() override;
 	virtual void SecondaryFire() override;
-
-	/**
-	 * C++ Attack firing functions
-	 */
 	
 	void RangeAttack();
 	void MeleeAttack();
 	void SecondaryAttack();
 
 	/**
-	 * Blueprint-implementable attack functions
+	 * Blueprint Events
 	 */
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -61,9 +58,8 @@ public:
 	
 
 	/**
-	 * ENUM Weapon Mode switching (may be replaced with bools later
+	 * @brief Sets the current weapon mode
 	 */
-	
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMode(EScytheWeaponMode NewMode);
 	
@@ -78,17 +74,20 @@ public:
 	 * @brief Functions determining logic on grapple event
 	 */
 	UFUNCTION()
-	void SetGrappling(FVector Location);
+	void SetGrappling(bool bIsGrappling);
 
-	FBsScytheGrappleAttachedEvent OnGrappleAttached;
+	UFUNCTION()
+	void StartGrappling();
+
+	UFUNCTION()
+	void StopGrappling();
+
 
 
 protected:
 	virtual void BeginPlay() override;
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
-
-	
 	
 	UFUNCTION()
 	void OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -98,8 +97,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	TSubclassOf<ABsProjectileBase> ProjectileClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	TSubclassOf<ABsGrappleProjectile> GrappleHookClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
+	UBsGrappleHookComponent* GrappleHookComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;
@@ -119,4 +118,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float AttackDuration = 0.5f;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
+	bool bGrappling = false;
 };

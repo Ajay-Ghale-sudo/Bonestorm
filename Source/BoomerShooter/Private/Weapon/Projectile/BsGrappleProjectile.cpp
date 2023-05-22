@@ -2,18 +2,60 @@
 
 
 #include "Weapon/Projectile/BsGrappleProjectile.h"
-#include "Component/BsGrappleComponent.h"
+#include "Component/BsGrapplePointComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+
+ABsGrappleProjectile::ABsGrappleProjectile()
+{
+
+}
+
+void ABsGrappleProjectile::BeginPlay()
+{
+	Super::BeginPlay();	
+}
 
 void ABsGrappleProjectile::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor)
 	{
-		if(const UBsGrappleComponent* GrappleComponent = OtherActor->FindComponentByClass<UBsGrappleComponent>())
+		if(const UBsGrapplePointComponent* GrapplePoint = OtherActor->FindComponentByClass<UBsGrapplePointComponent>())
 		{
-			const FVector GrappleHitLocation = GrappleComponent->GetComponentLocation();
-			OnGrappleComponentHit.Broadcast(GrappleHitLocation);
+			AttachToGrappleComponent(GrapplePoint);
+			return;
 		}
 	}
+	
+	Detach();
+}
+
+void ABsGrappleProjectile::AttachToGrappleComponent(const UBsGrapplePointComponent* GrapplePoint)
+{
+	SetActorEnableCollision(false);
+	DisableComponentsSimulatePhysics();
+	if (ProjectileCollision)
+	{
+		ProjectileCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ProjectileCollision->SetSimulatePhysics(false);
+		ProjectileCollision->SetEnableGravity(false);
+	}
+
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->StopMovementImmediately();
+		ProjectileMovement->bSimulationEnabled = false;
+		
+	}
+	OnGrappleComponentAttached.Broadcast();
+}
+
+
+
+void ABsGrappleProjectile::Detach()
+{
+	OnGrappleComponentDetached.Broadcast();
+	AttachedGrapplePoint = nullptr;
+	Destroy();
 }
 

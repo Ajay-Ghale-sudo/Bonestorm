@@ -2,36 +2,31 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Components/SphereComponent.h"
-#include "BsGrappleComponent.generated.h"
+#include "BsGrapplePointComponent.generated.h"
 
 
+class ABsGrappleProjectile;
 
+/**
+ * @brief A component that can be attached to an actor to allow a grapple hook to attach to it.
+ */
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class BOOMERSHOOTER_API UBsGrappleComponent : public USphereComponent
+class BOOMERSHOOTER_API UBsGrapplePointComponent : public USphereComponent
 {
 	GENERATED_BODY()
 
 	
 public:
 	// Sets default values for this component's properties
-	UBsGrappleComponent();
+	UBsGrapplePointComponent();
 	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	/*
-	 * Protected UFunctions
-	 */
-
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-
-
-	
 };

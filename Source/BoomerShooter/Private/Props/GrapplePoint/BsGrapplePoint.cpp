@@ -3,7 +3,7 @@
 
 #include "Props/GrapplePoint/BsGrapplePoint.h"
 
-#include "Component/BsGrappleComponent.h"
+#include "Component/BsGrapplePointComponent.h"
 
 
 // Sets default values
@@ -13,8 +13,8 @@ ABsGrapplePoint::ABsGrapplePoint()
 	PrimaryActorTick.bCanEverTick = false;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GrapplePoint"));
 	SetRootComponent(Mesh);
-	GrappleComponent = CreateDefaultSubobject<UBsGrappleComponent>(TEXT("GrappleComponent"));
-	GrappleComponent->SetupAttachment(Mesh);
+	GrappleArea = CreateDefaultSubobject<UBsGrapplePointComponent>(TEXT("GrappleComponent"));
+	GrappleArea->SetupAttachment(Mesh);
 }
 
 // Called when the game starts or when spawned

@@ -87,10 +87,10 @@ void ABsScythe::SecondaryAttack()
 		// TODO: Not guaranteed to get the FPS camera. The grapple hook needs to know to spawn relative to the camera's aim.
 		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
 		{
+			// Float multiplies forward vector, designating start location of the grapple component, preventing self-collision
 			FVector StartLocation = CameraComponent->GetComponentLocation() + (CameraComponent->GetForwardVector() * 100.f);
 			GrappleHookComponent->FireGrappleHook(StartLocation, CameraComponent->GetForwardVector());
 		}
-		
 	}
 }
 

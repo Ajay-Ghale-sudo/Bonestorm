@@ -81,6 +81,7 @@ protected:
 	/**
 	 * @brief Checks if the player can dash
 	 */
+	
 	bool CanDash();
 	/**
 	 * @brief Attacks with the weapon.
@@ -119,8 +120,6 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
-
-	
 	
 protected:
 	/**
@@ -165,7 +164,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
 
-	
 public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }

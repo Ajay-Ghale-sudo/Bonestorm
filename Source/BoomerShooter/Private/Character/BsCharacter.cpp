@@ -170,7 +170,6 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
-		
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -178,7 +177,7 @@ void ABsCharacter::Dash()
 			&ABsCharacter::AddDashCharge,
 			DashConfig.DashChargeRate,
 			false
-		); 
+		);
 	}
 }
 
@@ -195,7 +194,6 @@ void ABsCharacter::AddDashCharge()
 		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * GetWorld()->GetDeltaSeconds(), DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 	}
-
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
 		GetWorldTimerManager().SetTimer(	
@@ -205,19 +203,8 @@ void ABsCharacter::AddDashCharge()
 			DashConfig.DashChargeRate,
 			false
 		);
-		
 	}
-	/*	
-	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
-	{
-		DashConfig.DashChargeTimerHandle = GetWorldTimerManager().SetTimerForNextTick(this, &ABsCharacter::AddDashCharge);
-	}
-	*/
-	else
-	{
-		DashConfig.DashChargeTimerHandle.Invalidate();
-	}
-	
+	DashConfig.DashChargeTimerHandle.Invalidate();
 }
 
 bool ABsCharacter::CanDash()

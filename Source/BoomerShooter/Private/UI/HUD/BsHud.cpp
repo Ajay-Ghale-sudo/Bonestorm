@@ -23,7 +23,6 @@ void ABsHud::BeginPlay()
 
 	PlayerCharacter = Cast<ABsCharacter>(GetOwningPawn());
 	InitWidgets();
-	
 }
 
 // Called every frame

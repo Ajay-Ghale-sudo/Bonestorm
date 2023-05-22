@@ -87,11 +87,9 @@ struct FBsDashConfig
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashChargeRate = 0.005f;
 
-	// Base dash recharge amount (later multiplied by DeltaTime)
+	// Base dash recharge amount per second
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashChargeAmount = 25.f;
-
-	
 
 	FTimerHandle DashChargeTimerHandle;
 	

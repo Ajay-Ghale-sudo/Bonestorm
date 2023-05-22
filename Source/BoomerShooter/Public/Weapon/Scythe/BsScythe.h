@@ -21,8 +21,6 @@ enum class EScytheWeaponMode : uint8
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
-
-
 /**
  * 
  */
@@ -56,17 +54,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnSecondaryAttack();
 	
-
 	/**
 	 * @brief Sets the current weapon mode
 	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMode(EScytheWeaponMode NewMode);
 	
-
 	virtual void NextWeaponMode() override;
-
-
+	
 	UFUNCTION(BlueprintCallable)
 	void SetAttacking(bool bNewAttacking);
 
@@ -74,15 +69,10 @@ public:
 	 * @brief Functions determining logic on grapple event
 	 */
 	UFUNCTION()
-	void SetGrappling(bool bIsGrappling);
-
-	UFUNCTION()
 	void StartGrappling();
 
 	UFUNCTION()
 	void StopGrappling();
-
-
 
 protected:
 	virtual void BeginPlay() override;

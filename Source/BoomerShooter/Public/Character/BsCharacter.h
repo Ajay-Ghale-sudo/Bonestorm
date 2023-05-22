@@ -8,7 +8,6 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
-
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -81,10 +80,11 @@ protected:
 	 * @brief Enables grapple
 	 */
 	void StartGrapple();
-
-	void StopGrapple();
-
 	
+	/**
+	 * @brief Disabled grapple
+	 */
+	void StopGrapple();
 
 	/**
 	 * @brief Attacks with the weapon.
@@ -94,7 +94,6 @@ protected:
 	/**
 	 * @brief Uses secondary attack with the weapon
 	 */
-
 	void SecondaryAttack();
 	
 	/**
@@ -128,10 +127,6 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
-
-	
-
-	
 	
 protected:
 	/**
@@ -175,10 +170,8 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
-
-	FVector GrappleLocation;
+	
 	bool bGrappling = false;
 public:
-
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
 };

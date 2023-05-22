@@ -344,11 +344,5 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
-
 	}
 }
-
-
-
-
-

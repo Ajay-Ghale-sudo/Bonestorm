@@ -88,7 +88,6 @@ void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
 		// TODO: Review ways that still allow character movement influence
 		FVector Movement = Direction * GrappleHookProperties.PullForce;
 		EffectedCharacter->LaunchCharacter(Movement, true, true);
-		// EffectedCharacter->GetCharacterMovement()->AddForce(Movement);
 		
 		GrappleHookProperties.GrapplePullTimerHandle =
 			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerToGrapplePoint);
@@ -123,9 +122,10 @@ bool UBsGrappleHookComponent::OwnerCanSeeGrapplePoint() const
 {
 	if (!GrappleHookProperties.GrappleProjectile)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("GrappleProjectile is null"));
+		UE_LOG(LogTemp, Log, TEXT("Grapple projectile is null"))
 		return false;
 	}
+	if (!GetOwner()) return false;
 	
 	// Can we still see the grapple point?
 	if (const UWorld* World = GetWorld())
@@ -136,6 +136,7 @@ bool UBsGrappleHookComponent::OwnerCanSeeGrapplePoint() const
 		TArray<AActor*> AttachedActors;
 		GetOwner()->GetAttachedActors(AttachedActors);
 		CollisionParameters.AddIgnoredActors(AttachedActors);
+		
 		if (AActor* GrapplePoint = GrappleHookProperties.GrappleProjectile->GetGrapplePointActor())
 		{
 			CollisionParameters.AddIgnoredActor(GrapplePoint);

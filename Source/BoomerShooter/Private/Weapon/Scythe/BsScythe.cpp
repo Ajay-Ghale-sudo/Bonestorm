@@ -18,7 +18,6 @@ ABsScythe::ABsScythe()
 	
 }
 
-
 void ABsScythe::BeginPlay()
 {
 	Super::BeginPlay();
@@ -28,7 +27,6 @@ void ABsScythe::BeginPlay()
 		MeleeCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsScythe::OnScytheOverlap);
 	}
 }
-
 
 void ABsScythe::Fire()
 {
@@ -126,11 +124,6 @@ void ABsScythe::SetAttacking(bool bNewAttacking)
 	bIsAttacking = bNewAttacking;
 }
 
-void ABsScythe::SetGrappling(bool bIsGrappling)
-{
-	bGrappling = bIsGrappling;
-}
-
 void ABsScythe::StartGrappling()
 {
 	bGrappling = true;
@@ -140,7 +133,6 @@ void ABsScythe::StopGrappling()
 {
 	bGrappling = false;
 }
-
 
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)

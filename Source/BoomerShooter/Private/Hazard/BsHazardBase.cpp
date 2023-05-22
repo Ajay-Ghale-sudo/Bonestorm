@@ -35,9 +35,16 @@ void ABsHazardBase::BeginPlay()
 
 void ABsHazardBase::DamageTick()
 {
-	for (auto DamageReceiver : OverlappingActors)
+	for (int32 index = 0; index < OverlappingActors.Num(); ++index)
 	{
-		DamageReceiver->ReceiveHazardDamage(this, Damage);
+		if (OverlappingActors[index] == nullptr)
+		{
+			OverlappingActors.RemoveAt(index);
+		}
+		else
+		{
+			OverlappingActors[index]->ReceiveHazardDamage(this, Damage);
+		}
 	}
 }
 

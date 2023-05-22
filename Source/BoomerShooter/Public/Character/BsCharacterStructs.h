@@ -38,6 +38,9 @@ struct FBsInputConfig
 	UInputAction* AttackModeSwitchAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SecondaryAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -68,6 +71,30 @@ struct FBsDashConfig
 
 	// A flag to indicate if dashing is currently enabled.
 	bool bDashEnabled = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashCost = 33.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashCurrentAmount;
+
+	// Maximum dash "stamina"
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashMaxAmount = 100.f;
+	
+	// Minimum dash "stamina"
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashMinAmount = 0.f;
+
+	// Dash recharge rate interval
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeRate = 0.005f;
+
+	// Base dash recharge amount per second
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeAmount = 25.f;
+
+	FTimerHandle DashChargeTimerHandle;
 	
 };
 

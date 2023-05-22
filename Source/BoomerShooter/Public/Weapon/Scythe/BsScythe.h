@@ -3,20 +3,23 @@
 #pragma once
 
 #include "Weapon/BsWeaponBase.h"
+#include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "BsScythe.generated.h"
 
+class UBsGrappleHookComponent;
 
 class UBoxComponent;
+class ABsProjectileBase;
+
 UENUM(BlueprintType)
 enum class EScytheWeaponMode : uint8
 {
 	ESWM_Melee UMETA(DisplayName = "Melee"),
 	ESWM_Range UMETA(DisplayName = "Range"),
+	ESWM_Thrown UMETA(DisplayName = "Thrown"),
 
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
-
-class ABsProjectileBase;
 
 /**
  * 
@@ -32,9 +35,15 @@ public:
 	ABsScythe();
 	
 	virtual void Fire() override;
+	virtual void SecondaryFire() override;
 	
 	void RangeAttack();
 	void MeleeAttack();
+	void SecondaryAttack();
+
+	/**
+	 * Blueprint Events
+	 */
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnMeleeAttack();
@@ -42,15 +51,28 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRangedAttack();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnSecondaryAttack();
+	
+	/**
+	 * @brief Sets the current weapon mode
+	 */
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponMode(EScytheWeaponMode NewMode);
 	
-
 	virtual void NextWeaponMode() override;
-
-
+	
 	UFUNCTION(BlueprintCallable)
 	void SetAttacking(bool bNewAttacking);
+
+	/**
+	 * @brief Functions determining logic on grapple event
+	 */
+	UFUNCTION()
+	void StartGrappling();
+
+	UFUNCTION()
+	void StopGrappling();
 
 protected:
 	virtual void BeginPlay() override;
@@ -64,6 +86,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	TSubclassOf<ABsProjectileBase> ProjectileClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
+	UBsGrappleHookComponent* GrappleHookComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;
@@ -83,6 +108,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float AttackDuration = 0.5f;
 	
-
-public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
+	bool bGrappling = false;
 };

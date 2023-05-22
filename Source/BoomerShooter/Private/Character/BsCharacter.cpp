@@ -5,11 +5,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Component/BsGrappleHookComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Weapon/BsWeaponBase.h"
+#include "Weapon/Scythe/BsScythe.h"
 
 // Sets default values
 ABsCharacter::ABsCharacter()
@@ -52,7 +54,6 @@ void ABsCharacter::BeginPlay()
 void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	SlideTick(DeltaTime);
 }
 
@@ -80,6 +81,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Attack
 		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
 
+		// Secondary Attack
+		EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+
 		// Switch weapon attack mode
 		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 
@@ -98,6 +102,12 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		Weapon->SetOwner(this);
 	}
+	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
+	{
+		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
+		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
+	}
 }
 
 
@@ -113,7 +123,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
-		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);		
+		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
 	}
 }
 
@@ -130,8 +140,10 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	Super::Jump();
 	StopSliding();
+	StopGrapple();
+	
+	Super::Jump();
 }
 
 void ABsCharacter::Dash()
@@ -141,7 +153,9 @@ void ABsCharacter::Dash()
 		return;
 	}
 
+	StopGrapple();
 	StopSliding();
+	
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
 	if (Direction.IsZero())
@@ -216,11 +230,41 @@ bool ABsCharacter::CanDash()
 	return true;
 }
 
+void ABsCharacter::StartGrapple()
+{
+	StopSliding();
+	StopJumping();
+	bGrappling = true;
+}
+
+void ABsCharacter::StopGrapple()
+{
+	bGrappling = false;
+
+	if (Weapon)
+	{
+		if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
+		{
+			GrappleHookComponent->DetachGrappleHook();
+		}
+	}
+}
+
+
+
 void ABsCharacter::Attack()
 {
 	if (Weapon)
 	{
 		Weapon->Fire();
+	}
+}
+
+void ABsCharacter::SecondaryAttack()
+{
+	if (Weapon)
+	{
+		Weapon->SecondaryFire();
 	}
 }
 
@@ -308,9 +352,5 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
-
 	}
 }
-
-
-

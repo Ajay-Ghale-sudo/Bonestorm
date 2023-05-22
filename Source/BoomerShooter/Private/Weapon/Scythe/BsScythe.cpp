@@ -1,7 +1,10 @@
 #include "Weapon/Scythe/BsScythe.h"
 
+#include "Camera/CameraComponent.h"
+#include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
 #include "Interfaces/ReceiveDamage.h"
+#include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 
 ABsScythe::ABsScythe()
@@ -10,8 +13,10 @@ ABsScythe::ABsScythe()
 	MeleeCollision->SetupAttachment(WeaponMesh, FName("BladeSocket"));
 	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	MeleeCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
-}
 
+	GrappleHookComponent = CreateDefaultSubobject<UBsGrappleHookComponent>(TEXT("GrappleHookComponent"));
+	
+}
 
 void ABsScythe::BeginPlay()
 {
@@ -22,7 +27,6 @@ void ABsScythe::BeginPlay()
 		MeleeCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsScythe::OnScytheOverlap);
 	}
 }
-
 
 void ABsScythe::Fire()
 {
@@ -37,6 +41,14 @@ void ABsScythe::Fire()
 	{
 		RangeAttack();
 	}
+}
+
+void ABsScythe::SecondaryFire()
+{
+	if (!bCanAttack) return;
+	Super::SecondaryFire();
+	SecondaryAttack();
+	UE_LOG(LogTemp, Log, TEXT("Firing secondary"))
 }
 
 void ABsScythe::RangeAttack()
@@ -63,12 +75,36 @@ void ABsScythe::MeleeAttack()
 	OnMeleeAttack();
 }
 
+void ABsScythe::SecondaryAttack()
+{
+	// Spawn projectile
+	OnSecondaryAttack();
+	UWorld* World = GetWorld();	
+	
+	if (GrappleHookComponent && GetOwner())
+	{
+		GrappleHookComponent->DetachGrappleHook();
+		// TODO: Not guaranteed to get the FPS camera. The grapple hook needs to know to spawn relative to the camera's aim.
+		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
+		{
+			// Float multiplies forward vector, designating start location of the grapple component, preventing self-collision
+			FVector StartLocation = CameraComponent->GetComponentLocation() + (CameraComponent->GetForwardVector() * 100.f);
+			GrappleHookComponent->FireGrappleHook(StartLocation, CameraComponent->GetForwardVector());
+		}
+	}
+}
+
 void ABsScythe::OnMeleeAttack_Implementation()
 {
 	
 }
 
 void ABsScythe::OnRangedAttack_Implementation()
+{
+	
+}
+
+void ABsScythe::OnSecondaryAttack_Implementation()
 {
 	
 }
@@ -86,6 +122,16 @@ void ABsScythe::NextWeaponMode()
 void ABsScythe::SetAttacking(bool bNewAttacking)
 {
 	bIsAttacking = bNewAttacking;
+}
+
+void ABsScythe::StartGrappling()
+{
+	bGrappling = true;
+}
+
+void ABsScythe::StopGrappling()
+{
+	bGrappling = false;
 }
 
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

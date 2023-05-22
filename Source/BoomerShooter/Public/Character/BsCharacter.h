@@ -8,7 +8,6 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
-
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -84,9 +83,24 @@ protected:
 	bool CanDash();
 
 	/**
+	 * @brief Enables grapple
+	 */
+	void StartGrapple();
+	
+	/**
+	 * @brief Disabled grapple
+	 */
+	void StopGrapple();
+
+	/**
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+
+	/**
+	 * @brief Uses secondary attack with the weapon
+	 */
+	void SecondaryAttack();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.
@@ -162,7 +176,8 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
-
+	
+	bool bGrappling = false;
 public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }

@@ -45,8 +45,7 @@ void ABsCharacter::BeginPlay()
 	}
 	
 	JumpMaxCount = 2;
-
-	DashConfig.DashCharges = DashConfig.MaxDashCharges;
+	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
 }
 
 // Called every frame
@@ -137,7 +136,7 @@ void ABsCharacter::Jump()
 
 void ABsCharacter::Dash()
 {
-	if (!DashConfig.bDashEnabled || DashConfig.DashCharges <= 0)
+	if (!CanDash())
 	{
 		return;
 	}
@@ -155,10 +154,10 @@ void ABsCharacter::Dash()
 	Direction.Z = 0.f; // No Dashing Up/Down
 
 	LaunchCharacter(Direction, false, false);
-	DashConfig.DashCharges--;
+	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
 	OnDashAmountChanged.Broadcast();
-	
 	DashConfig.bDashEnabled = false;
+	OnDashEnabledChanged.Broadcast();
 	
 	if (const UWorld* World = GetWorld())
 	{
@@ -171,7 +170,6 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
-
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -186,17 +184,17 @@ void ABsCharacter::Dash()
 void ABsCharacter::EnableDash()
 {
 	DashConfig.bDashEnabled = true;
+	OnDashEnabledChanged.Broadcast();
 }
 
 void ABsCharacter::AddDashCharge()
 {
-	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
-		DashConfig.DashCharges++;
+		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * GetWorld()->GetDeltaSeconds(), DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 	}
-
-	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
 		GetWorldTimerManager().SetTimer(	
 			DashConfig.DashChargeTimerHandle,
@@ -206,6 +204,16 @@ void ABsCharacter::AddDashCharge()
 			false
 		);
 	}
+	DashConfig.DashChargeTimerHandle.Invalidate();
+}
+
+bool ABsCharacter::CanDash()
+{
+	if (!DashConfig.bDashEnabled || DashConfig.DashCurrentAmount <= DashConfig.DashCost)
+	{
+		return false;
+	}
+	return true;
 }
 
 void ABsCharacter::Attack()

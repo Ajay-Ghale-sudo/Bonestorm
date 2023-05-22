@@ -41,6 +41,9 @@ void ABsHud::InitWidgets()
 			DashAmountWidget->AddToViewport();
 			DashAmountWidget->SetOwningPlayer(GetOwningPlayerController());
 			PlayerCharacter->OnDashAmountChanged.AddUObject(this, &ABsHud::UpdateDashAmount);
+			PlayerCharacter->OnDashEnabledChanged.AddUObject(this, &ABsHud::UpdateDashCooldown);
+			// TODO: Find a method of solving race condition
+			GetWorldTimerManager().SetTimerForNextTick(this, &ABsHud::RefreshDashWidget);
 		}
 	}
 
@@ -57,4 +60,18 @@ void ABsHud::UpdateDashAmount()
 	{
 		DashAmountWidget->SetDashAmount(PlayerCharacter->GetDashAmount());
 	}
+}
+
+void ABsHud::UpdateDashCooldown()
+{
+	if (DashAmountWidget && PlayerCharacter)
+	{
+		DashAmountWidget->SetDashEnabled(PlayerCharacter->GetDashEnabled());
+	}
+}
+
+void ABsHud::RefreshDashWidget()
+{
+	UpdateDashAmount();
+	UpdateDashCooldown();
 }

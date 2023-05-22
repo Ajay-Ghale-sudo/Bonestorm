@@ -81,12 +81,11 @@ protected:
 	/**
 	 * @brief Checks if the player can dash
 	 */
-	
 	bool CanDash();
+
 	/**
 	 * @brief Attacks with the weapon.
 	 */
-	
 	void Attack();
 	
 	/**

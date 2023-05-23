@@ -8,7 +8,6 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
-
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -40,6 +39,7 @@ public:
 
 public:
 	FBsCharacterEvent OnDashAmountChanged;
+	FBsCharacterEvent OnDashEnabledChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -78,9 +78,29 @@ protected:
 	void AddDashCharge();
 
 	/**
+	 * @brief Checks if the player can dash
+	 */
+	bool CanDash();
+
+	/**
+	 * @brief Enables grapple
+	 */
+	void StartGrapple();
+	
+	/**
+	 * @brief Disabled grapple
+	 */
+	void StopGrapple();
+
+	/**
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+
+	/**
+	 * @brief Uses secondary attack with the weapon
+	 */
+	void SecondaryAttack();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.
@@ -113,8 +133,6 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
-
-	
 	
 protected:
 	/**
@@ -158,7 +176,10 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
+	
+	bool bGrappling = false;
 public:
 
-	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }
+	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 };

@@ -5,11 +5,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Component/BsGrappleHookComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Weapon/BsWeaponBase.h"
+#include "Weapon/Scythe/BsScythe.h"
 
 // Sets default values
 ABsCharacter::ABsCharacter()
@@ -45,15 +47,13 @@ void ABsCharacter::BeginPlay()
 	}
 	
 	JumpMaxCount = 2;
-
-	DashConfig.DashCharges = DashConfig.MaxDashCharges;
+	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
 }
 
 // Called every frame
 void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 	SlideTick(DeltaTime);
 }
 
@@ -81,6 +81,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		// Attack
 		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
 
+		// Secondary Attack
+		EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+
 		// Switch weapon attack mode
 		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 
@@ -99,6 +102,12 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		Weapon->SetOwner(this);
 	}
+	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
+	{
+		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
+		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
+	}
 }
 
 
@@ -114,7 +123,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
-		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);		
+		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
 	}
 }
 
@@ -131,18 +140,22 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	Super::Jump();
 	StopSliding();
+	StopGrapple();
+	
+	Super::Jump();
 }
 
 void ABsCharacter::Dash()
 {
-	if (!DashConfig.bDashEnabled || DashConfig.DashCharges <= 0)
+	if (!CanDash())
 	{
 		return;
 	}
 
+	StopGrapple();
 	StopSliding();
+	
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
 	if (Direction.IsZero())
@@ -155,10 +168,10 @@ void ABsCharacter::Dash()
 	Direction.Z = 0.f; // No Dashing Up/Down
 
 	LaunchCharacter(Direction, false, false);
-	DashConfig.DashCharges--;
+	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
 	OnDashAmountChanged.Broadcast();
-	
 	DashConfig.bDashEnabled = false;
+	OnDashEnabledChanged.Broadcast();
 	
 	if (const UWorld* World = GetWorld())
 	{
@@ -171,7 +184,6 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
-
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -186,17 +198,17 @@ void ABsCharacter::Dash()
 void ABsCharacter::EnableDash()
 {
 	DashConfig.bDashEnabled = true;
+	OnDashEnabledChanged.Broadcast();
 }
 
 void ABsCharacter::AddDashCharge()
 {
-	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
-		DashConfig.DashCharges++;
+		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * GetWorld()->GetDeltaSeconds(), DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 	}
-
-	if (DashConfig.DashCharges < DashConfig.MaxDashCharges)
+	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
 		GetWorldTimerManager().SetTimer(	
 			DashConfig.DashChargeTimerHandle,
@@ -206,13 +218,53 @@ void ABsCharacter::AddDashCharge()
 			false
 		);
 	}
+	DashConfig.DashChargeTimerHandle.Invalidate();
 }
+
+bool ABsCharacter::CanDash()
+{
+	if (!DashConfig.bDashEnabled || DashConfig.DashCurrentAmount <= DashConfig.DashCost)
+	{
+		return false;
+	}
+	return true;
+}
+
+void ABsCharacter::StartGrapple()
+{
+	StopSliding();
+	StopJumping();
+	bGrappling = true;
+}
+
+void ABsCharacter::StopGrapple()
+{
+	bGrappling = false;
+
+	if (Weapon)
+	{
+		if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
+		{
+			GrappleHookComponent->DetachGrappleHook();
+		}
+	}
+}
+
+
 
 void ABsCharacter::Attack()
 {
 	if (Weapon)
 	{
 		Weapon->Fire();
+	}
+}
+
+void ABsCharacter::SecondaryAttack()
+{
+	if (Weapon)
+	{
+		Weapon->SecondaryFire();
 	}
 }
 
@@ -300,9 +352,5 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
-
 	}
 }
-
-
-

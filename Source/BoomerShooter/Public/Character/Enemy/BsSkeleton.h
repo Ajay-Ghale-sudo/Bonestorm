@@ -20,9 +20,6 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void TriggerRagdoll();
-
 	virtual void Die() override;
 
 public:

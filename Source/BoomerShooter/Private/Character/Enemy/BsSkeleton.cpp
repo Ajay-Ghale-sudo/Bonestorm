@@ -20,29 +20,9 @@ void ABsSkeleton::BeginPlay()
 	
 }
 
-void ABsSkeleton::TriggerRagdoll()
-{
-	if (USkeletalMeshComponent* CurrentMesh = GetMesh())
-	{
-		
-		CurrentMesh->SetSimulatePhysics(true);
-		CurrentMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-		CurrentMesh->SetAllBodiesBelowSimulatePhysics(FName("Pelvis"), true, true);
-		CurrentMesh->SetCollisionResponseToAllChannels(ECR_Block);
-		CurrentMesh->SetSimulatePhysics(true);
-		CurrentMesh->SetPhysicsBlendWeight(0.75f);
-		//CurrentMesh->WakeAllRigidBodies();
-	}
-	if (UCapsuleComponent* CurrentCapsule = GetCapsuleComponent())
-	{
-		CurrentCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-}
-
 void ABsSkeleton::Die()
 {
 	Super::Die();
-	TriggerRagdoll();
 }
 
 // Called every frame

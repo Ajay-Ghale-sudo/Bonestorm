@@ -19,6 +19,12 @@ struct FProjectileDamageProperties
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float ProjectileSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float ProjectileLifeTime = 15.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
 	
 };
 
@@ -64,5 +70,6 @@ protected:
 	FProjectileDamageProperties ProjectileDamageProperties;
 
 public:
-
+	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	FORCEINLINE FProjectileDamageProperties GetProjectileDamageProperties() const { return ProjectileDamageProperties; }
 };

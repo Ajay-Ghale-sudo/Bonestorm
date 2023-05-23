@@ -12,6 +12,7 @@ class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
+class ABsSeveredHeadBase;
 
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
@@ -133,6 +134,9 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
+
+	UFUNCTION()
+	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
 	
 protected:
 	/**

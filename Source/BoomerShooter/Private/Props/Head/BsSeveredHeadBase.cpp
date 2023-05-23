@@ -3,6 +3,8 @@
 
 #include "Props/Head/BsSeveredHeadBase.h"
 
+#include "Component/BsInventoryComponent.h"
+
 
 // Sets default values
 ABsSeveredHeadBase::ABsSeveredHeadBase()
@@ -19,6 +21,22 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 void ABsSeveredHeadBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (HeadMesh)
+	{
+		HeadMesh->OnComponentBeginOverlap.AddDynamic(this, &ABsSeveredHeadBase::OnMeshOverlapBegin);
+	}
 	
 }
+
+
+void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
+{
+	if (UBsInventoryComponent* Inventory = OtherActor->FindComponentByClass<UBsInventoryComponent>())
+	{
+		Inventory->AddSeveredHead(this);
+	}
+}
+
 

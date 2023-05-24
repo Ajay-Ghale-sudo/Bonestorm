@@ -26,6 +26,11 @@ void ABsScythe::BeginPlay()
 	{
 		MeleeCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsScythe::OnScytheOverlap);
 	}
+
+	if (GrappleHookComponent)
+	{
+		GrappleHookComponent->SetGrappleFXAttachPoint(WeaponMesh);
+	}	
 }
 
 void ABsScythe::Fire()

@@ -4,7 +4,7 @@
 #include "Weapon/Projectile/BsProjectileFireball.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
-
+#include "Interfaces/ReceiveDamage.h"
 
 
 // Sets default values
@@ -23,6 +23,14 @@ void ABsProjectileFireball::BeginPlay()
 	ShowProjectileFX();
 }
 
+void ABsProjectileFireball::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{	
+	if (IReceiveDamage* ReceiveDamageActor = Cast<IReceiveDamage>(OtherActor))
+	{
+		ReceiveDamageActor->ReceiveProjectileDamage(SweepResult, this, ProjectileDamageProperties.ProjectileDamage);
+	}
+}
 
 
 void ABsProjectileFireball::Impact()

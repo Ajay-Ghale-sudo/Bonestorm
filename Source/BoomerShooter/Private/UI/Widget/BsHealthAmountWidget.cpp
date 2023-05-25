@@ -3,7 +3,28 @@
 
 #include "UI/Widget/BsHealthAmountWidget.h"
 
-void UBsHealthAmountWidget::SetHealthAmount_Implementation(float Value)
+#include "Component/BsHealthComponent.h"
+
+void UBsHealthAmountWidget::BindToHealthComponent(UBsHealthComponent* InHealthComponent)
 {
-	
+	this->HealthComponent = InHealthComponent;
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChanged.AddDynamic(this, &UBsHealthAmountWidget::RefreshHealthAmount);
+		RefreshHealthAmount();
+	}
+}
+
+void UBsHealthAmountWidget::RefreshHealthAmount()
+{
+	if (HealthComponent)
+	{
+		HealthAmount = HealthComponent->GetCurrentHealth();
+		MaxHealthAmount = HealthComponent->GetMaxHealth();
+		UpdateWidget();
+	}
+}
+
+void UBsHealthAmountWidget::UpdateWidget_Implementation()
+{
 }

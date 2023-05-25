@@ -2,9 +2,11 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "BsHealthAmountWidget.generated.h"
+
+
+class UBsHealthComponent;
 
 /**
  * 
@@ -15,7 +17,21 @@ class BOOMERSHOOTER_API UBsHealthAmountWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void BindToHealthComponent(UBsHealthComponent* InHealthComponent);
+	void RefreshHealthAmount();
+
+protected:
 	UFUNCTION(BlueprintNativeEvent)
-	void SetHealthAmount(float Value);
+	void UpdateWidget();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	UBsHealthComponent* HealthComponent;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float HealthAmount = 1.f;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float MaxHealthAmount = 1.f;
 	
 };

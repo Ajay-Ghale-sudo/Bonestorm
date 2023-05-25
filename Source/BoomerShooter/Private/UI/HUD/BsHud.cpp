@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Character/BsCharacter.h"
+#include "Component/BsHealthComponent.h"
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
@@ -50,10 +51,15 @@ void ABsHud::InitWidgets()
 		CrosshairWidget = CreateWidget<UBsCrosshairWidget>(GetWorld(), CrosshairWidgetClass);
 		CrosshairWidget->AddToViewport();
 	}
-	if (HealthAmountWidget)
+	
+	if (HealthAmountWidgetClass && PlayerCharacter)
 	{
 		HealthAmountWidget = CreateWidget<UBsHealthAmountWidget>(GetWorld(), HealthAmountWidgetClass);
-		HealthAmountWidget->AddToViewport();
+		if (HealthAmountWidget)
+		{
+			HealthAmountWidget->BindToHealthComponent(PlayerCharacter->FindComponentByClass<UBsHealthComponent>());
+			HealthAmountWidget->AddToViewport();
+		}
 	}
 }
 

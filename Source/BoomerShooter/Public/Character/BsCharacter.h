@@ -163,7 +163,7 @@ protected:
      * @brief Player Health Component
      */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
-	UBsHealthComponent* PlayerHealthComponent;
+	UBsHealthComponent* HealthComponent;
 
 	/**
 	 * @todo For testing purposes only, will be replaced on health refactor

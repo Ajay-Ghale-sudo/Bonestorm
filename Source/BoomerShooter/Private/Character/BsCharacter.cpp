@@ -24,7 +24,7 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->bUsePawnControlRotation = true;
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
-	PlayerHealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("PlayerHealthComponent"));
+	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
 }
 
 // Called when the game starts or when spawned

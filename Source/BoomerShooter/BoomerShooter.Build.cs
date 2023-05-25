@@ -15,7 +15,8 @@ public class BoomerShooter : ModuleRules
 			"Engine",
 			"InputCore",
 			"UMG",
-			"SlateCore"
+			"SlateCore",
+			"Niagara"
 			
 		});
 

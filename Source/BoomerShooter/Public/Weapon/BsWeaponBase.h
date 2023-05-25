@@ -17,6 +17,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void Fire();
 	UFUNCTION(BlueprintCallable)
+	virtual void SecondaryFire();
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void NextWeaponMode();
 
 protected:

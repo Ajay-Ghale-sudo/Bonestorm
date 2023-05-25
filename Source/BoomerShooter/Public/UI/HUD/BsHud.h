@@ -31,6 +31,13 @@ protected:
 	UFUNCTION()
 	void UpdateDashAmount();
 
+	UFUNCTION()
+	void UpdateDashCooldown();
+
+	UFUNCTION()
+	void RefreshDashWidget();
+
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	ABsCharacter* PlayerCharacter;
@@ -52,7 +59,7 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsCrosshairWidget* CrosshairWidget;
-	
+
 public:
 
 };

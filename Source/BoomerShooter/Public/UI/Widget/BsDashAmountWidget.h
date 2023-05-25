@@ -15,5 +15,16 @@ class BOOMERSHOOTER_API UBsDashAmountWidget : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void SetDashAmount(int32 Amount);
+	void SetDashAmount(float Amount);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void SetDashEnabled(bool bDashEnabled);
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DashWidget|Color")
+	FLinearColor EnabledColor;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "DashWidget|Color")
+	FLinearColor DisabledColor;
+	
 };

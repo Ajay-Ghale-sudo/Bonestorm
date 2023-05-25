@@ -37,6 +37,9 @@ protected:
 	UFUNCTION()
 	virtual void Die();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void TriggerRagdoll();
+
 	virtual void SeverHead();
 
 
@@ -49,6 +52,15 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	bool bIsAlive = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	FName RootBoneName = FName("Pelvis");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	FName HeadBoneName = FName("Head");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float RagdollPhysicsBlendWeight = 0.75f;
 	
 public:
 	FORCEINLINE bool GetIsAlive() const { return bIsAlive; }

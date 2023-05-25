@@ -8,7 +8,6 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
-
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -41,6 +40,7 @@ public:
 
 public:
 	FBsCharacterEvent OnDashAmountChanged;
+	FBsCharacterEvent OnDashEnabledChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -79,9 +79,29 @@ protected:
 	void AddDashCharge();
 
 	/**
+	 * @brief Checks if the player can dash
+	 */
+	bool CanDash();
+
+	/**
+	 * @brief Enables grapple
+	 */
+	void StartGrapple();
+	
+	/**
+	 * @brief Disabled grapple
+	 */
+	void StopGrapple();
+
+	/**
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+
+	/**
+	 * @brief Uses secondary attack with the weapon
+	 */
+	void SecondaryAttack();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.
@@ -115,13 +135,6 @@ protected:
 	 */
 	void SlideTick(float DeltaTime);
 
-	/**
-	 * @todo Have player health set upon take damage, or set upon healing
-	 */
-	void SetHealth(float Value);
-
-	
-	
 protected:
 	/**
 	 * @brief The default input configuration for the Character.
@@ -166,17 +179,14 @@ protected:
 	UBsHealthComponent* HealthComponent;
 
 	/**
-	 * @todo For testing purposes only, will be replaced on health refactor
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
-	float PlayerHealth = 200.f;
-	
-	/**
 	 * @brief Currently Equipped Weapon.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
 	ABsWeaponBase* Weapon;
+	
+	bool bGrappling = false;
 public:
 
-	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCharges; }
+	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }
+	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 };

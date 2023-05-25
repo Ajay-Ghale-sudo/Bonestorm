@@ -6,7 +6,8 @@
 #include "BsGrappleHookComponent.generated.h"
 
 
-
+class UNiagaraComponent;
+class UNiagaraSystem;
 class ABsGrappleProjectile;
 class ACharacter;
 class USceneComponent;
@@ -41,6 +42,17 @@ struct FGrappleHookProperties
 	bool bIsAttached = false;
 
 	FTimerHandle GrapplePullTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GrappleHook")
+	UNiagaraSystem* GrappleFX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GrappleHook")
+	UNiagaraComponent* GrappleFXComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="GrappleHook")
+	USceneComponent* GrappleFXComponentAttachPoint;
+	
+	FTimerHandle GrappleFXUpdateTimerHandle;
 	
 };
 
@@ -63,6 +75,7 @@ public:
 	void DetachGrappleHook();
 	void PullOwnerToGrapplePoint();
 	void SetEffectedCharacter(ACharacter* Character);
+	void SetGrappleFXAttachPoint(USceneComponent* AttachPoint);
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="GrappleHook")
@@ -83,6 +96,9 @@ protected:
 
 	bool OwnerCanSeeGrapplePoint() const;
 	bool OwnerCanReachGrapplePoint() const;
+
+	void InitFX();
+	void UpdateGrappleFX();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GrappleHook")

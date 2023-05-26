@@ -30,6 +30,7 @@ void UBsHealthComponent::BeginPlay()
 void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatedBy, AActor* DamageCauser)
 {
+	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
@@ -37,7 +38,6 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 	}
 	else
 	{
-		OnTookDamage.Broadcast();
 		OnHealthChanged.Broadcast();
 	}
 }

@@ -18,6 +18,8 @@ class BOOMERSHOOTER_API UBsHealthAmountWidget : public UUserWidget
 
 public:
 	void BindToHealthComponent(UBsHealthComponent* InHealthComponent);
+
+	UFUNCTION()
 	void RefreshHealthAmount();
 
 protected:

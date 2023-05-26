@@ -155,6 +155,8 @@ void ABsCharacter::Dash()
 
 	StopGrapple();
 	StopSliding();
+
+	FVector PlayerVelocity = this->GetVelocity();
 	
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();
@@ -167,7 +169,7 @@ void ABsCharacter::Dash()
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down
 
-	LaunchCharacter(Direction, false, false);
+	LaunchCharacter(Direction, true, false);
 	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;

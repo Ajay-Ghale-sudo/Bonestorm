@@ -3,6 +3,8 @@
 
 #include "Component/BsGrappleHookComponent.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "GameFramework/Character.h"
 #include "Weapon/Projectile/BsGrappleProjectile.h"
 
@@ -23,7 +25,6 @@ void UBsGrappleHookComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 ABsGrappleProjectile* UBsGrappleHookComponent::FireGrappleHook(const FVector& StartLocation, const FVector& Direction)
@@ -49,7 +50,8 @@ ABsGrappleProjectile* UBsGrappleHookComponent::FireGrappleHook(const FVector& St
 			GrappleHookProperties.GrappleProjectile = GrappleHook;
 			GrappleHook->OnGrappleComponentAttached.AddDynamic(this, &UBsGrappleHookComponent::GrappleHookAttached);
 			GrappleHook->OnGrappleComponentDetached.AddDynamic(this, &UBsGrappleHookComponent::GrappleHookDetached);
-			
+
+			InitFX();
 			return GrappleHook;
 		}
 	}
@@ -99,6 +101,11 @@ void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
 void UBsGrappleHookComponent::SetEffectedCharacter(ACharacter* Character)
 {
 	EffectedCharacter = Character;
+}
+
+void UBsGrappleHookComponent::SetGrappleFXAttachPoint(USceneComponent* AttachPoint)
+{
+	GrappleHookProperties.GrappleFXComponentAttachPoint = AttachPoint;
 }
 
 
@@ -184,4 +191,41 @@ bool UBsGrappleHookComponent::OwnerCanReachGrapplePoint() const
 	}
 
 	return true;
+}
+
+void UBsGrappleHookComponent::InitFX()
+{
+	if (GrappleHookProperties.GrappleFX && GrappleHookProperties.GrappleProjectile)
+	{
+		GrappleHookProperties.GrappleFXComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			GrappleHookProperties.GrappleFX,
+			GrappleHookProperties.GrappleProjectile->GetRootComponent(),
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true
+		);
+
+		UpdateGrappleFX();
+	}
+}
+
+void UBsGrappleHookComponent::UpdateGrappleFX()
+{
+	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
+	if (GrappleHookProperties.GrappleFXComponent && GrappleHookProperties.GrappleProjectile && EffectedCharacter)
+	{
+		if (!GrappleHookProperties.GrappleFXComponent->IsActive())
+		{
+			GrappleHookProperties.GrappleFXComponent->Activate(true);
+		}
+
+		if (GrappleHookProperties.GrappleFXComponentAttachPoint)
+		{
+			GrappleHookProperties.GrappleFXComponent->SetVectorParameter(FName("StartPosition"), GrappleHookProperties.GrappleFXComponentAttachPoint->GetSocketLocation(FName("BladeSocket")));
+			GrappleHookProperties.GrappleFXUpdateTimerHandle =
+				GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::UpdateGrappleFX);
+		}
+	}
 }

@@ -4,6 +4,7 @@
 #include "Character/Enemy/BsEnemyBase.h"
 
 #include "Component/BsHealthComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Hazard/BsHazardBase.h"
 #include "Props/Head/BsSeveredHeadBase.h"
@@ -36,6 +37,23 @@ void ABsEnemyBase::Die()
 {
 	bIsAlive = false;
 	SeverHead();
+	TriggerRagdoll();
+}
+
+void ABsEnemyBase::TriggerRagdoll()
+{	
+	if (USkeletalMeshComponent* CurrentMesh = GetMesh())
+	{
+		CurrentMesh->SetSimulatePhysics(true);
+		CurrentMesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		CurrentMesh->SetAllBodiesBelowSimulatePhysics(RootBoneName, true, true);
+		CurrentMesh->SetCollisionResponseToAllChannels(ECR_Block);
+		CurrentMesh->SetPhysicsBlendWeight(RagdollPhysicsBlendWeight);
+	}
+	if (UCapsuleComponent* CurrentCapsule = GetCapsuleComponent())
+	{
+		CurrentCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void ABsEnemyBase::SeverHead()
@@ -44,12 +62,12 @@ void ABsEnemyBase::SeverHead()
 	USkeletalMeshComponent* CurrentMesh = GetMesh();
 	if (SeveredHeadClass && World && CurrentMesh) 
 	{
-		CurrentMesh->HideBoneByName(FName("Head"), EPhysBodyOp::PBO_None);
+		CurrentMesh->HideBoneByName(HeadBoneName, EPhysBodyOp::PBO_None);
 		
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
-		FTransform SpawnTransform = CurrentMesh->GetSocketTransform(FName("Head"));
+		FTransform SpawnTransform = CurrentMesh->GetSocketTransform(HeadBoneName);
 		SpawnTransform.SetScale3D(CurrentMesh->GetComponentScale());
 		if (ABsSeveredHeadBase* SeveredHead = World->SpawnActor<ABsSeveredHeadBase>(SeveredHeadClass, SpawnTransform, SpawnParams))
 		{

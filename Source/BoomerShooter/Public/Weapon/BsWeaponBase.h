@@ -22,6 +22,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void NextWeaponMode();
 
+	/**
+	 * @brief Drops the Weapon in the world.
+	 */
+	void Drop();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -3,6 +3,8 @@
 
 #include "Component/BsInventoryComponent.h"
 
+#include "Props/Head/BsSeveredHeadBase.h"
+
 
 // Sets default values for this component's properties
 UBsInventoryComponent::UBsInventoryComponent()
@@ -37,6 +39,24 @@ bool UBsInventoryComponent::HasKey(EBsKeyType BsKey)
 	return false;
 }
 
+void UBsInventoryComponent::AddSeveredHead(ABsSeveredHeadBase* SeveredHead)
+{
+	if (SeveredHead && SeveredHeads.Num() < MaxSeveredHeads && !SeveredHeads.Contains(SeveredHead))
+	{
+		SeveredHeads.AddUnique(SeveredHead);
+		OnSeveredHeadAdded.Broadcast(SeveredHead);
+	}
+}
+
+ABsSeveredHeadBase* UBsInventoryComponent::GetNextHead()
+{
+	if (!SeveredHeads.IsEmpty())
+	{
+		return SeveredHeads.Pop();
+	}
+
+	return nullptr;
+}
 
 // Called when the game starts
 void UBsInventoryComponent::BeginPlay()
@@ -44,6 +64,5 @@ void UBsInventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 

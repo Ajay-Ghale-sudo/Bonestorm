@@ -6,6 +6,7 @@
 
 class UBsCrosshairWidget;
 class UBsDashAmountWidget;
+class UBsHealthAmountWidget;
 class ABsCharacter;
 class UUserWidget;
 
@@ -44,9 +45,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsDashAmountWidget"))
 	TSubclassOf<UUserWidget> DashAmountWidgetClass;
 
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	UBsDashAmountWidget* DashAmountWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsHealthAmountWidget"))
+	TSubclassOf<UUserWidget> HealthAmountWidgetClass;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
+	UBsHealthAmountWidget* HealthAmountWidget;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsCrosshairWidget"))
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;

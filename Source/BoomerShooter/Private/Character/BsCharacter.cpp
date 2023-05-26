@@ -6,10 +6,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Component/BsGrappleHookComponent.h"
+#include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/Interactable.h"
+#include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Scythe/BsScythe.h"
 
@@ -25,6 +27,7 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->bUsePawnControlRotation = true;
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
+	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +51,16 @@ void ABsCharacter::BeginPlay()
 	
 	JumpMaxCount = 2;
 	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
+
+	if (InventoryComponent)
+	{
+		InventoryComponent->OnSeveredHeadAdded.AddUObject(this, &ABsCharacter::OnSeveredHeadPickup);
+	}
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &ABsCharacter::Die);
+	}
 }
 
 // Called every frame
@@ -186,6 +199,7 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
+
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -354,5 +368,30 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
+	}
+}
+
+void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
+{
+	if (Head)
+	{
+		if (UStaticMeshComponent* HeadMesh = Head->GetHeadMesh())
+		{
+			HeadMesh->SetSimulatePhysics(false);
+			HeadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			HeadMesh->SetVisibility(false, true);
+		}
+		Head->SetActorEnableCollision(false);
+		Head->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+}
+
+void ABsCharacter::Die()
+{
+	bAlive = true;
+
+	if (Weapon)
+	{
+		Weapon->Drop();
 	}
 }

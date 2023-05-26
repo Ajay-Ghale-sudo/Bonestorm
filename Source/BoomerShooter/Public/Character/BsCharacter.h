@@ -135,6 +135,9 @@ protected:
 	 */
 	void SlideTick(float DeltaTime);
 
+	UFUNCTION()
+	void Die();
+
 protected:
 	/**
 	 * @brief The default input configuration for the Character.
@@ -185,6 +188,7 @@ protected:
 	ABsWeaponBase* Weapon;
 	
 	bool bGrappling = false;
+	bool bAlive = true;
 public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }

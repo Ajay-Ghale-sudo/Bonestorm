@@ -50,6 +50,11 @@ void ABsCharacter::BeginPlay()
 	
 	JumpMaxCount = 2;
 	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &ABsCharacter::Die);
+	}
 }
 
 // Called every frame
@@ -355,5 +360,15 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
+	}
+}
+
+void ABsCharacter::Die()
+{
+	bAlive = true;
+
+	if (Weapon)
+	{
+		Weapon->Drop();
 	}
 }

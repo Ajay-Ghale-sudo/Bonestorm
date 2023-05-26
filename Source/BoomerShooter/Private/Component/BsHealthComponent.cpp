@@ -36,10 +36,7 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 	{
 		OnDeath.Broadcast();
 	}
-	else
-	{
-		OnHealthChanged.Broadcast();
-	}
+	OnHealthChanged.Broadcast();
 }
 
 

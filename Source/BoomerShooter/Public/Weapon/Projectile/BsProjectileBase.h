@@ -19,6 +19,12 @@ struct FProjectileDamageProperties
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float ProjectileSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float ProjectileLifeTime = 15.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
 	
 };
 
@@ -46,7 +52,8 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                         bool bFromSweep, const FHitResult& SweepResult);
-	
+
+	UFUNCTION()
 	virtual void OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 							 bool bFromSweep, const FHitResult& SweepResult);
 	
@@ -64,5 +71,6 @@ protected:
 	FProjectileDamageProperties ProjectileDamageProperties;
 
 public:
-
+	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	FORCEINLINE FProjectileDamageProperties GetProjectileDamageProperties() const { return ProjectileDamageProperties; }
 };

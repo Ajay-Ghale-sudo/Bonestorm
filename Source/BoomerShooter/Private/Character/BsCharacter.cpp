@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Component/BsGrappleHookComponent.h"
+#include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -26,6 +27,7 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->bUsePawnControlRotation = true;
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
+	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -53,6 +55,11 @@ void ABsCharacter::BeginPlay()
 	if (InventoryComponent)
 	{
 		InventoryComponent->OnSeveredHeadAdded.AddUObject(this, &ABsCharacter::OnSeveredHeadPickup);
+	}
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &ABsCharacter::Die);
 	}
 }
 
@@ -190,6 +197,7 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
+
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -373,5 +381,15 @@ void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
 		}
 		Head->SetActorEnableCollision(false);
 		Head->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+}
+
+void ABsCharacter::Die()
+{
+	bAlive = true;
+
+	if (Weapon)
+	{
+		Weapon->Drop();
 	}
 }

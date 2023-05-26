@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FBsHealthComponentEvent OnTookDamage;
+
+	UPROPERTY(BlueprintAssignable)
+	FBsHealthComponentEvent OnHealthChanged;
 	
 protected:
 	// Called when the game starts
@@ -43,4 +46,6 @@ protected:
 	float MaxHealth = 100.f;
 public:
 
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 };

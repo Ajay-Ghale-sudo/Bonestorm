@@ -13,6 +13,7 @@ class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
 class ABsSeveredHeadBase;
+class UBsHealthComponent;
 
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
@@ -136,6 +137,10 @@ protected:
 	void SlideTick(float DeltaTime);
 
 	UFUNCTION()
+	void Die();
+
+
+	UFUNCTION()
 	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
 	
 protected:
@@ -174,6 +179,12 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory)
 	UBsInventoryComponent* InventoryComponent;
+	
+	/**
+     * @brief Player Health Component
+     */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
+	UBsHealthComponent* HealthComponent;
 
 	/**
 	 * @brief Currently Equipped Weapon.
@@ -182,6 +193,7 @@ protected:
 	ABsWeaponBase* Weapon;
 	
 	bool bGrappling = false;
+	bool bAlive = true;
 public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }

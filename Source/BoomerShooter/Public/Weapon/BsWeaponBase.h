@@ -47,4 +47,5 @@ protected:
 	bool bCanAttack = true;
 
 public:
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 };

@@ -53,6 +53,18 @@ void ABsWeaponBase::NextWeaponMode()
 		
 }
 
+void ABsWeaponBase::Drop()
+{
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	if (WeaponMesh)
+	{
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		WeaponMesh->SetCollisionResponseToAllChannels(ECR_Block);
+		WeaponMesh->SetPhysicsBlendWeight(0.f);
+		WeaponMesh->SetSimulatePhysics(true);
+	}
+}
+
 
 
 

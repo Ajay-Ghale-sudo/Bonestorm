@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interfaces/Interactable.h"
+#include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Scythe/BsScythe.h"
 
@@ -50,6 +51,11 @@ void ABsCharacter::BeginPlay()
 	
 	JumpMaxCount = 2;
 	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
+
+	if (InventoryComponent)
+	{
+		InventoryComponent->OnSeveredHeadAdded.AddUObject(this, &ABsCharacter::OnSeveredHeadPickup);
+	}
 
 	if (HealthComponent)
 	{
@@ -360,6 +366,21 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
+	}
+}
+
+void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
+{
+	if (Head)
+	{
+		if (UStaticMeshComponent* HeadMesh = Head->GetHeadMesh())
+		{
+			HeadMesh->SetSimulatePhysics(false);
+			HeadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			HeadMesh->SetVisibility(false, true);
+		}
+		Head->SetActorEnableCollision(false);
+		Head->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
 }
 

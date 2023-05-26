@@ -12,6 +12,7 @@ class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
 class UInputAction;
+class ABsSeveredHeadBase;
 class UBsHealthComponent;
 
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
@@ -138,6 +139,10 @@ protected:
 	UFUNCTION()
 	void Die();
 
+
+	UFUNCTION()
+	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
+	
 protected:
 	/**
 	 * @brief The default input configuration for the Character.

@@ -70,6 +70,12 @@ protected:
 	void Dash();
 
 	/**
+	 * @brief Process and apply Dash Movement.
+	 * @param DeltaTime	The time passed since the last frame.
+	 */
+	void DashTick(const float DeltaTime);
+
+	/**
 	 * @brief Enables dashing.
 	 */
 	void EnableDash();

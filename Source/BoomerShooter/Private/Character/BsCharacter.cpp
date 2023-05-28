@@ -68,6 +68,7 @@ void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SlideTick(DeltaTime);
+	DashTick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -180,7 +181,11 @@ void ABsCharacter::Dash()
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down
 
-	LaunchCharacter(Direction, false, false);
+	DashConfig.DashDirection = Direction;
+	DashConfig.PreDashVelocity = GetVelocity();
+	DashConfig.bDashing = true;
+	DashConfig.DashElapsedTime = 0.f;
+
 	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;
@@ -207,6 +212,26 @@ void ABsCharacter::Dash()
 			false
 		);
 	}
+}
+
+void ABsCharacter::DashTick(const float DeltaTime)
+{
+	if (!DashConfig.bDashing || DashConfig.DashElapsedTime >= DashConfig.DashDuration)
+	{
+		return;
+	}
+
+	DashConfig.DashElapsedTime += DeltaTime;
+	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
+
+	if (DashConfig.DashElapsedTime >= DashConfig.DashDuration)
+	{
+		DashConfig.bDashing = false;
+		DashConfig.DashElapsedTime = 0.f;
+		FVector DashNormal = DashConfig.DashDirection;
+		DashNormal.Normalize();
+		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Length();
+	}	
 }
 
 void ABsCharacter::EnableDash()

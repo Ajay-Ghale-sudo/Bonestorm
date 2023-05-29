@@ -67,6 +67,7 @@ void UBsGrappleHookComponent::DetachGrappleHook()
 	{
 		GrappleHookProperties.GrappleProjectile->Detach();
 		GrappleHookProperties.GrappleProjectile = nullptr;
+		GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 	}
 }
 
@@ -89,8 +90,7 @@ void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
 		
 		// TODO: Review ways that still allow character movement influence
 		FVector Movement = Direction * GrappleHookProperties.PullForce;
-		EffectedCharacter->LaunchCharacter(Movement, true, true);
-		
+		OnGrappleHookPull.Broadcast(Movement);
 		GrappleHookProperties.GrapplePullTimerHandle =
 			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerToGrapplePoint);
 	}

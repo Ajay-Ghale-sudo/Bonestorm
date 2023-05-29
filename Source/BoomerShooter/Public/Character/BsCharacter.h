@@ -93,13 +93,18 @@ protected:
 	/**
 	 * @brief Enables grapple
 	 */
+	UFUNCTION()
 	void StartGrapple();
 	
 	/**
 	 * @brief Disabled grapple
 	 */
+	UFUNCTION()
 	void StopGrapple();
 
+	UFUNCTION()
+	void PullGrapple(FVector Vector);
+	
 	/**
 	 * @brief Attacks with the weapon.
 	 */

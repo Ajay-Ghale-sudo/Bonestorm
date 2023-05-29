@@ -64,7 +64,3 @@ void ABsWeaponBase::Drop()
 		WeaponMesh->SetSimulatePhysics(true);
 	}
 }
-
-
-
-

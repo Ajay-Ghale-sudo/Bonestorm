@@ -11,7 +11,7 @@ ABsScythe::ABsScythe()
 {
 	MeleeCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeCollision"));
 	MeleeCollision->SetupAttachment(WeaponMesh, FName("BladeSocket"));
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MeleeCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 	GrappleHookComponent = CreateDefaultSubobject<UBsGrappleHookComponent>(TEXT("GrappleHookComponent"));

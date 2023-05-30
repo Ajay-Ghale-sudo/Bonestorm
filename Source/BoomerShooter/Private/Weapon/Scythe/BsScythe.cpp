@@ -53,7 +53,7 @@ void ABsScythe::ThrowTick(float DeltaTime)
 			bThrown = false;
 			bReturningToOwner = false;
 			OnWeaponCaught.Broadcast();
-			WeaponMesh->PlayAnimation(IdleAnimation, true);
+			ClearMontage();
 			bCanAttack = true;
 			return;			
 		}
@@ -114,18 +114,13 @@ void ABsScythe::RangeAttack()
 void ABsScythe::MeleeAttack()
 {
 	OnMeleeAttack();
-	if (WeaponMesh && MeleeAnimation)
-	{
-		WeaponMesh->PlayAnimation(MeleeAnimation, false);
-		WeaponMesh->SetPlayRate(1.f);
-	}
+	PlayMontage(MeleeAttackMontage);
 }
 
 void ABsScythe::SecondaryAttack()
 {
 	// Spawn projectile
 	OnSecondaryAttack();
-	UWorld* World = GetWorld();	
 	
 	if (GrappleHookComponent && GetOwner())
 	{
@@ -136,10 +131,6 @@ void ABsScythe::SecondaryAttack()
 			// Float multiplies forward vector, designating start location of the grapple component, preventing self-collision
 			FVector StartLocation = CameraComponent->GetComponentLocation() + (CameraComponent->GetForwardVector() * 100.f);
 			GrappleHookComponent->FireGrappleHook(StartLocation, CameraComponent->GetForwardVector());
-		}
-
-		if (bAttachedToGrapplePoint)
-		{
 		}
 	}
 }
@@ -188,11 +179,7 @@ void ABsScythe::Throw()
 {
 	Super::Throw();
 
-	if (ThrowAnimation)
-	{
-		WeaponMesh->PlayAnimation(ThrowAnimation, true);
-		WeaponMesh->SetPlayRate(3.f);
-	}
+	PlayMontage(ThrowMontage);
 	
 	if (bThrown)
 	{
@@ -218,11 +205,6 @@ void ABsScythe::Throw()
 void ABsScythe::Equip()
 {
 	Super::Equip();
-
-	if (WeaponMesh)
-	{
-		WeaponMesh->PlayAnimation(IdleAnimation, true);
-	}
 
 	SetActorRelativeLocation(FVector::ZeroVector);
 }

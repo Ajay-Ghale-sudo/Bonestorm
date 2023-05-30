@@ -49,6 +49,18 @@ protected:
 	UFUNCTION()
 	void EnableAttack();
 
+	/**
+	 * @brief Plays the Montage on the Weapon Mesh.
+	 * @param MontageToPlay Montage to play.
+	 */
+	void PlayMontage(UAnimMontage* MontageToPlay) const;
+
+	/**
+	 * @brief Clears the Montage on the Weapon Mesh.
+	 * @param MontageToClear Montage to clear. If NULL, all Montages will be cleared.
+	 */
+	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	USkeletalMeshComponent* WeaponMesh;

@@ -116,14 +116,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
 	bool bGrappling = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	UAnimationAsset* ThrowAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* ThrowMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	UAnimationAsset* IdleAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* MeleeAttackMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	UAnimationAsset* MeleeAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* RangedAttackMontage;
 
 	bool bThrown = false;
 	bool bReturningToOwner = false;
@@ -142,4 +142,14 @@ protected:
 
 	FVector ThrowDirection = FVector::ZeroVector;
 	FVector ThrowStartLocation = FVector::ZeroVector;
+
+public:
+	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }
+	FORCEINLINE bool IsGrappling() const { return bGrappling; }
+	FORCEINLINE bool IsThrown() const { return bThrown; }
+	FORCEINLINE bool IsReturningToOwner() const { return bReturningToOwner; }
+	FORCEINLINE bool IsAttachedToGrapplePoint() const { return bAttachedToGrapplePoint; }
+	FORCEINLINE bool IsMeleeMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Melee; }
+	FORCEINLINE bool IsRangedMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Range; }
+	FORCEINLINE EScytheWeaponMode GetWeaponMode() const { return WeaponMode; }
 };

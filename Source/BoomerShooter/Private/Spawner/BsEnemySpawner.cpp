@@ -28,7 +28,6 @@ void ABsEnemySpawner::StartSpawnTimer()
 	UWorld* World = GetWorld();
 	if (World && SpawnEnemyClass)
 	{
-		FTransform SpawnTransform = GetTransform();
         FTimerManager& TimerManager = GetWorldTimerManager();
         TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
 	}

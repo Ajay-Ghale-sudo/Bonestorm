@@ -19,8 +19,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(BlueprintReadOnly, Category = "Enemies")
+	FActorSpawnParameters SpawnParams;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	TSubclassOf<ABsEnemyBase> SpawnedEnemy;
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	void Spawn();
 	
 

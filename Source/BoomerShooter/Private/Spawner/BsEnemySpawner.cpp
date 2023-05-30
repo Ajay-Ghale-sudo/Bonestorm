@@ -8,7 +8,7 @@
 ABsEnemySpawner::ABsEnemySpawner()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 // Called when the game starts or when spawned
@@ -21,8 +21,10 @@ void ABsEnemySpawner::BeginPlay()
 void ABsEnemySpawner::Spawn()
 {
 	UWorld* World = GetWorld();
+	FTransform SpawnTransform = GetTransform();
 	if (SpawnedEnemy && World)
 	{
+		World->SpawnActor(SpawnedEnemy, &SpawnTransform, SpawnParams);
 	}
 }
 

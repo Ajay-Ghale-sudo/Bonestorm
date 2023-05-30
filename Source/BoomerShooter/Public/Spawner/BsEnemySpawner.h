@@ -20,24 +20,62 @@ public:
 	/**
 	 * @brief Timer for enemy spawns
 	 **/
-	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	void SpawnTimer();
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void StartSpawnTimer();
 	
 	/**
-	 * @brief Function for spawning enemies
+	 * @brief Virtual function for spawning enemies
 	 **/
-	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	void SpawnEnemy();
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	virtual void SpawnEnemy();
+
+	/**
+	 * @brief Invalidates spawn timer, stopping enemies from spawning
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void StopSpawnTimer();
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
-	TSubclassOf<ABsEnemyBase> SpawnedEnemyClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+
+	/**
+	 * @brief Enemy to spawn from this spawner (determined in blueprint)
+	 **/
+	UPROPERTY(EditAnywhere, Category = "Spawn")
+	TSubclassOf<ABsEnemyBase> SpawnEnemyClass;
+
+	/**
+	 * @brief Interval in seconds that the timer spawns enemies
+	 **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
 	float SpawnInterval = 1.f;
 
-	FTimerHandle EnemySpawnTimer;
+	/**
+	 * @brief Current amount of enemies spawned from this spawner
+	 **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	int CurrentSpawnAmount = 0;
+
+	/**
+	 * @brief Maximum amount of enemies that can spawn from this spawner
+	 **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	int MaxSpawnAmount = 5;
+	
+	/**
+	 * @brief Should start spawning on begin play?
+	 **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	bool bSpawnOnBeginPlay = true;
+
+	/**
+	 * @brief Should start spawning on tick?
+	 * Likely will not be used, may come in handy for enemies that spawn quickly
+	 * (think a swarm of bees)
+	 **/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	bool bSpawnOnTick = false;
+
+	FTimerHandle EnemySpawnTimerHandle;
 };

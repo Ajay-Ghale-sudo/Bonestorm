@@ -20,30 +20,33 @@ void ABsEnemySpawner::Tick(float DeltaTime)
 void ABsEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	SpawnTimer();
+	if (bSpawnOnBeginPlay) StartSpawnTimer();
 }
 
-void ABsEnemySpawner::SpawnTimer()
+void ABsEnemySpawner::StartSpawnTimer()
 {
 	UWorld* World = GetWorld();
-	if (World && SpawnedEnemyClass)
+	if (World && SpawnEnemyClass)
 	{
 		FTransform SpawnTransform = GetTransform();
         FTimerManager& TimerManager = GetWorldTimerManager();
-		/*
-		 * Would not repeat the timer without a delegate, will be refactored to take spawn conditions from AI director later
-		*/
-        TimerManager.SetTimer(EnemySpawnTimer, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
-        World->SpawnActor(SpawnedEnemyClass, &SpawnTransform);
+        TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
 	}
 }
 
 void ABsEnemySpawner::SpawnEnemy()
 {
 	UWorld* World = GetWorld();
-	if (World)
+	if (World && CurrentSpawnAmount < MaxSpawnAmount)
 	{
 		FTransform SpawnTransform = GetTransform();
-		World->SpawnActor(SpawnedEnemyClass, &SpawnTransform);
+		World->SpawnActor(SpawnEnemyClass, &SpawnTransform);
+		CurrentSpawnAmount++;
 	}
+	StopSpawnTimer();
+}
+
+void ABsEnemySpawner::StopSpawnTimer()
+{
+	EnemySpawnTimerHandle.Invalidate();
 }

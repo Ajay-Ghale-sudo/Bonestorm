@@ -68,6 +68,8 @@ void ABsEnemyBase::SeverHead()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
 		FTransform SpawnTransform = CurrentMesh->GetSocketTransform(HeadBoneName);
+		const FQuat InstigatorRotation = GetControlRotation().Quaternion();
+		SpawnTransform.SetRotation(InstigatorRotation);
 		SpawnTransform.SetScale3D(CurrentMesh->GetComponentScale());
 		if (ABsSeveredHeadBase* SeveredHead = World->SpawnActor<ABsSeveredHeadBase>(SeveredHeadClass, SpawnTransform, SpawnParams))
 		{

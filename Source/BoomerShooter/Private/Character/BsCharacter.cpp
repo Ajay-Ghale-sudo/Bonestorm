@@ -10,6 +10,7 @@
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/Interactable.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
@@ -25,6 +26,11 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->SetupAttachment(GetCapsuleComponent());
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 	CameraComponent->bUsePawnControlRotation = true;
+
+	WeaponSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpringArm"));
+	WeaponSpringArmComponent->SetupAttachment(CameraComponent);
+	WeaponSpringArmComponent->bDoCollisionTest = false;
+	WeaponSpringArmComponent->TargetArmLength = 60.f;
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
 	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
@@ -106,6 +112,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Sliding
 		EnhancedInputComponent->BindAction(InputConfig.SlideAction, ETriggerEvent::Started, this, &ABsCharacter::StartSliding);
+
+		// Throw
+		EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
 	}
 }
 
@@ -115,6 +124,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (Weapon)
 	{
 		Weapon->SetOwner(this);
+		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
@@ -122,8 +132,9 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
 		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
-}
 
+	GrabCurrentWeapon();
+}
 
 void ABsCharacter::Move(const FInputActionValue& Value)
 {
@@ -307,6 +318,14 @@ void ABsCharacter::SecondaryAttack()
 	}
 }
 
+void ABsCharacter::ThrowWeapon()
+{
+	if (Weapon)
+	{
+		Weapon->Throw();
+	}
+}
+
 void ABsCharacter::NextWeaponMode()
 {
 	if (Weapon)
@@ -332,6 +351,14 @@ void ABsCharacter::Interact()
 			if (IInteractable* Interactable = Cast<IInteractable>(InteractTraceResult.GetActor()))
 			{
 				Interactable->Interact(this);
+			}
+
+			if (ABsWeaponBase* HitWeapon = Cast<ABsWeaponBase>(InteractTraceResult.GetActor()))
+			{
+				if (Weapon != HitWeapon)
+				{
+					SetWeapon(HitWeapon);
+				}
 			}
 		}
 	}
@@ -416,5 +443,16 @@ void ABsCharacter::Die()
 	if (Weapon)
 	{
 		Weapon->Drop();
+	}
+}
+
+void ABsCharacter::GrabCurrentWeapon()
+{
+	if (Weapon)
+	{
+		Weapon->AttachToComponent(WeaponSpringArmComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Weapon->SetActorRelativeRotation(FRotator(0.f, 180.f, 0.f));
+		Weapon->SetActorRelativeLocation(FVector::ZeroVector);
+		Weapon->Equip();
 	}
 }

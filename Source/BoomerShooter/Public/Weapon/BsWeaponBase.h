@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "BsWeaponBase.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
+
 UCLASS()
 class BOOMERSHOOTER_API ABsWeaponBase : public AActor
 {
@@ -27,6 +29,19 @@ public:
 	 */
 	void Drop();
 
+	/**
+	 * @brief Throws the Weapon.
+	 */
+	virtual void Throw();
+
+	/**
+	 * @brief Equip the Weapon.
+	 */
+	virtual void Equip();
+
+public:
+	FBsWeaponBaseEvent OnWeaponCaught;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

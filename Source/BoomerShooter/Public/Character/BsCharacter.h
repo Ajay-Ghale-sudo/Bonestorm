@@ -8,6 +8,7 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
+class USpringArmComponent;
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -109,6 +110,11 @@ protected:
 	 * @brief Uses secondary attack with the weapon
 	 */
 	void SecondaryAttack();
+
+    /**
+     * @brief Throws the current weapon.
+     */
+    void ThrowWeapon();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.
@@ -148,6 +154,9 @@ protected:
 
 	UFUNCTION()
 	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
+
+	UFUNCTION()
+	void GrabCurrentWeapon();
 	
 protected:
 	/**
@@ -195,8 +204,11 @@ protected:
 	/**
 	 * @brief Currently Equipped Weapon.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
 	ABsWeaponBase* Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
+	USpringArmComponent* WeaponSpringArmComponent;
 	
 	bool bGrappling = false;
 	bool bAlive = true;

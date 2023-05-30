@@ -74,8 +74,13 @@ public:
 	UFUNCTION()
 	void StopGrappling();
 
+	virtual void Throw() override;
+	virtual void Equip() override;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void ThrowTick(float DeltaTime);
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
 	
@@ -110,4 +115,31 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
 	bool bGrappling = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	UAnimationAsset* ThrowAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	UAnimationAsset* IdleAnimation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	UAnimationAsset* MeleeAnimation;
+
+	bool bThrown = false;
+	bool bReturningToOwner = false;
+	bool bAttachedToGrapplePoint = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	float ThrowSpeed = 5000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	float ThrowDistance = 3000.f;
+
+	/**
+	 * @brief Distance before the scythe is returned to the owner.
+	 */
+	float ReturnDistanceThreshold = 100.f;
+
+	FVector ThrowDirection = FVector::ZeroVector;
+	FVector ThrowStartLocation = FVector::ZeroVector;
 };

@@ -38,7 +38,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
+	
+protected:
 	/**
 	 * @brief Enemy to spawn from this spawner (determined in blueprint)
 	 **/

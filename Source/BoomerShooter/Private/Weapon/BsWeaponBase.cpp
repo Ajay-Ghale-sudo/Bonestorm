@@ -11,6 +11,7 @@ ABsWeaponBase::ABsWeaponBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(WeaponMesh);
 }
 

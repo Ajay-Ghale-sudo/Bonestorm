@@ -86,7 +86,7 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	{
 		
 		//Jumping
-		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ABsCharacter::Jump);
 		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
@@ -130,6 +130,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
 		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->OnGrappleHookPull.AddUObject(this, &ABsCharacter::PullGrapple);
 		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
 
@@ -167,7 +168,7 @@ void ABsCharacter::Jump()
 {
 	StopSliding();
 	StopGrapple();
-	
+
 	Super::Jump();
 }
 
@@ -289,7 +290,12 @@ void ABsCharacter::StartGrapple()
 
 void ABsCharacter::StopGrapple()
 {
+	// TODO: There should be a way to "request detach" This should be done in the GrappleHookComponent.
+	// TEMP HACK: Without this check we stack overflow.
+	if (!bGrappling) return;
+	
 	bGrappling = false;
+	GetCharacterMovement()->ClearAccumulatedForces();
 
 	if (Weapon)
 	{
@@ -300,6 +306,13 @@ void ABsCharacter::StopGrapple()
 	}
 }
 
+void ABsCharacter::PullGrapple(FVector Vector)
+{
+	if (bGrappling)
+	{
+		LaunchCharacter(Vector, true, true);
+	}
+}
 
 
 void ABsCharacter::Attack()

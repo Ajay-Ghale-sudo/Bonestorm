@@ -58,6 +58,7 @@ struct FGrappleHookProperties
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsGrappleHookComponentEvent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsGrappleHookComponentMoveEvent, FVector Movement);
 
 /*
  * @brief A grapple hook can attach to a grapple point and then pull the owner towards it.
@@ -83,6 +84,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="GrappleHook")
 	FBsGrappleHookComponentEvent OnGrappleHookDetached;
+
+	FBsGrappleHookComponentMoveEvent OnGrappleHookPull;
 
 protected:
 	// Called when the game starts

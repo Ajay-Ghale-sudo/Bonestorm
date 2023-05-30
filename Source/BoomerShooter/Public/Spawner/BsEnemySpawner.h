@@ -15,18 +15,29 @@ class BOOMERSHOOTER_API ABsEnemySpawner : public AActor
 public:
 	// Sets default values for this actor's properties
 	ABsEnemySpawner();
-
+	virtual void Tick(float DeltaTime) override;
+	
+	/**
+	 * @brief Timer for enemy spawns
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void SpawnTimer();
+	
+	/**
+	 * @brief Function for spawning enemies
+	 **/
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void SpawnEnemy();
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	FActorSpawnParameters SpawnParams;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
-	TSubclassOf<ABsEnemyBase> SpawnedEnemy;
-	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	void Spawn();
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	TSubclassOf<ABsEnemyBase> SpawnedEnemyClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float SpawnInterval = 1.f;
 
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	FTimerHandle EnemySpawnTimer;
 };

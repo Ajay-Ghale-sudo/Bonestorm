@@ -11,26 +11,39 @@ ABsEnemySpawner::ABsEnemySpawner()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-// Called when the game starts or when spawned
-void ABsEnemySpawner::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void ABsEnemySpawner::Spawn()
-{
-	UWorld* World = GetWorld();
-	FTransform SpawnTransform = GetTransform();
-	if (SpawnedEnemy && World)
-	{
-		World->SpawnActor(SpawnedEnemy, &SpawnTransform, SpawnParams);
-	}
-}
-
-// Called every frame
 void ABsEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
+// Called when the game starts or when spawned
+void ABsEnemySpawner::BeginPlay()
+{
+	Super::BeginPlay();
+	SpawnTimer();
+}
+
+void ABsEnemySpawner::SpawnTimer()
+{
+	UWorld* World = GetWorld();
+	if (World && SpawnedEnemyClass)
+	{
+		FTransform SpawnTransform = GetTransform();
+        FTimerManager& TimerManager = GetWorldTimerManager();
+		/*
+		 * Would not repeat the timer without a delegate, will be refactored to take spawn conditions from AI director later
+		*/
+        TimerManager.SetTimer(EnemySpawnTimer, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
+        World->SpawnActor(SpawnedEnemyClass, &SpawnTransform);
+	}
+}
+
+void ABsEnemySpawner::SpawnEnemy()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		FTransform SpawnTransform = GetTransform();
+		World->SpawnActor(SpawnedEnemyClass, &SpawnTransform);
+	}
+}

@@ -99,7 +99,7 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(InputConfig.DashAction, ETriggerEvent::Started, this, &ABsCharacter::Dash);
 
 		// Attack
-		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Started, this, &ABsCharacter::Attack);
+		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Triggered, this, &ABsCharacter::Attack);
 
 		// Secondary Attack
 		EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);

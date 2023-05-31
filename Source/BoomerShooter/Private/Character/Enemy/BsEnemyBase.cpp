@@ -17,6 +17,7 @@ ABsEnemyBase::ABsEnemyBase()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
 }
@@ -68,6 +69,8 @@ void ABsEnemyBase::SeverHead()
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		
 		FTransform SpawnTransform = CurrentMesh->GetSocketTransform(HeadBoneName);
+		const FQuat InstigatorRotation = GetControlRotation().Quaternion();
+		SpawnTransform.SetRotation(InstigatorRotation);
 		SpawnTransform.SetScale3D(CurrentMesh->GetComponentScale());
 		if (ABsSeveredHeadBase* SeveredHead = World->SpawnActor<ABsSeveredHeadBase>(SeveredHeadClass, SpawnTransform, SpawnParams))
 		{

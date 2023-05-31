@@ -8,6 +8,7 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
+class USpringArmComponent;
 class UBsInventoryComponent;
 class ABsWeaponBase;
 class UCameraComponent;
@@ -70,6 +71,12 @@ protected:
 	void Dash();
 
 	/**
+	 * @brief Process and apply Dash Movement.
+	 * @param DeltaTime	The time passed since the last frame.
+	 */
+	void DashTick(const float DeltaTime);
+
+	/**
 	 * @brief Enables dashing.
 	 */
 	void EnableDash();
@@ -87,13 +94,18 @@ protected:
 	/**
 	 * @brief Enables grapple
 	 */
+	UFUNCTION()
 	void StartGrapple();
 	
 	/**
 	 * @brief Disabled grapple
 	 */
+	UFUNCTION()
 	void StopGrapple();
 
+	UFUNCTION()
+	void PullGrapple(FVector Vector);
+	
 	/**
 	 * @brief Attacks with the weapon.
 	 */
@@ -103,6 +115,11 @@ protected:
 	 * @brief Uses secondary attack with the weapon
 	 */
 	void SecondaryAttack();
+
+    /**
+     * @brief Throws the current weapon.
+     */
+    void ThrowWeapon();
 	
 	/**
 	 * @brief Change the Weapon Mode to the next available.
@@ -142,6 +159,9 @@ protected:
 
 	UFUNCTION()
 	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
+
+	UFUNCTION()
+	void GrabCurrentWeapon();
 	
 protected:
 	/**
@@ -189,8 +209,11 @@ protected:
 	/**
 	 * @brief Currently Equipped Weapon.
 	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Inventory)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
 	ABsWeaponBase* Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
+	USpringArmComponent* WeaponSpringArmComponent;
 	
 	bool bGrappling = false;
 	bool bAlive = true;

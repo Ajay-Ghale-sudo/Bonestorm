@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "BsWeaponBase.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
+
 UCLASS()
 class BOOMERSHOOTER_API ABsWeaponBase : public AActor
 {
@@ -27,12 +29,37 @@ public:
 	 */
 	void Drop();
 
+	/**
+	 * @brief Throws the Weapon.
+	 */
+	virtual void Throw();
+
+	/**
+	 * @brief Equip the Weapon.
+	 */
+	virtual void Equip();
+
+public:
+	FBsWeaponBaseEvent OnWeaponCaught;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void EnableAttack();
+
+	/**
+	 * @brief Plays the Montage on the Weapon Mesh.
+	 * @param MontageToPlay Montage to play.
+	 */
+	void PlayMontage(UAnimMontage* MontageToPlay) const;
+
+	/**
+	 * @brief Clears the Montage on the Weapon Mesh.
+	 * @param MontageToClear Montage to clear. If NULL, all Montages will be cleared.
+	 */
+	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")

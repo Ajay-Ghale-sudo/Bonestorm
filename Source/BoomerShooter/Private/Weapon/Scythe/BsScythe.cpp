@@ -9,9 +9,11 @@
 
 ABsScythe::ABsScythe()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	MeleeCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("MeleeCollision"));
 	MeleeCollision->SetupAttachment(WeaponMesh, FName("BladeSocket"));
-	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	MeleeCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	MeleeCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 
 	GrappleHookComponent = CreateDefaultSubobject<UBsGrappleHookComponent>(TEXT("GrappleHookComponent"));
@@ -21,7 +23,7 @@ ABsScythe::ABsScythe()
 void ABsScythe::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	if (MeleeCollision)
 	{
 		MeleeCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsScythe::OnScytheOverlap);
@@ -31,6 +33,40 @@ void ABsScythe::BeginPlay()
 	{
 		GrappleHookComponent->SetGrappleFXAttachPoint(WeaponMesh);
 	}	
+}
+
+void ABsScythe::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ThrowTick(DeltaTime);
+}
+
+void ABsScythe::ThrowTick(float DeltaTime)
+{
+	if (!bThrown || bAttachedToGrapplePoint) return;
+
+	FVector Direction = GetActorForwardVector();
+	if (bReturningToOwner && Owner)
+	{
+		if (FVector::Dist(GetActorLocation(), Owner->GetActorLocation()) < ReturnDistanceThreshold)
+		{
+			bThrown = false;
+			bReturningToOwner = false;
+			OnWeaponCaught.Broadcast();
+			ClearMontage();
+			bCanAttack = true;
+			return;			
+		}
+		Direction = Owner->GetActorLocation() - GetActorLocation();
+		Direction.Normalize();
+	}
+	
+	SetActorLocation(GetActorLocation() + (Direction * DeltaTime * ThrowSpeed * (bReturningToOwner ? 2.f : 1.f)));
+	const float Distance = FVector::Dist(GetActorLocation(), ThrowStartLocation);
+	if (Distance >= ThrowDistance)
+	{
+		bReturningToOwner = true;
+	}
 }
 
 void ABsScythe::Fire()
@@ -78,13 +114,13 @@ void ABsScythe::RangeAttack()
 void ABsScythe::MeleeAttack()
 {
 	OnMeleeAttack();
+	PlayMontage(MeleeAttackMontage);
 }
 
 void ABsScythe::SecondaryAttack()
 {
 	// Spawn projectile
 	OnSecondaryAttack();
-	UWorld* World = GetWorld();	
 	
 	if (GrappleHookComponent && GetOwner())
 	{
@@ -139,6 +175,40 @@ void ABsScythe::StopGrappling()
 	bGrappling = false;
 }
 
+void ABsScythe::Throw()
+{
+	Super::Throw();
+
+	PlayMontage(ThrowMontage);
+	
+	if (bThrown)
+	{
+		bReturningToOwner = true;
+		bAttachedToGrapplePoint = false;
+		return;
+	}
+	
+	if (GrappleHookComponent)
+	{
+		GrappleHookComponent->DetachGrappleHook();
+	}
+
+	ThrowDirection = GetActorForwardVector();
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	ThrowStartLocation = GetActorLocation();
+
+	bIsAttacking = true;
+	bThrown = true;
+	bCanAttack = false;
+}
+
+void ABsScythe::Equip()
+{
+	Super::Equip();
+
+	SetActorRelativeLocation(FVector::ZeroVector);
+}
+
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
@@ -147,6 +217,18 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
  		if (IReceiveDamage* DamageActor = Cast<IReceiveDamage>(OtherActor))
 		{
 			DamageActor->ReceiveMeleeDamage(SweepResult, this, MeleeDamage);
+		}
+		else if (bReturningToOwner)
+		{
+			
+		}
+		else if (UBsGrapplePointComponent* GrapplePointComponent = OtherActor->GetComponentByClass<UBsGrapplePointComponent>())
+		{
+			if (!bThrown) return;
+
+			AttachToComponent(GrapplePointComponent, FAttachmentTransformRules::KeepWorldTransform);
+			bAttachedToGrapplePoint = true;
+			WeaponMesh->Stop();
 		}
 	}
 }

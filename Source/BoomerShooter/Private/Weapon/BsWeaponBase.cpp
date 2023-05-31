@@ -11,6 +11,7 @@ ABsWeaponBase::ABsWeaponBase()
 	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(WeaponMesh);
 }
 
@@ -24,6 +25,28 @@ void ABsWeaponBase::BeginPlay()
 void ABsWeaponBase::EnableAttack()
 {
 	bCanAttack = true;
+}
+
+void ABsWeaponBase::PlayMontage(UAnimMontage* MontageToPlay) const
+{
+	if (!MontageToPlay || !WeaponMesh)
+	{
+		return;
+	}
+
+	if (UAnimInstance* AnimInstance = WeaponMesh->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(MontageToPlay);
+	}
+}
+
+void ABsWeaponBase::ClearMontage(const UAnimMontage* MontageToClear /*= nullptr*/) const
+{
+	if (!WeaponMesh) return;
+	if (UAnimInstance* AnimInstance = WeaponMesh->GetAnimInstance())
+	{
+		AnimInstance->Montage_Stop(0.1f, MontageToClear);
+	}
 }
 
 void ABsWeaponBase::Fire()
@@ -65,6 +88,11 @@ void ABsWeaponBase::Drop()
 	}
 }
 
+void ABsWeaponBase::Throw()
+{
+}
 
+void ABsWeaponBase::Equip()
+{
 
-
+}

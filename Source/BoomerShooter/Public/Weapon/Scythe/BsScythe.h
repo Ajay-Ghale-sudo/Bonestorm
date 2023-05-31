@@ -74,8 +74,13 @@ public:
 	UFUNCTION()
 	void StopGrappling();
 
+	virtual void Throw() override;
+	virtual void Equip() override;
+
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void ThrowTick(float DeltaTime);
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
 	
@@ -110,4 +115,41 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
 	bool bGrappling = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* ThrowMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* MeleeAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* RangedAttackMontage;
+
+	bool bThrown = false;
+	bool bReturningToOwner = false;
+	bool bAttachedToGrapplePoint = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	float ThrowSpeed = 5000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	float ThrowDistance = 3000.f;
+
+	/**
+	 * @brief Distance before the scythe is returned to the owner.
+	 */
+	float ReturnDistanceThreshold = 100.f;
+
+	FVector ThrowDirection = FVector::ZeroVector;
+	FVector ThrowStartLocation = FVector::ZeroVector;
+
+public:
+	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }
+	FORCEINLINE bool IsGrappling() const { return bGrappling; }
+	FORCEINLINE bool IsThrown() const { return bThrown; }
+	FORCEINLINE bool IsReturningToOwner() const { return bReturningToOwner; }
+	FORCEINLINE bool IsAttachedToGrapplePoint() const { return bAttachedToGrapplePoint; }
+	FORCEINLINE bool IsMeleeMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Melee; }
+	FORCEINLINE bool IsRangedMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Range; }
+	FORCEINLINE EScytheWeaponMode GetWeaponMode() const { return WeaponMode; }
 };

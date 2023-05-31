@@ -63,12 +63,16 @@ ABsGrappleProjectile* UBsGrappleHookComponent::FireGrappleHook(const FVector& St
 
 void UBsGrappleHookComponent::DetachGrappleHook()
 {
+	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
+	GrappleHookProperties.bIsAttached = false;
 	if (GrappleHookProperties.GrappleProjectile)
 	{
 		GrappleHookProperties.GrappleProjectile->Detach();
 		GrappleHookProperties.GrappleProjectile = nullptr;
-		GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
+		return;
 	}
+	
+	OnGrappleHookDetached.Broadcast();
 }
 
 void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
@@ -98,6 +102,39 @@ void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
 	GrappleHookProperties.AttachTime += GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
 }
 
+void UBsGrappleHookComponent::PullOwnerToLocation()
+{
+	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
+	if (EffectedCharacter)
+	{
+		FVector Location = GrappleHookProperties.GrapplePointLocation;
+		float Distance = FVector::Dist(Location, EffectedCharacter->GetActorLocation());
+		if (Distance <= GrappleHookProperties.DistanceCompletionThreshold || Distance >= GrappleHookProperties.MaxDistance)
+		{
+			GrappleHookDetached();
+			return;
+		}
+		
+		FVector Direction = Location - EffectedCharacter->GetActorLocation();
+		Direction.Normalize();
+
+		FVector Movement = Direction * GrappleHookProperties.PullForce;
+		OnGrappleHookPull.Broadcast(Movement);
+		GrappleHookProperties.GrapplePullTimerHandle =
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerTick);
+
+		GrappleHookProperties.AttachTime += GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
+	}
+}
+
+void UBsGrappleHookComponent::PullOwnerTick()
+{
+	if (GrappleHookProperties.bIsAttached)
+	{
+		PullOwnerToLocation();
+	}
+}
+
 void UBsGrappleHookComponent::SetEffectedCharacter(ACharacter* Character)
 {
 	EffectedCharacter = Character;
@@ -108,6 +145,13 @@ void UBsGrappleHookComponent::SetGrappleFXAttachPoint(USceneComponent* AttachPoi
 	GrappleHookProperties.GrappleFXComponentAttachPoint = AttachPoint;
 }
 
+void UBsGrappleHookComponent::AttachToGrapplePoint(UBsGrapplePointComponent* GrapplePoint)
+{
+	if (!GrapplePoint) return;
+	GrappleHookAttached();
+	GrappleHookProperties.GrapplePointLocation = GrapplePoint->GetComponentLocation();
+}
+
 
 void UBsGrappleHookComponent::GrappleHookAttached()
 {
@@ -115,13 +159,13 @@ void UBsGrappleHookComponent::GrappleHookAttached()
 	// Set the Attached time. We set it to -GetWorld()->GetDeltaSeconds() so that the first tick will be 0
 	GrappleHookProperties.AttachTime =  GetWorld() ? -GetWorld()->GetDeltaSeconds() : 0.f;
 	GrappleHookProperties.bIsAttached = true;
-	PullOwnerToGrapplePoint();
 }
 
 void UBsGrappleHookComponent::GrappleHookDetached()
 {
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 	GrappleHookProperties.bIsAttached = false;
+	GrappleHookProperties.GrapplePointLocation = FVector::ZeroVector;
 	OnGrappleHookDetached.Broadcast();
 }
 

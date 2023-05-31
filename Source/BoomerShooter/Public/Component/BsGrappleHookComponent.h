@@ -6,6 +6,7 @@
 #include "BsGrappleHookComponent.generated.h"
 
 
+class UBsGrapplePointComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class ABsGrappleProjectile;
@@ -53,6 +54,8 @@ struct FGrappleHookProperties
 	USceneComponent* GrappleFXComponentAttachPoint;
 	
 	FTimerHandle GrappleFXUpdateTimerHandle;
+
+	FVector GrapplePointLocation = FVector::ZeroVector;
 	
 };
 
@@ -75,8 +78,14 @@ public:
 	ABsGrappleProjectile* FireGrappleHook(const FVector& StartLocation, const FVector& Direction);
 	void DetachGrappleHook();
 	void PullOwnerToGrapplePoint();
+	
+	UFUNCTION()
+	void PullOwnerToLocation();
+	void PullOwnerTick();
 	void SetEffectedCharacter(ACharacter* Character);
 	void SetGrappleFXAttachPoint(USceneComponent* AttachPoint);
+
+	void AttachToGrapplePoint(UBsGrapplePointComponent* GrapplePoint);
 
 public:
 	UPROPERTY(BlueprintAssignable, Category="GrappleHook")

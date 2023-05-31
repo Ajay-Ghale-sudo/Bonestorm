@@ -100,6 +100,9 @@ protected:
 	virtual bool CanAttack() const override;
 	void EnableRangedFire();
 	
+	UFUNCTION()
+	void OnGrappleHookDetached();
+	
 	virtual FTransform GetProjectileSpawnTransform() const;
 	
 	UFUNCTION()

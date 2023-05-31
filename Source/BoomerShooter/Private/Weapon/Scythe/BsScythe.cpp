@@ -69,9 +69,34 @@ void ABsScythe::ThrowTick(float DeltaTime)
 	}
 }
 
+bool ABsScythe::CanAttack() const
+{
+	if (bThrown)
+	{
+		return false;
+	}
+	
+	if (IsMeleeMode())
+	{
+		return bCanAttack;
+	}
+	
+	if (IsRangedMode())
+	{
+		return RangedConfig.bCanFire;
+	}
+	
+	return true;
+}
+
+void ABsScythe::EnableRangedFire()
+{
+	RangedConfig.bCanFire = true;
+}
+
 void ABsScythe::Fire()
 {
-	if (!bCanAttack) return;
+	if (!CanAttack()) return;
 	Super::Fire();
 	
 	if (WeaponMode == EScytheWeaponMode::ESWM_Melee)
@@ -86,7 +111,7 @@ void ABsScythe::Fire()
 
 void ABsScythe::SecondaryFire()
 {
-	if (!bCanAttack) return;
+	if (!CanAttack()) return;
 	Super::SecondaryFire();
 	SecondaryAttack();
 	UE_LOG(LogTemp, Log, TEXT("Firing secondary"))
@@ -97,16 +122,27 @@ void ABsScythe::RangeAttack()
 	// Spawn Projectile
 	OnRangedAttack();
 	UWorld* World = GetWorld();
-	if (ProjectileClass && World)
+	if (RangedConfig.ProjectileClass && World && RangedConfig.bCanFire)
 	{
 		const FTransform SpawnTransform = GetProjectileSpawnTransform();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = GetOwner();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = GetInstigator();
-		if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParams)))
+		if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(World->SpawnActor(RangedConfig.ProjectileClass, &SpawnTransform, SpawnParams)))
 		{
 			Projectile->SetOwner(GetOwner());
+			Projectile->SetInstigator(GetInstigator());
+
+			RangedConfig.bCanFire = false;
+			World->GetTimerManager()
+				.SetTimer(
+					RangedConfig.FireRateTimerHandle,
+					this,
+					&ABsScythe::EnableRangedFire,
+					RangedConfig.FireRate,
+					false
+				);
 		}
 	}
 }
@@ -115,6 +151,8 @@ void ABsScythe::MeleeAttack()
 {
 	OnMeleeAttack();
 	PlayMontage(MeleeAttackMontage);
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsScythe::EnableAttack, AttackDuration, false);
 }
 
 void ABsScythe::SecondaryAttack()

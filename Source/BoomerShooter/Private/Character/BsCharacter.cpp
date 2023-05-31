@@ -181,8 +181,6 @@ void ABsCharacter::Dash()
 
 	StopGrapple();
 	StopSliding();
-
-	FVector PlayerVelocity = this->GetVelocity();
 	
 	// Get input from Player, otherwise dash to our current direction
 	FVector Direction = GetLastMovementInputVector();

@@ -312,6 +312,10 @@ void ABsCharacter::PullGrapple(FVector Vector)
 	{
 		LaunchCharacter(Vector, true, true);
 	}
+	else
+	{
+		StopGrapple();
+	}
 }
 
 
@@ -327,7 +331,10 @@ void ABsCharacter::SecondaryAttack()
 {
 	if (Weapon)
 	{
-		Weapon->SecondaryFire();
+		if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
+		{
+			GrappleHookComponent->PullOwnerToLocation();
+		}
 	}
 }
 
@@ -335,6 +342,7 @@ void ABsCharacter::ThrowWeapon()
 {
 	if (Weapon)
 	{
+		StopGrapple();
 		Weapon->Throw();
 	}
 }

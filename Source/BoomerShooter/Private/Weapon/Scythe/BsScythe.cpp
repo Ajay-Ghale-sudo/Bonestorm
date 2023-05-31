@@ -32,6 +32,7 @@ void ABsScythe::BeginPlay()
 	if (GrappleHookComponent)
 	{
 		GrappleHookComponent->SetGrappleFXAttachPoint(WeaponMesh);
+		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsScythe::OnGrappleHookDetached);
 	}	
 }
 
@@ -43,12 +44,22 @@ void ABsScythe::Tick(float DeltaTime)
 
 void ABsScythe::ThrowTick(float DeltaTime)
 {
-	if (!bThrown || bAttachedToGrapplePoint) return;
+	if (!bThrown || !Owner) return;
+
+	const float DistanceToOwner = FVector::Dist(GetActorLocation(), Owner->GetActorLocation());
+	if (bAttachedToGrapplePoint)
+	{
+		if (GrappleHookComponent && DistanceToOwner >= ThrowDistance)
+		{
+			GrappleHookComponent->DetachGrappleHook();
+		}
+		return;
+	}
 
 	FVector Direction = GetActorForwardVector();
-	if (bReturningToOwner && Owner)
+	if (bReturningToOwner)
 	{
-		if (FVector::Dist(GetActorLocation(), Owner->GetActorLocation()) < ReturnDistanceThreshold)
+		if (DistanceToOwner < ReturnDistanceThreshold)
 		{
 			bThrown = false;
 			bReturningToOwner = false;
@@ -62,8 +73,8 @@ void ABsScythe::ThrowTick(float DeltaTime)
 	}
 	
 	SetActorLocation(GetActorLocation() + (Direction * DeltaTime * ThrowSpeed * (bReturningToOwner ? 2.f : 1.f)));
-	const float Distance = FVector::Dist(GetActorLocation(), ThrowStartLocation);
-	if (Distance >= ThrowDistance)
+	const float DistanceFromStart = FVector::Dist(GetActorLocation(), ThrowStartLocation);
+	if (DistanceFromStart >= ThrowDistance)
 	{
 		bReturningToOwner = true;
 	}
@@ -111,10 +122,7 @@ void ABsScythe::Fire()
 
 void ABsScythe::SecondaryFire()
 {
-	if (!CanAttack()) return;
-	Super::SecondaryFire();
 	SecondaryAttack();
-	UE_LOG(LogTemp, Log, TEXT("Firing secondary"))
 }
 
 void ABsScythe::RangeAttack()
@@ -160,16 +168,9 @@ void ABsScythe::SecondaryAttack()
 	// Spawn projectile
 	OnSecondaryAttack();
 	
-	if (GrappleHookComponent && GetOwner())
+	if (GrappleHookComponent && bAttachedToGrapplePoint)
 	{
-		GrappleHookComponent->DetachGrappleHook();
-		// TODO: Not guaranteed to get the FPS camera. The grapple hook needs to know to spawn relative to the camera's aim.
-		if (UCameraComponent* CameraComponent = GetOwner()->FindComponentByClass<UCameraComponent>())
-		{
-			// Float multiplies forward vector, designating start location of the grapple component, preventing self-collision
-			FVector StartLocation = CameraComponent->GetComponentLocation() + (CameraComponent->GetForwardVector() * 100.f);
-			GrappleHookComponent->FireGrappleHook(StartLocation, CameraComponent->GetForwardVector());
-		}
+		GrappleHookComponent->PullOwnerToLocation();
 	}
 }
 
@@ -225,11 +226,6 @@ void ABsScythe::Throw()
 		bAttachedToGrapplePoint = false;
 		return;
 	}
-	
-	if (GrappleHookComponent)
-	{
-		GrappleHookComponent->DetachGrappleHook();
-	}
 
 	ThrowDirection = GetActorForwardVector();
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
@@ -245,6 +241,12 @@ void ABsScythe::Equip()
 	Super::Equip();
 
 	SetActorRelativeLocation(FVector::ZeroVector);
+}
+
+void ABsScythe::OnGrappleHookDetached()
+{
+	bAttachedToGrapplePoint = false;
+	bReturningToOwner = true;
 }
 
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -266,7 +268,8 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 			AttachToComponent(GrapplePointComponent, FAttachmentTransformRules::KeepWorldTransform);
 			bAttachedToGrapplePoint = true;
-			WeaponMesh->Stop();
+			GrappleHookComponent->AttachToGrapplePoint(GrapplePointComponent);
+			ClearMontage();
 		}
 	}
 }

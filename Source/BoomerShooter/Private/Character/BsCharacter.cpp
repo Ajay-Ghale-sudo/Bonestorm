@@ -6,10 +6,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Component/BsGrappleHookComponent.h"
+#include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/Interactable.h"
+#include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Scythe/BsScythe.h"
 
@@ -24,7 +27,13 @@ ABsCharacter::ABsCharacter()
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
 	CameraComponent->bUsePawnControlRotation = true;
 
+	WeaponSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpringArm"));
+	WeaponSpringArmComponent->SetupAttachment(CameraComponent);
+	WeaponSpringArmComponent->bDoCollisionTest = false;
+	WeaponSpringArmComponent->TargetArmLength = 60.f;
+
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
+	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +57,16 @@ void ABsCharacter::BeginPlay()
 	
 	JumpMaxCount = 2;
 	DashConfig.DashCurrentAmount = DashConfig.DashMaxAmount;
+
+	if (InventoryComponent)
+	{
+		InventoryComponent->OnSeveredHeadAdded.AddUObject(this, &ABsCharacter::OnSeveredHeadPickup);
+	}
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &ABsCharacter::Die);
+	}
 }
 
 // Called every frame
@@ -55,6 +74,7 @@ void ABsCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SlideTick(DeltaTime);
+	DashTick(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -66,7 +86,7 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	{
 		
 		//Jumping
-		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ABsCharacter::Jump);
 		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		//Moving
@@ -92,6 +112,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Sliding
 		EnhancedInputComponent->BindAction(InputConfig.SlideAction, ETriggerEvent::Started, this, &ABsCharacter::StartSliding);
+
+		// Throw
+		EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
 	}
 }
 
@@ -101,15 +124,18 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (Weapon)
 	{
 		Weapon->SetOwner(this);
+		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
 		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
 		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->OnGrappleHookPull.AddUObject(this, &ABsCharacter::PullGrapple);
 		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
-}
 
+	GrabCurrentWeapon();
+}
 
 void ABsCharacter::Move(const FInputActionValue& Value)
 {
@@ -142,7 +168,7 @@ void ABsCharacter::Jump()
 {
 	StopSliding();
 	StopGrapple();
-	
+
 	Super::Jump();
 }
 
@@ -169,7 +195,11 @@ void ABsCharacter::Dash()
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down
 
-	LaunchCharacter(Direction, true, false);
+	DashConfig.DashDirection = Direction;
+	DashConfig.PreDashVelocity = GetVelocity();
+	DashConfig.bDashing = true;
+	DashConfig.DashElapsedTime = 0.f;
+
 	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;
@@ -186,6 +216,7 @@ void ABsCharacter::Dash()
 			DashConfig.DashCooldown,
 			false
 		);
+
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		TimerManager.SetTimer(
 			DashConfig.DashChargeTimerHandle,
@@ -195,6 +226,26 @@ void ABsCharacter::Dash()
 			false
 		);
 	}
+}
+
+void ABsCharacter::DashTick(const float DeltaTime)
+{
+	if (!DashConfig.bDashing || DashConfig.DashElapsedTime >= DashConfig.DashDuration)
+	{
+		return;
+	}
+
+	DashConfig.DashElapsedTime += DeltaTime;
+	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
+
+	if (DashConfig.DashElapsedTime >= DashConfig.DashDuration)
+	{
+		DashConfig.bDashing = false;
+		DashConfig.DashElapsedTime = 0.f;
+		FVector DashNormal = DashConfig.DashDirection;
+		DashNormal.Normalize();
+		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Length();
+	}	
 }
 
 void ABsCharacter::EnableDash()
@@ -241,7 +292,12 @@ void ABsCharacter::StartGrapple()
 
 void ABsCharacter::StopGrapple()
 {
+	// TODO: There should be a way to "request detach" This should be done in the GrappleHookComponent.
+	// TEMP HACK: Without this check we stack overflow.
+	if (!bGrappling) return;
+	
 	bGrappling = false;
+	GetCharacterMovement()->ClearAccumulatedForces();
 
 	if (Weapon)
 	{
@@ -252,6 +308,13 @@ void ABsCharacter::StopGrapple()
 	}
 }
 
+void ABsCharacter::PullGrapple(FVector Vector)
+{
+	if (bGrappling)
+	{
+		LaunchCharacter(Vector, true, true);
+	}
+}
 
 
 void ABsCharacter::Attack()
@@ -267,6 +330,14 @@ void ABsCharacter::SecondaryAttack()
 	if (Weapon)
 	{
 		Weapon->SecondaryFire();
+	}
+}
+
+void ABsCharacter::ThrowWeapon()
+{
+	if (Weapon)
+	{
+		Weapon->Throw();
 	}
 }
 
@@ -295,6 +366,14 @@ void ABsCharacter::Interact()
 			if (IInteractable* Interactable = Cast<IInteractable>(InteractTraceResult.GetActor()))
 			{
 				Interactable->Interact(this);
+			}
+
+			if (ABsWeaponBase* HitWeapon = Cast<ABsWeaponBase>(InteractTraceResult.GetActor()))
+			{
+				if (Weapon != HitWeapon)
+				{
+					SetWeapon(HitWeapon);
+				}
 			}
 		}
 	}
@@ -354,5 +433,41 @@ void ABsCharacter::SlideTick(float DeltaTime)
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
 		}
+	}
+}
+
+void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
+{
+	if (Head)
+	{
+		if (UStaticMeshComponent* HeadMesh = Head->GetHeadMesh())
+		{
+			HeadMesh->SetSimulatePhysics(false);
+			HeadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			HeadMesh->SetVisibility(false, true);
+		}
+		Head->SetActorEnableCollision(false);
+		Head->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+}
+
+void ABsCharacter::Die()
+{
+	bAlive = true;
+
+	if (Weapon)
+	{
+		Weapon->Drop();
+	}
+}
+
+void ABsCharacter::GrabCurrentWeapon()
+{
+	if (Weapon)
+	{
+		Weapon->AttachToComponent(WeaponSpringArmComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Weapon->SetActorRelativeRotation(FRotator(0.f, 180.f, 0.f));
+		Weapon->SetActorRelativeLocation(FVector::ZeroVector);
+		Weapon->Equip();
 	}
 }

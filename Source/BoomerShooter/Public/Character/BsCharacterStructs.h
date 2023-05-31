@@ -45,6 +45,9 @@ struct FBsInputConfig
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SlideAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ThrowAction;;
 	
 };
 
@@ -94,7 +97,36 @@ struct FBsDashConfig
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashChargeAmount = 25.f;
 
+	/**
+	 * @brief How long to dash for.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashDuration = 0.1f;
+
+	/**
+	 * @brief Time spent dashing.
+	 */
+	float DashElapsedTime = 0.f;
+
+	/**
+	 * @brief Timer Handle for Dash Charging
+	 */
 	FTimerHandle DashChargeTimerHandle;
+
+	/**
+	 * @brief If the Character is dashing or not.
+	 */
+	bool bDashing = false;
+
+	/**
+	 * @brief The Direction the Character is dashing in.
+	 */
+	FVector DashDirection = FVector::ZeroVector;
+
+	/**
+	 * @brief The Velocity before the Character starting Dashing.
+	 */
+	FVector PreDashVelocity = FVector::ZeroVector;
 	
 };
 

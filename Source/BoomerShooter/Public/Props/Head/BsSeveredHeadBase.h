@@ -17,6 +17,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UFUNCTION()
+	void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
+
 
 protected:
 	// TODO: This should be a Skeletal Mesh

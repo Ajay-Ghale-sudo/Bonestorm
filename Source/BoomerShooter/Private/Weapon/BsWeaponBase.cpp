@@ -49,6 +49,11 @@ void ABsWeaponBase::ClearMontage(const UAnimMontage* MontageToClear /*= nullptr*
 	}
 }
 
+bool ABsWeaponBase::CanAttack() const
+{
+	return bCanAttack;
+}
+
 void ABsWeaponBase::Fire()
 {
 	if (!bCanAttack)

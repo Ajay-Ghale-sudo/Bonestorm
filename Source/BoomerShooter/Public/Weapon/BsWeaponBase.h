@@ -61,6 +61,12 @@ protected:
 	 */
 	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
 
+	/**
+	 * @brief Get if the Weapon can attack.
+	 * @return Returns True if the Weapon can attack.
+	 */
+	virtual bool CanAttack() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	USkeletalMeshComponent* WeaponMesh;

@@ -21,6 +21,23 @@ enum class EScytheWeaponMode : uint8
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
+USTRUCT(BlueprintType)
+struct FScytheRangedConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Ranged Config")
+	float FireRate = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Ranged Config")
+	TSubclassOf<ABsProjectileBase> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Scythe|Ranged Config")
+	bool bCanFire = true;
+
+	FTimerHandle FireRateTimerHandle;
+};
+
 /**
  * 
  */
@@ -31,7 +48,6 @@ class BOOMERSHOOTER_API ABsScythe : public ABsWeaponBase
 
 
 public:
-
 	ABsScythe();
 	
 	virtual void Fire() override;
@@ -81,6 +97,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
+	virtual bool CanAttack() const override;
+	void EnableRangedFire();
 	
 	virtual FTransform GetProjectileSpawnTransform() const;
 	
@@ -89,9 +107,6 @@ protected:
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	TSubclassOf<ABsProjectileBase> ProjectileClass;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
 	UBsGrappleHookComponent* GrappleHookComponent;
 
@@ -142,6 +157,9 @@ protected:
 
 	FVector ThrowDirection = FVector::ZeroVector;
 	FVector ThrowStartLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	FScytheRangedConfig RangedConfig;
 
 public:
 	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }

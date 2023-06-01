@@ -1,9 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Props/Elevator/BsElevatorBase.h"
 #include "Components/CapsuleComponent.h"
-
 
 // Sets default values
 ABsElevatorBase::ABsElevatorBase()
@@ -17,7 +15,6 @@ ABsElevatorBase::ABsElevatorBase()
 	ElevatorEndComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ElevatorEnd"));
 	ElevatorEndComponent->SetupAttachment(CapsuleComponent);
 }
-
 
 // Called every frame
 void ABsElevatorBase::Tick(float DeltaTime)
@@ -46,12 +43,14 @@ void ABsElevatorBase::Activated()
 
 void ABsElevatorBase::MoveToLocation(float DeltaTime)
 {
-	if (!bIsActivated && ElevatorFloatCurve) return;
 	UWorld* World = GetWorld();
-	//ElevatorFloatCurve->FloatCurve.GetLastKey();
-	// Elevator is going upwards
-	LerpEndLocation = ElevatorEndComponent->GetComponentLocation();
-	//FMath::Lerp(LerpStartLocation, LerpEndLocation
+	if (!bIsActivated && ElevatorFloatCurve && World) return;
+	// Swizzles between going up and going down based on positive or negative input
+	CurrentTime += DeltaTime * (bGoingUp ? 1.f : -1.f);
+	float CurveEnd = ElevatorFloatCurve->FloatCurve.GetLastKey().Value;
+	if (CurrentTime <= CurveEnd)
+	{
+		FVector CurrentLocation = FMath::Lerp(LerpStartLocation, LerpEndLocation, CurrentTime);
+		ElevatorMesh->SetRelativeLocation(CurrentLocation);
+	}
 }
-
-

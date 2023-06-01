@@ -62,24 +62,26 @@ protected:
 	/**
 	 * @brief Start location for the elevator to lerp from
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|Location")
 	FVector LerpStartLocation;
 
 	/**
 	 * @brief End location for the elevator to lerp to
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|Location")
 	FVector LerpEndLocation;
+	
+	float CurrentTime = 0.f;
 	
 	/**
 	 * @brief Set if elevator is activated
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|State")
 	bool bIsActivated = false;
 
 	/**
 	 * @brief Set if the elevator is going up
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|State")
 	bool bGoingUp = true;
 };

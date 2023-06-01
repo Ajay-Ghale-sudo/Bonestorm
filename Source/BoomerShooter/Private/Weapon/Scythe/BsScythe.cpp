@@ -277,10 +277,13 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 FTransform ABsScythe::GetProjectileSpawnTransform() const
 {
 	FTransform SpawnTransform = GetActorTransform();
-	const FVector Direction = GetActorForwardVector();
-	const FVector Location = SpawnTransform.GetLocation() + Direction * 300.0f;
+	if (WeaponMesh)
+	{
+		SpawnTransform = WeaponMesh->GetSocketTransform(FName("MuzzleSocket"));
+	}
+	
 	SpawnTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
-	SpawnTransform.SetLocation(Location);
+	SpawnTransform.SetRotation(GetActorRotation().Quaternion());
 
 	return SpawnTransform;
 }

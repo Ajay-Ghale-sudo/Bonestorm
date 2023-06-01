@@ -8,10 +8,13 @@ ABsElevatorBase::ABsElevatorBase()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	SetRootComponent(CapsuleComponent);
+	
 	ElevatorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ElevatorMesh"));
 	ElevatorMesh->SetupAttachment(CapsuleComponent);
+	
 	ElevatorEndComponent = CreateDefaultSubobject<USceneComponent>(TEXT("ElevatorEnd"));
 	ElevatorEndComponent->SetupAttachment(CapsuleComponent);
 }
@@ -20,7 +23,7 @@ ABsElevatorBase::ABsElevatorBase()
 void ABsElevatorBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveToLocation(DeltaTime);
+	MoveTick(DeltaTime);
 }
 
 void ABsElevatorBase::Interact(AActor* Interactor)
@@ -39,18 +42,35 @@ void ABsElevatorBase::BeginPlay()
 void ABsElevatorBase::Activated()
 {
 	bIsActivated = true;
+	SetActorTickEnabled(true);
 }
 
-void ABsElevatorBase::MoveToLocation(float DeltaTime)
+void ABsElevatorBase::SetActivated(bool bActivated)
 {
-	UWorld* World = GetWorld();
-	if (!bIsActivated && ElevatorFloatCurve && World) return;
+	bIsActivated = bActivated;
+
+	if (bActivated) OnElevatorActivated.Broadcast();
+	else OnElevatorDeactivated.Broadcast();
+
+	SetActorTickEnabled(bIsActivated);
+
+}
+
+void ABsElevatorBase::MoveTick(float DeltaTime)
+{
+	if (!bIsActivated || !ElevatorFloatCurve) return;
+	
 	// Swizzles between going up and going down based on positive or negative input
-	CurrentTime += DeltaTime * (bGoingUp ? 1.f : -1.f);
 	float CurveEnd = ElevatorFloatCurve->FloatCurve.GetLastKey().Value;
-	if (CurrentTime <= CurveEnd)
+	CurrentTime = FMath::Clamp(CurrentTime + DeltaTime * (bGoingUp ? 1.f : -1.f), 0.f, CurveEnd);
+	
+	if (CurrentTime < CurveEnd && CurrentTime > 0.f)
 	{
 		FVector CurrentLocation = FMath::Lerp(LerpStartLocation, LerpEndLocation, CurrentTime);
 		ElevatorMesh->SetRelativeLocation(CurrentLocation);
+	}
+	else
+	{
+		SetActivated(false);
 	}
 }

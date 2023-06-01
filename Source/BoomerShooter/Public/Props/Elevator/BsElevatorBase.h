@@ -8,6 +8,9 @@
 
 class UCapsuleComponent;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsElevatorEvent);
+
 UCLASS()
 class BOOMERSHOOTER_API ABsElevatorBase : public AActor, public IInteractable
 {
@@ -28,15 +31,36 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	void Activated();
 
+	UFUNCTION(BlueprintCallable)
+	void SetActivated(bool bActivated);
+
+
+public:
+	/**
+	 * @brief Event that is called when the elevator is activated
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Elevator|Event")
+	FBsElevatorEvent OnElevatorActivated;
+
+	/**
+	 * @brief Event that is called when the elevator is deactivated
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Elevator|Event")
+	FBsElevatorEvent OnElevatorDeactivated;
+	
 protected:
 	virtual void BeginPlay() override;
+
+	/**
+	 * @brief Moves the elevator based on the float curve, the start and end location, and the current time
+	 * @param DeltaTime Delta time between frames
+	 */
+	void MoveTick(float DeltaTime);
 	
-	UFUNCTION(BlueprintCallable)
-	void MoveToLocation(float DeltaTime);
 protected:
 	
 	/**
-	 * @brief Static mesh of the elevator. Set in blueprint.
+	 * @brief Static mesh of the elevator.
 	 **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ElevatorMesh;
@@ -62,16 +86,26 @@ protected:
 	/**
 	 * @brief Start location for the elevator to lerp from
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|Location")
+	UPROPERTY(BlueprintReadOnly, Category = "Elevator|Location")
 	FVector LerpStartLocation;
 
 	/**
 	 * @brief End location for the elevator to lerp to
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|Location")
+	UPROPERTY(BlueprintReadOnly, Category = "Elevator|Location")
 	FVector LerpEndLocation;
-	
+
+	/**
+	 * @brief Current time for the elevator movement
+	 **/
+	UPROPERTY(BlueprintReadOnly, Category = "Elevator|Movement")
 	float CurrentTime = 0.f;
+
+	/**
+	 * @brief Speed scale for the elevator movement.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|Movement", meta = (ClampMin = "0.0", ClampMax = "10.0", UIMin = "0.0", UIMax = "10.0"))
+	float SpeedScale = 1.f;
 	
 	/**
 	 * @brief Set if elevator is activated
@@ -82,6 +116,6 @@ protected:
 	/**
 	 * @brief Set if the elevator is going up
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|State")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Elevator|State")
 	bool bGoingUp = true;
 };

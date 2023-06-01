@@ -67,6 +67,11 @@ void ABsCharacter::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsCharacter::Die);
 	}
+
+	if (const UCharacterMovementComponent* CharMovement = GetCharacterMovement())
+	{
+		SlideConfig.PreSlideGroundFriction = CharMovement->GroundFriction;
+	}
 }
 
 // Called every frame
@@ -416,9 +421,12 @@ void ABsCharacter::StartSliding()
 
 void ABsCharacter::StopSliding()
 {
-	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	if (SlideConfig.bSliding)
 	{
-		MovementComponent->GroundFriction = SlideConfig.PreSlideGroundFriction;
+		if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+		{
+			MovementComponent->GroundFriction = SlideConfig.PreSlideGroundFriction;
+		}
 	}
 	
 	SlideConfig.bSliding = false;

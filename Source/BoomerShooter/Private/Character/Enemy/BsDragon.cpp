@@ -20,6 +20,26 @@ void ABsDragon::RangeAttack(const ACharacter* Target)
 		const FTransform TargetTransform = Target->GetActorTransform();
 		const FTransform SpawnTransform = GetMesh()->GetSocketTransform(FName("RangedAttackSocket"));
 		const FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnTransform.GetLocation(), TargetTransform.GetLocation());
+
+		FHitResult LOSHitResult;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+		QueryParams.AddIgnoredActor(Target);
+
+		// Is anything in the way of us and the target?
+		bool bHasLOS = !World->LineTraceSingleByChannel(
+			LOSHitResult,
+			SpawnTransform.GetLocation(),
+			 TargetTransform.GetLocation(),
+			 ECollisionChannel::ECC_Visibility,
+			 QueryParams
+		);
+
+		if (!bHasLOS)
+		{
+			// TODO: This should return a bool or notify the failure somehow.
+			return;
+		}
 		
 		if (ABsProjectileBase* Projectile = World->SpawnActor<ABsProjectileBase>(ProjectileClass, SpawnTransform.GetLocation(), SpawnRotation, SpawnParameters))
 		{

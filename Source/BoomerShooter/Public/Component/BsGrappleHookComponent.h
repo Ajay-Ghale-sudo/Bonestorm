@@ -24,6 +24,9 @@ struct FGrappleHookProperties
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="GrappleHook")
 	ABsGrappleProjectile* GrappleProjectile = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GrappleHook")
+	UBsGrapplePointComponent* AttachedGrapplePoint = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="GrappleHook")
 	float MaxDistance = 10000.f;
 
@@ -77,7 +80,7 @@ public:
 
 	ABsGrappleProjectile* FireGrappleHook(const FVector& StartLocation, const FVector& Direction);
 	void DetachGrappleHook();
-	void PullOwnerToGrapplePoint();
+	void PullOwnerToGrappleProjectile();
 	
 	UFUNCTION()
 	void PullOwnerToLocation();
@@ -106,7 +109,9 @@ protected:
 	UFUNCTION()
 	void GrappleHookDetached();
 
+	bool OwnerCanSeeGrappleProjectile() const;
 	bool OwnerCanSeeGrapplePoint() const;
+	bool OwnerCanReachGrappleProjectile() const;
 	bool OwnerCanReachGrapplePoint() const;
 
 	void InitFX();

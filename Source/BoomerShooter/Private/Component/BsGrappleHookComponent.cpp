@@ -75,12 +75,12 @@ void UBsGrappleHookComponent::DetachGrappleHook()
 	OnGrappleHookDetached.Broadcast();
 }
 
-void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
+void UBsGrappleHookComponent::PullOwnerToGrappleProjectile()
 {
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 
 	// If we cannot reach the grapple point, detach and return
-	if (!OwnerCanReachGrapplePoint())
+	if (!OwnerCanReachGrappleProjectile())
 	{
 		if (GrappleHookProperties.GrappleProjectile) GrappleHookProperties.GrappleProjectile->Detach();
 		return;
@@ -96,7 +96,7 @@ void UBsGrappleHookComponent::PullOwnerToGrapplePoint()
 		FVector Movement = Direction * GrappleHookProperties.PullForce;
 		OnGrappleHookPull.Broadcast(Movement);
 		GrappleHookProperties.GrapplePullTimerHandle =
-			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerToGrapplePoint);
+			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerToGrappleProjectile);
 	}
 
 	GrappleHookProperties.AttachTime += GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
@@ -107,6 +107,12 @@ void UBsGrappleHookComponent::PullOwnerToLocation()
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 	if (EffectedCharacter)
 	{
+		if (!OwnerCanReachGrapplePoint())
+		{
+			DetachGrappleHook();
+			return;
+		}
+		
 		FVector Location = GrappleHookProperties.GrapplePointLocation;
 		float Distance = FVector::Dist(Location, EffectedCharacter->GetActorLocation());
 		if (Distance <= GrappleHookProperties.DistanceCompletionThreshold || Distance >= GrappleHookProperties.MaxDistance)
@@ -150,6 +156,7 @@ void UBsGrappleHookComponent::AttachToGrapplePoint(UBsGrapplePointComponent* Gra
 	if (!GrapplePoint) return;
 	GrappleHookAttached();
 	GrappleHookProperties.GrapplePointLocation = GrapplePoint->GetComponentLocation();
+	GrappleHookProperties.AttachedGrapplePoint = GrapplePoint;
 }
 
 
@@ -169,7 +176,7 @@ void UBsGrappleHookComponent::GrappleHookDetached()
 	OnGrappleHookDetached.Broadcast();
 }
 
-bool UBsGrappleHookComponent::OwnerCanSeeGrapplePoint() const
+bool UBsGrappleHookComponent::OwnerCanSeeGrappleProjectile() const
 {
 	if (!GrappleHookProperties.GrappleProjectile)
 	{
@@ -213,7 +220,38 @@ bool UBsGrappleHookComponent::OwnerCanSeeGrapplePoint() const
 	return false;
 }
 
-bool UBsGrappleHookComponent::OwnerCanReachGrapplePoint() const
+bool UBsGrappleHookComponent::OwnerCanSeeGrapplePoint() const
+{
+	if (!GetOwner() || !EffectedCharacter || !GrappleHookProperties.AttachedGrapplePoint) return false;
+	
+	// Can we still see the grapple point?
+	if (const UWorld* World = GetWorld())
+	{
+		FHitResult HitResult;
+		FCollisionQueryParams CollisionParameters;
+		TArray<AActor*> AttachedActors;
+		
+		GetOwner()->GetAttachedActors(AttachedActors);
+		CollisionParameters.AddIgnoredActors(AttachedActors);
+		CollisionParameters.AddIgnoredActor(GetOwner());
+		CollisionParameters.AddIgnoredActor(GrappleHookProperties.AttachedGrapplePoint->GetOwner());
+		CollisionParameters.AddIgnoredActor(EffectedCharacter);
+		
+		World->LineTraceSingleByChannel(
+			HitResult,
+			EffectedCharacter->GetActorLocation(),
+			GrappleHookProperties.GrapplePointLocation,
+			ECollisionChannel::ECC_Visibility,
+			CollisionParameters
+		);
+
+		return !HitResult.bBlockingHit;
+	}
+
+	return false;
+}
+
+bool UBsGrappleHookComponent::OwnerCanReachGrappleProjectile() const
 {
 	// If the owner no longer exists, detach the grapple hook and return
 	if (!GetOwner() || !GrappleHookProperties.GrappleProjectile)
@@ -230,6 +268,18 @@ bool UBsGrappleHookComponent::OwnerCanReachGrapplePoint() const
 	// Are we close enough to the grapple point?
 	const float DistanceRemaining = FVector::Dist(GetOwner()->GetActorLocation(), GrappleHookProperties.GrappleProjectile->GetActorLocation());
 	if (DistanceRemaining <= GrappleHookProperties.DistanceCompletionThreshold)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool UBsGrappleHookComponent::OwnerCanReachGrapplePoint() const
+{
+	if (!GetOwner() || !OwnerCanSeeGrapplePoint()) return false;
+
+	if (GrappleHookProperties.AttachTime >= GrappleHookProperties.MaxAttachTime)
 	{
 		return false;
 	}

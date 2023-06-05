@@ -46,7 +46,6 @@ class BOOMERSHOOTER_API ABsScythe : public ABsWeaponBase
 {
 	GENERATED_BODY()
 
-
 public:
 	ABsScythe();
 	
@@ -109,6 +108,10 @@ protected:
 	void OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION()
+	void OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
 	UBsGrappleHookComponent* GrappleHookComponent;
@@ -124,6 +127,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
 	UBoxComponent* MeleeCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
+	UBoxComponent* ScytheCollision;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Scythe")
 	bool bIsAttacking = false;

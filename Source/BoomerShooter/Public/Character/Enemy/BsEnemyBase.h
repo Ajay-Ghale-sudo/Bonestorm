@@ -22,6 +22,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanAttack() const;
+
 	// IReceive Damage Interface \\
 
 	virtual void ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,
@@ -42,6 +45,8 @@ protected:
 
 	virtual void SeverHead();
 
+	void EnableAttack();
+	virtual void OnAttack();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
@@ -52,6 +57,14 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	bool bIsAlive = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	bool bCanAttack = true;
+
+	FTimerHandle AttackTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float AttackCooldown = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	FName RootBoneName = FName("Pelvis");

@@ -8,10 +8,71 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 
-void ABsDragon::RangeAttack(const ACharacter* Target)
+bool ABsDragon::TargetInLOS(const AActor* Target) const
 {
 	UWorld* World = GetWorld();
-	if (Target && ProjectileClass && World && GetMesh())
+	if (!Target || !World) return false;
+
+	TArray<AActor*> ActorsToIgnore;
+	Target->GetAttachedActors(ActorsToIgnore);
+	
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.AddIgnoredActor(Target);
+	Params.AddIgnoredActors(ActorsToIgnore);	
+	
+	FHitResult HitResult;
+	World->LineTraceSingleByChannel(
+		HitResult,
+		GetActorLocation(),
+		Target->GetActorLocation(),
+		ECollisionChannel::ECC_Visibility,
+		Params
+	);
+
+	if (HitResult.bBlockingHit)
+	{
+		// TODO: If we want to be able to shoot through objects we need to check if the hit actor here and then recast
+		return false;
+	}
+
+	// We have a clear line of sight to the target
+	return true;
+	
+}
+
+bool ABsDragon::TargetInRange(const AActor* Target) const
+{
+	if (!Target) return false;
+
+	return LocationInRange(Target->GetTargetLocation());
+}
+
+bool ABsDragon::LocationInRange(const FVector& Location) const
+{
+	const float Distance = FVector::Dist(GetActorLocation(), Location);
+	return  Distance <= MaxAttackRange && Distance >= MinAttackRange;
+}
+
+bool ABsDragon::CanAttackTarget(const AActor* Target) const
+{
+	return bCanAttack && TargetInLOS(Target) && TargetInRange(Target);
+}
+
+EAttackResult ABsDragon::RangeAttack(const ACharacter* Target)
+{
+	if (!TargetInRange(Target))
+	{
+		return EAttackResult::EAR_TooFar;
+	}
+
+	if (!TargetInLOS(Target))
+	{
+		return EAttackResult::EAR_NoLOS;
+	}
+	
+	UWorld* World = GetWorld();
+	if (CanAttack() && Target && ProjectileClass && World && GetMesh())
 	{
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = this;
@@ -21,32 +82,13 @@ void ABsDragon::RangeAttack(const ACharacter* Target)
 		const FTransform SpawnTransform = GetMesh()->GetSocketTransform(FName("RangedAttackSocket"));
 		const FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnTransform.GetLocation(), TargetTransform.GetLocation());
 
-		FHitResult LOSHitResult;
-		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(this);
-		QueryParams.AddIgnoredActor(Target);
-
-		// Is anything in the way of us and the target?
-		bool bHasLOS = !World->LineTraceSingleByChannel(
-			LOSHitResult,
-			SpawnTransform.GetLocation(),
-			 TargetTransform.GetLocation(),
-			 ECollisionChannel::ECC_Visibility,
-			 QueryParams
-		);
-
-		if (!bHasLOS)
-		{
-			// TODO: This should return a bool or notify the failure somehow.
-			return;
-		}
 		
 		if (ABsProjectileBase* Projectile = World->SpawnActor<ABsProjectileBase>(ProjectileClass, SpawnTransform.GetLocation(), SpawnRotation, SpawnParameters))
 		{
 			if (UProjectileMovementComponent* ProjectileMovement = Projectile->GetProjectileMovement())
 			{
 				const float ProjectileSpeed = Projectile->GetProjectileDamageProperties().ProjectileSpeed;
-				if (ProjectileSpeed <= 0) return;
+				if (ProjectileSpeed <= 0) return EAttackResult::EAR_None;
 				
 				// (Dist to target / bullet speed) * (target speed * target forward vec + target location)
 				const float TravelTime = FVector::Dist(TargetTransform.GetLocation(), SpawnTransform.GetLocation()) / ProjectileSpeed;
@@ -75,13 +117,16 @@ void ABsDragon::RangeAttack(const ACharacter* Target)
 				if (bHasAimSolution)
 				{
 					ProjectileMovement->Velocity = OutLaunchVelocity;
+					OnAttack();
+					return EAttackResult::EAR_Successful;
 				}
-				else
-				{
-					// Cannot hit target, just fire in a straight line
-				}
+				
+				Projectile->Destroy();
+				return EAttackResult::EAR_NoLOS;
 			}
 				
 		}
 	}
+
+	return EAttackResult::EAR_None;
 }

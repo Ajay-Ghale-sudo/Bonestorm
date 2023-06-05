@@ -81,14 +81,36 @@ void ABsEnemyBase::SeverHead()
 	}
 }
 
+void ABsEnemyBase::EnableAttack()
+{
+	bCanAttack = true;
+}
+
+void ABsEnemyBase::OnAttack()
+{
+	bCanAttack = false;
+	GetWorldTimerManager().SetTimer(
+		AttackTimerHandle,
+		this,
+		&ABsEnemyBase::EnableAttack,
+		AttackCooldown,
+		false
+	);
+}
+
 // Called every frame
 void ABsEnemyBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
+bool ABsEnemyBase::CanAttack() const
+{
+	return bIsAlive && bCanAttack;
+}
+
 void ABsEnemyBase::ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,
-	const float Damage)
+                                           const float Damage)
 {
 	if (!Projectile) return;
 

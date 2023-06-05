@@ -19,13 +19,37 @@ void ABsAIController::ProcessStateChange()
 {
 	if (UBlackboardComponent* CurrentBlackboard = GetBlackboardComponent())
 	{
-		CurrentBlackboard->SetValueAsEnum("CurrentState", static_cast<uint8>(CurrentState));
-		CurrentBlackboard->SetValueAsEnum("PreviousState", static_cast<uint8>(PreviousState));
+		CurrentBlackboard->SetValueAsEnum(BsBlackboardKeys::CurrentState, static_cast<uint8>(CurrentState));
+		CurrentBlackboard->SetValueAsEnum(BsBlackboardKeys::PreviousState, static_cast<uint8>(PreviousState));
 	}
 	
 	if (CurrentState == EBsAIState::EAIS_Dead && PreviousState != CurrentState)
 	{
 		OnDeath();
+	}
+}
+
+void ABsAIController::ProcessState()
+{
+	if (Blackboard)
+	{
+		const AActor* Target = Cast<AActor>(Blackboard->GetValueAsObject(BsBlackboardKeys::Target));
+		const APawn* CurrentPawn = GetPawn();
+		if (!Target || !CurrentPawn) return;
+		
+		const float Distance = FVector::Dist(Target->GetActorLocation(), CurrentPawn->GetActorLocation());
+
+		// TODO: Replace magic numbers with configurable variables.
+		const float ChaseDistanceThreshold = 1500.f;
+		const float FleeDistanceThreshold = 1300.f;
+		if (Distance > ChaseDistanceThreshold)
+		{
+			SetCurrentState(EBsAIState::EAIS_Chase);
+		}
+		else if (Distance <= FleeDistanceThreshold)
+		{
+			SetCurrentState(EBsAIState::EAIS_Flee);
+		}
 	}
 }
 

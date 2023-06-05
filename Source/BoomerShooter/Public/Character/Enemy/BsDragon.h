@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Character/Enemy/BsFlyingEnemy.h"
+#include "Data/AttackResult.h"
 #include "BsDragon.generated.h"
 
 
@@ -18,17 +19,29 @@ class BOOMERSHOOTER_API ABsDragon : public ABsFlyingEnemy
 
 
 public:
+
+	bool TargetInLOS(const AActor* Target) const;
+	bool TargetInRange(const AActor* Target) const;
+	bool LocationInRange(const FVector& Location) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanAttackTarget(const AActor* Target) const;
+	
 	/**
 	 * @brief Spawns a projectile aimed at the target.
-	 * @param TargetTransform The Transform of the target to attack
+	 * @param Target The target to attack
+	 * @returns The result of the attack
 	 */
 	UFUNCTION(BlueprintCallable)
-	void RangeAttack(const ACharacter* Target);
+	EAttackResult RangeAttack(const ACharacter* Target);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragon")
 	TSubclassOf<ABsProjectileBase> ProjectileClass;
 
-	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragon")
+	float MaxAttackRange = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dragon")
+	float MinAttackRange = 500.f;
 };

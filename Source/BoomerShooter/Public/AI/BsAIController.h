@@ -9,13 +9,22 @@
 UENUM(BlueprintType)
 enum class EBsAIState : uint8
 {
-	EAIS_Idle UMETA(DisplayName = "Idle"),
-	EAIS_Chase UMETA(DisplayName = "Chase"),
-	EAIS_Attack UMETA(DisplayName = "Attack"),
-	EAIS_Dead UMETA(DisplayName = "Dead"),
+	EAIS_Idle		UMETA(DisplayName = "Idle"),
+	EAIS_Chase		UMETA(DisplayName = "Chase"),
+	EAIS_Attack		UMETA(DisplayName = "Attack"),
+	EAIS_Flee		UMETA(DisplayName = "Flee"),
+	EAIS_Dead		UMETA(DisplayName = "Dead"),
 
 	Default_Max UMETA(DisplayName = "Max")
 };
+
+namespace BsBlackboardKeys
+{
+	const FName CurrentState = "CurrentState";
+	const FName PreviousState = "PreviousState";
+	const FName Target = "Target";
+	const FName POI = "POI";
+}
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsAIControllerEvent);
@@ -34,6 +43,9 @@ public:
 	virtual void SetCurrentState(const EBsAIState NewState);
 
 	virtual void ProcessStateChange();
+
+	UFUNCTION(BlueprintCallable)
+	virtual void ProcessState();
 	
 	UFUNCTION()
 	virtual void Die();

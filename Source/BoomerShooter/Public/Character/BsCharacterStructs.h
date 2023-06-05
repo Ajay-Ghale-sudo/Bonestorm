@@ -180,6 +180,18 @@ struct FBsSlideConfig
 	float SlideStrength = 1000.f;
 
 	/**
+	 * @brief The strength of a downward impulse when the character is on a slope.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
+	float SlopeSlideStrength = -500.f;
+
+	/**
+	 * @brief How far below to check for a floor when the character is on a slope.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
+	float SlopeSlideFloorDistance = 200.f;
+
+	/**
 	 * @brief Timer handle used for controlling slide duration.
 	 */
 	FTimerHandle SlideTimerHandle;

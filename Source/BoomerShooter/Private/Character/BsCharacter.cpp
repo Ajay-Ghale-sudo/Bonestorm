@@ -434,11 +434,6 @@ void ABsCharacter::StopSliding()
 
 void ABsCharacter::SlideTick(float DeltaTime)
 {
-	if (SlideConfig.bSliding && GetVelocity().Size() < SlideConfig.VelocityToStopSlide)
-	{	
-		StopSliding();
-	}
-	
 	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
 		const float DesiredHeight = SlideConfig.bSliding ? SlideConfig.SlideHeight :SlideConfig.PreSlideHeight;
@@ -446,6 +441,43 @@ void ABsCharacter::SlideTick(float DeltaTime)
 		{
 			const float NewHeight = FMath::FInterpTo(Capsule->GetUnscaledCapsuleHalfHeight(), DesiredHeight, DeltaTime, 5.f);
 			Capsule->SetCapsuleHalfHeight(NewHeight, true);
+		}
+	}
+	
+	if (!SlideConfig.bSliding) return;
+	
+	if (GetVelocity().Size() < SlideConfig.VelocityToStopSlide)
+	{	
+		StopSliding();
+	}
+	
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		UWorld* World = GetWorld();
+		if (World && MovementComp->IsFalling())
+		{
+			FHitResult HitResult;
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(this);
+			
+			World->LineTraceSingleByChannel(
+				HitResult,
+				GetActorLocation(),
+				GetActorLocation() - FVector::UpVector * SlideConfig.SlopeSlideFloorDistance,
+				ECollisionChannel::ECC_Visibility,
+				Params
+			);
+			
+			// If there is a slope below us, add a small impulse to keep sliding
+			if (HitResult.bBlockingHit)
+			{
+				MovementComp->AddImpulse(FVector::UpVector * SlideConfig.SlopeSlideStrength, true);
+			}
+			else
+			{
+				// If we slide off a ledge, stop sliding
+				StopSliding();
+			}
 		}
 	}
 }

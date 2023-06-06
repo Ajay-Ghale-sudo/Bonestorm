@@ -171,6 +171,7 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
+	StopDashing();
 	StopSliding();
 	StopGrapple();
 
@@ -229,6 +230,11 @@ void ABsCharacter::Dash()
 			false
 		);
 	}
+}
+
+void ABsCharacter::StopDashing()
+{
+	DashConfig.bDashing = false;
 }
 
 void ABsCharacter::DashTick(const float DeltaTime)

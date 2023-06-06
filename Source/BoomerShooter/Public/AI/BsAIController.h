@@ -65,6 +65,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	EBsAIState PreviousState = EBsAIState::EAIS_Idle;
 
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	float ChaseDistanceThreshold = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	bool bCanFlee = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI")
+	float FleeDistanceThreshold = 1300.f;
+
 public:
 	UFUNCTION(BlueprintCallable)
 	FORCEINLINE EBsAIState GetCurrentState() const { return CurrentState; }

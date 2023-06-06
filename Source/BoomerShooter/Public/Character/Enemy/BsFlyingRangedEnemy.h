@@ -2,19 +2,19 @@
 
 #pragma once
 
-#include "Character/Enemy/BsEnemyBase.h"
-#include "BsFlyingEnemy.generated.h"
+#include "BsRangedEnemy.h"
+#include "BsFlyingRangedEnemy.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class BOOMERSHOOTER_API ABsFlyingEnemy : public ABsEnemyBase
+class BOOMERSHOOTER_API ABsFlyingRangedEnemy : public ABsRangedEnemy
 {
 	GENERATED_BODY()
 
 public:
-	ABsFlyingEnemy();
+	ABsFlyingRangedEnemy();
 
 protected:
 	virtual void BeginPlay() override;

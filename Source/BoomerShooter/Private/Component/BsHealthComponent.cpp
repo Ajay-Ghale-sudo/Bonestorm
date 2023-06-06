@@ -30,6 +30,13 @@ void UBsHealthComponent::BeginPlay()
 void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
 	AController* InstigatedBy, AActor* DamageCauser)
 {
+
+	// TODO: Damage Type should determine if self damage is allowed
+	if (!DamageCauser || DamageCauser == DamagedActor || DamagedActor == DamageCauser->GetOwner())
+	{
+		return;
+	}
+	
 	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
 	if (CurrentHealth <= 0.f)

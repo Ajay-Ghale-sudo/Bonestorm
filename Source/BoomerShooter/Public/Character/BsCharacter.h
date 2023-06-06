@@ -104,6 +104,9 @@ protected:
 	void StopGrapple();
 
 	UFUNCTION()
+	void OnGrappleDetached();
+
+	UFUNCTION()
 	void PullGrapple(FVector Vector);
 	
 	/**
@@ -215,7 +218,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
 	USpringArmComponent* WeaponSpringArmComponent;
 	
-	bool bGrappling = false;
+	bool bGrappleAttached = false;
+	bool bBeingPulledToGrapple = false;
 	bool bAlive = true;
 public:
 

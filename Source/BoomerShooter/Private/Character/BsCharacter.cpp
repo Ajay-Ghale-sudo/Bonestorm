@@ -134,7 +134,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
 		GrappleHookComponent->OnGrappleHookAttached.AddDynamic(this, &ABsCharacter::StartGrapple);
-		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::StopGrapple);
+		GrappleHookComponent->OnGrappleHookDetached.AddDynamic(this, &ABsCharacter::OnGrappleDetached);
 		GrappleHookComponent->OnGrappleHookPull.AddUObject(this, &ABsCharacter::PullGrapple);
 		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
@@ -290,16 +290,18 @@ void ABsCharacter::StartGrapple()
 {
 	StopSliding();
 	StopJumping();
-	bGrappling = true;
+	bGrappleAttached = true;
 }
 
 void ABsCharacter::StopGrapple()
 {
 	// TODO: There should be a way to "request detach" This should be done in the GrappleHookComponent.
 	// TEMP HACK: Without this check we stack overflow.
-	if (!bGrappling) return;
+	if (!bBeingPulledToGrapple) return;
 	
-	bGrappling = false;
+	bGrappleAttached = false;
+	bBeingPulledToGrapple = false;
+	
 	GetCharacterMovement()->ClearAccumulatedForces();
 
 	if (Weapon)
@@ -311,9 +313,15 @@ void ABsCharacter::StopGrapple()
 	}
 }
 
+void ABsCharacter::OnGrappleDetached()
+{
+	bGrappleAttached = false;
+	bBeingPulledToGrapple = false;
+}
+
 void ABsCharacter::PullGrapple(FVector Vector)
 {
-	if (bGrappling)
+	if (bGrappleAttached)
 	{
 		LaunchCharacter(Vector, true, true);
 	}
@@ -334,11 +342,12 @@ void ABsCharacter::Attack()
 
 void ABsCharacter::SecondaryAttack()
 {
-	if (Weapon)
+	if (bGrappleAttached && Weapon)
 	{
 		if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 		{
 			GrappleHookComponent->PullOwnerToLocation();
+			bBeingPulledToGrapple = true;
 		}
 	}
 }

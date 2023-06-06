@@ -71,6 +71,11 @@ protected:
 	void Dash();
 
 	/**
+	 * @brief Stop Dashing.
+	 */
+	void StopDashing();
+
+	/**
 	 * @brief Process and apply Dash Movement.
 	 * @param DeltaTime	The time passed since the last frame.
 	 */

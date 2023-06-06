@@ -39,16 +39,13 @@ void ABsAIController::ProcessState()
 		
 		const float Distance = FVector::Dist(Target->GetActorLocation(), CurrentPawn->GetActorLocation());
 
-		// TODO: Replace magic numbers with configurable variables.
-		const float ChaseDistanceThreshold = 1500.f;
-		const float FleeDistanceThreshold = 1300.f;
-		if (Distance > ChaseDistanceThreshold)
-		{
-			SetCurrentState(EBsAIState::EAIS_Chase);
-		}
-		else if (Distance <= FleeDistanceThreshold)
+		if (bCanFlee && Distance <= FleeDistanceThreshold)
 		{
 			SetCurrentState(EBsAIState::EAIS_Flee);
+		}
+		else if (Distance > ChaseDistanceThreshold)
+		{
+			SetCurrentState(EBsAIState::EAIS_Chase);
 		}
 	}
 }
@@ -76,6 +73,11 @@ void ABsAIController::OnPossess(APawn* InPawn)
 		{
 			HealthComponent->OnDeath.AddDynamic(this, &ABsAIController::Die);
 		}
+	}
+
+	if (Blackboard)
+	{
+		Blackboard->SetValueAsVector(BsBlackboardKeys::POI, InPawn->GetActorLocation());
 	}
 }
 

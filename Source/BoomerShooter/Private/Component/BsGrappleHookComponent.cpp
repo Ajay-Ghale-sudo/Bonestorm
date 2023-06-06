@@ -63,6 +63,8 @@ ABsGrappleProjectile* UBsGrappleHookComponent::FireGrappleHook(const FVector& St
 
 void UBsGrappleHookComponent::DetachGrappleHook()
 {
+	if (!GrappleHookProperties.bIsAttached) return; // If we are not attached, return
+	
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 	GrappleHookProperties.bIsAttached = false;
 	if (GrappleHookProperties.GrappleProjectile)

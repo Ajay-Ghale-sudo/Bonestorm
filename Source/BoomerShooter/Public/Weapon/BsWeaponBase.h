@@ -5,6 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "BsWeaponBase.generated.h"
 
+class ABsSeveredHeadBase;
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 
 UCLASS()
@@ -38,6 +39,17 @@ public:
 	 * @brief Equip the Weapon.
 	 */
 	virtual void Equip();
+
+	/**
+	 * @brief Attaches a SeveredHead to this weapon.
+	 * @param SeveredHead The SeveredHead to attach.
+	 */
+	void AttachSeveredHead(ABsSeveredHeadBase* SeveredHead);
+
+	/**
+	 * @brief Detaches the currently Attached SeveredHead.
+	 */
+	void DetachSeveredHead();
 
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;
@@ -78,6 +90,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	bool bCanAttack = true;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	FVector SeveredHeadScale = FVector(0.5f, 0.5f, 0.5f); // TODO: Should this be handled on a per head basis?
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	ABsSeveredHeadBase* AttachedSeveredHead;
 
 public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }

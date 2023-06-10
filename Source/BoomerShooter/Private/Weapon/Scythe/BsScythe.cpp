@@ -149,6 +149,14 @@ void ABsScythe::RangeAttack()
 		SpawnParams.Owner = GetOwner();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = GetInstigator();
+		
+		if (AttachedSeveredHead)
+		{
+			// TODO: Attached Severed Head mechanics
+			// Add effect to Projectile?
+			// Change the projectile that is spawned?
+		}
+		
 		if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(World->SpawnActor(RangedConfig.ProjectileClass, &SpawnTransform, SpawnParams)))
 		{
 			Projectile->SetOwner(GetOwner());
@@ -294,6 +302,11 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 
 		if (ABsSeveredHeadBase* SeveredHead = Cast<ABsSeveredHeadBase>(OtherActor))
 		{
+			// If there isn't an attached head, attempt to attach this one.
+			if (!AttachedSeveredHead)
+			{
+				AttachSeveredHead(SeveredHead);
+			}
 			return;
 		}
 

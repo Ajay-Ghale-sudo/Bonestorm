@@ -22,21 +22,47 @@ void ABsSeveredHeadBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	EnableMeshOverlap();	
+}
+
+void ABsSeveredHeadBase::SetAttached(bool bAttached)
+{
+	bIsAttached = bAttached;
+
+	if (bIsAttached)
+	{
+		DisableMeshOverlap();
+	}
+	else
+	{
+		EnableMeshOverlap();
+	}
+}
+
+
+void ABsSeveredHeadBase::EnableMeshOverlap()
+{
 	if (HeadMesh)
 	{
 		HeadMesh->OnComponentBeginOverlap.AddDynamic(this, &ABsSeveredHeadBase::OnMeshOverlapBegin);
+		HeadMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
-	
+}
+
+void ABsSeveredHeadBase::DisableMeshOverlap()
+{
+	if (HeadMesh)
+	{
+		HeadMesh->OnComponentBeginOverlap.RemoveDynamic(this, &ABsSeveredHeadBase::OnMeshOverlapBegin);
+		HeadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 
 void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
+                                            UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	if (UBsInventoryComponent* Inventory = OtherActor->FindComponentByClass<UBsInventoryComponent>())
-	{
-		Inventory->AddSeveredHead(this);
-	}
+	
 }
 
 

@@ -9,6 +9,7 @@
 class ABsSeveredHeadBase;
 class ABsWeaponBase;
 class UBsHealthComponent;
+class UAnimMontage;
 
 UCLASS()
 class BOOMERSHOOTER_API ABsEnemyBase : public ACharacter, public IReceiveDamage
@@ -48,6 +49,14 @@ protected:
 	void EnableAttack();
 	virtual void OnAttack();
 
+	UFUNCTION()
+	virtual void StartHitStun();
+
+	UFUNCTION()
+	virtual void EndHitStun();
+
+	void PlayMontage(UAnimMontage* MontageToPlay) const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBsHealthComponent* HealthComponent;
@@ -60,6 +69,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	bool bCanAttack = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
+	bool bHitStunned = false;
 
 	FTimerHandle AttackTimerHandle;
 
@@ -74,6 +86,17 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	float RagdollPhysicsBlendWeight = 0.75f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UAnimMontage* HitStunMontage;
+
+	FTimerHandle HitStunTimerHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float HitStunDuration = 0.3f;
+
+	EMovementMode PreHitStunMovementMode = EMovementMode::MOVE_Walking;
+	
 	
 public:
 	FORCEINLINE bool GetIsAlive() const { return bIsAlive; }

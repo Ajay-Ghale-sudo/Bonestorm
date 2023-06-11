@@ -6,6 +6,7 @@
 #include "Component/BsHealthComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Hazard/BsHazardBase.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
@@ -30,8 +31,20 @@ void ABsEnemyBase::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsEnemyBase::Die);
+		HealthComponent->OnTookDamage.AddDynamic(this, &ABsEnemyBase::StartHitStun);
+	}
+
+	if (const UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		PreHitStunMovementMode = MovementComponent->MovementMode;
 	}
 	
+}
+
+// Called every frame
+void ABsEnemyBase::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void ABsEnemyBase::Die()
@@ -98,10 +111,45 @@ void ABsEnemyBase::OnAttack()
 	);
 }
 
-// Called every frame
-void ABsEnemyBase::Tick(float DeltaTime)
+void ABsEnemyBase::StartHitStun()
 {
-	Super::Tick(DeltaTime);
+	if (bHitStunned) return;
+	
+	PlayMontage(HitStunMontage);
+	
+	if (UCharacterMovementComponent* CMovement = GetCharacterMovement())
+	{
+		bHitStunned = true;
+		PreHitStunMovementMode = CMovement->MovementMode;
+		CMovement->DisableMovement();
+		
+		GetWorldTimerManager().SetTimer(
+			HitStunTimerHandle,
+			this,
+			&ABsEnemyBase::EndHitStun,
+			HitStunDuration, // TODO: This could be determined by the attack or the montage played.
+			false
+		);
+	}
+}
+
+void ABsEnemyBase::EndHitStun()
+{
+	if (UCharacterMovementComponent* CMovement = GetCharacterMovement())
+	{
+		CMovement->SetMovementMode(PreHitStunMovementMode);
+	}
+
+	bHitStunned = false;
+}
+
+
+void ABsEnemyBase::PlayMontage(UAnimMontage* MontageToPlay) const
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->Montage_Play(MontageToPlay);
+	}
 }
 
 bool ABsEnemyBase::CanAttack() const
@@ -132,5 +180,3 @@ void ABsEnemyBase::ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage
 	
 	TakeDamage(Damage, FDamageEvent(), Hazard->GetInstigatorController(), Hazard);
 }
-
-

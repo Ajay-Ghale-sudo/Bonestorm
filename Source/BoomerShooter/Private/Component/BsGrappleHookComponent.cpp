@@ -137,7 +137,7 @@ void UBsGrappleHookComponent::PullOwnerToLocation()
 
 void UBsGrappleHookComponent::PullOwnerTick()
 {
-	if (GrappleHookProperties.bIsAttached)
+	if (GrappleHookProperties.bIsAttached && GrappleHookProperties.AttachedGrapplePoint)
 	{
 		PullOwnerToLocation();
 	}

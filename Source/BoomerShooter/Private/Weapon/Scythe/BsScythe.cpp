@@ -244,6 +244,10 @@ void ABsScythe::Throw()
 	{
 		bReturningToOwner = true;
 		bAttachedToGrapplePoint = false;
+		if (GrappleHookComponent)
+		{
+			GrappleHookComponent->DetachGrappleHook();
+		}
 		return;
 	}
 

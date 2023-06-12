@@ -53,7 +53,6 @@ void ABsElevatorBase::SetActivated(bool bActivated)
 	else OnElevatorDeactivated.Broadcast();
 
 	SetActorTickEnabled(bIsActivated);
-
 }
 
 void ABsElevatorBase::MoveTick(float DeltaTime)
@@ -71,6 +70,7 @@ void ABsElevatorBase::MoveTick(float DeltaTime)
 	}
 	else
 	{
+		OnElevatorDestinationReached.Broadcast();
 		SetActivated(false);
 	}
 }

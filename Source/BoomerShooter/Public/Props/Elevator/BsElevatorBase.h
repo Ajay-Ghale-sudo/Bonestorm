@@ -34,7 +34,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetActivated(bool bActivated);
 
-
 public:
 	/**
 	 * @brief Event that is called when the elevator is activated
@@ -47,6 +46,12 @@ public:
 	 */
 	UPROPERTY(BlueprintAssignable, Category = "Elevator|Event")
 	FBsElevatorEvent OnElevatorDeactivated;
+
+	/**
+	 * @brief Event that is called when the elevator hits its desired location
+	 */
+	UPROPERTY(BlueprintAssignable, Category = "Elevator|Event")
+	FBsElevatorEvent OnElevatorDestinationReached;
 	
 protected:
 	virtual void BeginPlay() override;

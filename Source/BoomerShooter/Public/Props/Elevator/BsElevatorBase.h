@@ -115,7 +115,7 @@ protected:
 	/**
 	 * @brief Set if elevator is activated
 	 **/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Elevator|State")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Elevator|State")
 	bool bIsActivated = false;
 
 	/**

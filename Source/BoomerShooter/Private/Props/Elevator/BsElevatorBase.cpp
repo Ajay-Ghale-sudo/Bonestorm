@@ -71,6 +71,5 @@ void ABsElevatorBase::MoveTick(float DeltaTime)
 	else
 	{
 		OnElevatorDestinationReached.Broadcast();
-		SetActivated(false);
 	}
 }

@@ -8,7 +8,8 @@
 ABsDoorBase::ABsDoorBase()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
+	SetActorTickEnabled(false);
 
 	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
 	SetRootComponent(DoorMesh);
@@ -24,11 +25,41 @@ void ABsDoorBase::Interact(AActor* Interactor)
 void ABsDoorBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	OnDoorStateChanged.AddDynamic(this, &ABsDoorBase::UpdateTargetTransform);
 
-	if (DoorMesh)
+	InitialTransform = GetTransform();
+	TargetTransform = GetTransform();
+}
+
+void ABsDoorBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	DoorTick(DeltaSeconds);
+}
+
+void ABsDoorBase::DoorTick(float DeltaSeconds)
+{
+	if (!GetTransform().Equals(TargetTransform))
 	{
-		StartingRotation = DoorMesh->GetRelativeRotation();
+		const FVector Location = GetActorTransform().GetLocation();
+		const FRotator Rotation = GetActorTransform().GetRotation().Rotator();
+
+		const FVector NewLocation = FMath::VInterpTo(Location, TargetTransform.GetLocation(), DeltaSeconds, DoorSpeed);
+		const FRotator NewRotation = FMath::RInterpTo(Rotation, TargetTransform.GetRotation().Rotator(), DeltaSeconds, DoorSpeed);
+		
+		SetActorLocationAndRotation(NewLocation, NewRotation);
 	}
+	else
+	{
+		SetActorTickEnabled(false);
+	}
+}
+
+void ABsDoorBase::UpdateTargetTransform()
+{
+	TargetTransform = InitialTransform + (bIsOpen ? OpenedTransform : ClosedTransform);
+	SetActorTickEnabled(true);
 }
 
 void ABsDoorBase::ToggleDoor()

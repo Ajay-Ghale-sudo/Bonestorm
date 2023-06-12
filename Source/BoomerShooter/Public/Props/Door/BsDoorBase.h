@@ -33,6 +33,15 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void DoorTick(float DeltaSeconds);
+
+	/**
+	 * @brief Updates the target transform based on the current state of the door and enables Tick.
+	 */
+	UFUNCTION()
+	void UpdateTargetTransform();
 	
 	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	void ToggleDoor();
@@ -41,7 +50,6 @@ protected:
 	virtual bool CanOpen();
 
 protected:
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
 	UStaticMeshComponent* DoorMesh;
 	
@@ -54,10 +62,33 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
 	bool bOpenedElsewhere = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
-	float RotationAmount = 90.f;
+	/**
+	 * @brief The relative transform to apply to InitialTransform when Closed.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
+	FTransform ClosedTransform;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
-	FRotator StartingRotation;
-	
+	/**
+	 * @brief The relative transform to apply to InitialTransform when Opened.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
+	FTransform OpenedTransform;
+
+	/**
+	 * @brief The initial transform of the door. Set in BeginPlay.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
+	FTransform InitialTransform;
+
+	/**
+	 * @brief The target transform of the door. Set in UpdateTargetTransform.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Door")
+	FTransform TargetTransform;
+
+	/**
+	 * @brief The speed at which the door opens and closes.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
+	float DoorSpeed = 5.f;	
 };

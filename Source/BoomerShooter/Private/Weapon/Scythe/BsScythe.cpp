@@ -172,6 +172,8 @@ void ABsScythe::RangeAttack()
 					false
 				);
 		}
+
+		PlayMontage(RangedAttackMontage);
 	}
 }
 

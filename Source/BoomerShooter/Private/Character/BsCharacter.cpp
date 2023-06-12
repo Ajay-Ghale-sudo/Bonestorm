@@ -473,6 +473,9 @@ void ABsCharacter::SlideTick(float DeltaTime)
 		{
 			FHitResult HitResult;
 			FCollisionQueryParams Params;
+			TArray<AActor*> IgnoredActors;
+			GetAttachedActors(IgnoredActors);
+			Params.AddIgnoredActors(IgnoredActors);
 			Params.AddIgnoredActor(this);
 			
 			World->LineTraceSingleByChannel(

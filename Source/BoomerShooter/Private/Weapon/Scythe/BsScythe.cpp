@@ -140,7 +140,6 @@ void ABsScythe::SecondaryFire()
 void ABsScythe::RangeAttack()
 {
 	// Spawn Projectile
-	OnRangedAttack();
 	UWorld* World = GetWorld();
 	if (RangedConfig.ProjectileClass && World && RangedConfig.bCanFire)
 	{
@@ -161,6 +160,8 @@ void ABsScythe::RangeAttack()
 		{
 			Projectile->SetOwner(GetOwner());
 			Projectile->SetInstigator(GetInstigator());
+			PlayMontage(RangedAttackMontage);
+			OnRangedAttack();
 
 			RangedConfig.bCanFire = false;
 			World->GetTimerManager()
@@ -172,8 +173,6 @@ void ABsScythe::RangeAttack()
 					false
 				);
 		}
-
-		PlayMontage(RangedAttackMontage);
 	}
 }
 

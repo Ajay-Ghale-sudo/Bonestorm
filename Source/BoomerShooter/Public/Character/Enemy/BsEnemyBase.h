@@ -47,6 +47,7 @@ protected:
 	virtual void SeverHead();
 
 	void EnableAttack();
+	virtual void Attack();
 	virtual void OnAttack();
 
 	UFUNCTION()

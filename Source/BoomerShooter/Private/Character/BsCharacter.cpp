@@ -120,6 +120,12 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Throw
 		EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
+
+		// Block
+		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::Block);
+
+		// Detach head from weapon
+		EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
 	}
 }
 
@@ -346,6 +352,11 @@ void ABsCharacter::Attack()
 	}
 }
 
+void ABsCharacter::Block()
+{
+	// TODO: Add block capability here, parrying should activate in first 0.2s of block
+}
+
 void ABsCharacter::SecondaryAttack()
 {
 	if (bGrappleAttached && Weapon)
@@ -372,6 +383,14 @@ void ABsCharacter::NextWeaponMode()
 	if (Weapon)
 	{
 		Weapon->NextWeaponMode();
+	}
+}
+
+void ABsCharacter::DetachHead()
+{
+	if (Weapon)
+	{
+		Weapon->DetachSeveredHead();
 	}
 }
 

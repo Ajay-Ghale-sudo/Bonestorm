@@ -120,6 +120,11 @@ protected:
 	void Attack();
 
 	/**
+	 * @brief Block with the weapon.
+	 */
+	void Block();
+
+	/**
 	 * @brief Uses secondary attack with the weapon
 	 */
 	void SecondaryAttack();
@@ -133,6 +138,11 @@ protected:
 	 * @brief Change the Weapon Mode to the next available.
 	 */
 	void NextWeaponMode();
+
+	/**
+	 * @brief Detach head from weapon
+	 */
+	void DetachHead();
 
 	/**
 	 * @brief Attempt to interact with an object in front of the character.
@@ -163,8 +173,7 @@ protected:
 
 	UFUNCTION()
 	void Die();
-
-
+	
 	UFUNCTION()
 	void OnSeveredHeadPickup(ABsSeveredHeadBase* Head);
 

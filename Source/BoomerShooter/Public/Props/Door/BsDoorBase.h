@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	virtual void CloseDoor();
 
+	UFUNCTION(BlueprintCallable)
+	virtual void SetLocked(bool bLock);
+
 public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FBsDoorEvent OnDoorStateChanged;
@@ -45,7 +48,6 @@ protected:
 	
 	UFUNCTION(BlueprintCallable, meta = (AllowInEventReceiver = "true"))
 	void ToggleDoor();
-
 	
 	virtual bool CanOpen();
 

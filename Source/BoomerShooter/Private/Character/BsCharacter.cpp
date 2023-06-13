@@ -245,6 +245,7 @@ void ABsCharacter::StopDashing()
 
 void ABsCharacter::DashTick(const float DeltaTime)
 {
+	SetCanBeDamaged(true);
 	if (!DashConfig.bDashing || DashConfig.DashElapsedTime >= DashConfig.DashDuration)
 	{
 		return;
@@ -252,6 +253,7 @@ void ABsCharacter::DashTick(const float DeltaTime)
 
 	DashConfig.DashElapsedTime += DeltaTime;
 	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
+	SetCanBeDamaged(false);
 
 	if (DashConfig.DashElapsedTime >= DashConfig.DashDuration)
 	{
@@ -260,6 +262,7 @@ void ABsCharacter::DashTick(const float DeltaTime)
 		FVector DashNormal = DashConfig.DashDirection;
 		DashNormal.Normalize();
 		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Length();
+		SetCanBeDamaged(true);
 	}	
 }
 

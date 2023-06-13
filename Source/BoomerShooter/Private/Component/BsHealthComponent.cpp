@@ -14,7 +14,6 @@ UBsHealthComponent::UBsHealthComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void UBsHealthComponent::BeginPlay()
 {
@@ -32,7 +31,7 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 {
 
 	// TODO: Damage Type should determine if self damage is allowed
-	if (!DamageCauser || DamageCauser == DamagedActor || DamagedActor == DamageCauser->GetOwner())
+	if (DamageCauser == DamagedActor || (DamageCauser && DamagedActor == DamageCauser->GetOwner()))
 	{
 		return;
 	}

@@ -19,16 +19,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	/**
+	 * @brief Binds the switch trigger event
+	 */
 	virtual void BindSwitchTrigger();
 
+	/**
+	 * @brief Called when the switch is triggered
+	 */
 	UFUNCTION()
 	void OnSwitchTriggered();
 
-
 protected:
+	/**
+	 * @brief The switch trigger component
+	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Evelvator|Switch")
 	UBsSwitchTriggerComponent* SwitchTriggerComponent;
-	
-public:
-
 };

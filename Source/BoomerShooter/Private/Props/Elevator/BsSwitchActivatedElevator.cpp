@@ -1,10 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Props/Elevator/BsSwitchActivatedElevator.h"
-
 #include "Component/BsSwitchTriggerComponent.h"
-
 
 // Sets default values
 ABsSwitchActivatedElevator::ABsSwitchActivatedElevator()

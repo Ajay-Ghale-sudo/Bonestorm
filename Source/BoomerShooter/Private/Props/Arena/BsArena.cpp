@@ -3,7 +3,6 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Character.h"
 #include "Props/Door/BsDoorBase.h"
-
 // Sets default values
 ABsArena::ABsArena()
 {

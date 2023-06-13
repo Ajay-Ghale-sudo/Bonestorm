@@ -87,10 +87,12 @@ void ABsDoorBase::CloseDoor()
 	OnDoorStateChanged.Broadcast();
 }
 
+void ABsDoorBase::SetLocked(bool bLock)
+{
+	bLocked = bLock;
+}
 
 bool ABsDoorBase::CanOpen()
 {
 	return !bLocked;
 }
-
-

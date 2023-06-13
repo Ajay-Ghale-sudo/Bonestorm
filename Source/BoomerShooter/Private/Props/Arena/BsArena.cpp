@@ -5,7 +5,6 @@
 #include "Props/Door/BsDoorBase.h"
 
 // Sets default values
-
 ABsArena::ABsArena()
 {
 	ArenaVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("ArenaVolume"));
@@ -18,11 +17,11 @@ void ABsArena::BeginPlay()
 	Super::BeginPlay();
 	if (ArenaVolume)
 	{
-		ArenaVolume->OnComponentBeginOverlap.AddDynamic(this, &ABsArena::OnBoxComponentBeginOverlap);
+		ArenaVolume->OnComponentBeginOverlap.AddDynamic(this, &ABsArena::OnArenaVolumeBeginOverlap);
 	}
 }
 
-void ABsArena::OnBoxComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+void ABsArena::OnArenaVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
@@ -53,8 +52,6 @@ void ABsArena::SetDoorsLocked(bool bLockDoors)
 {
 	if (UWorld* World = GetWorld())
 	{
-		// Doors lock if arena is activated and unlock if unactivated
-		bLockDoors = bArenaActive;
 		for (auto Door : LockableDoors)
 		{
 			Door->CloseDoor();

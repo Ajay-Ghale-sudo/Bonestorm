@@ -92,10 +92,7 @@ void ABsDoorBase::SetLocked(bool bLock)
 	bLocked = bLock;
 }
 
-
 bool ABsDoorBase::CanOpen()
 {
 	return !bLocked;
 }
-
-

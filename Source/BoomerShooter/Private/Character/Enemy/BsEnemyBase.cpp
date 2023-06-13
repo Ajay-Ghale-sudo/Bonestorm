@@ -99,6 +99,10 @@ void ABsEnemyBase::EnableAttack()
 	bCanAttack = true;
 }
 
+void ABsEnemyBase::Attack()
+{
+}
+
 void ABsEnemyBase::OnAttack()
 {
 	bCanAttack = false;

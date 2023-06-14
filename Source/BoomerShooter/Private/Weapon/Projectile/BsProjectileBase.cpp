@@ -4,7 +4,9 @@
 #include "Weapon/Projectile/BsProjectileBase.h"
 
 #include "BoomerShooter.h"
+#include "Component/BsHealthComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 
@@ -52,7 +54,7 @@ void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnCo
 void ABsProjectileBase::OnProjectileHitInternal(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	
+
 }
 
 void ABsProjectileBase::OnProjectileOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -64,6 +66,10 @@ void ABsProjectileBase::OnProjectileOverlap_Implementation(UPrimitiveComponent* 
 void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (UBsHealthComponent* HealthComponent = Cast<UBsHealthComponent>(OtherActor->GetComponentByClass(UBsHealthComponent::StaticClass())))
+	{
+		OtherActor->TakeDamage(ProjectileDamageProperties.ProjectileDamage, FDamageEvent(ProjectileDamageProperties.ProjectileDamageType), GetInstigatorController(), this);
+	}
 }
 
 

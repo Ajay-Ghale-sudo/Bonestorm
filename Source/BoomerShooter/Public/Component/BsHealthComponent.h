@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "BsHealthComponent.generated.h"
 
-
+class UBsBleedDamageType;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsHealthComponentEvent);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -35,8 +35,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	void ApplyDamage(float Damage);
+	
 	UFUNCTION()
 	void ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	
+	UFUNCTION()
+	void ProcessBleedDamage();
+
+	FTimerHandle BleedTimerHandle;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
@@ -47,6 +54,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth = 100.f;
+
+	UPROPERTY()
+	const UBsBleedDamageType* CurrentBleedDamageType;
+	
+	float CurrentBleedDuration = 0.f;
 public:
 
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }

@@ -91,7 +91,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	bool bCanAttack = true;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FVector SeveredHeadScale = FVector(0.5f, 0.5f, 0.5f); // TODO: Should this be handled on a per head basis?
 	

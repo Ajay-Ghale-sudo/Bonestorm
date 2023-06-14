@@ -2,7 +2,7 @@
 
 
 #include "Props/Head/BsSeveredHeadBase.h"
-
+#include "Weapon/Projectile/BsProjectileBase.h"
 #include "Component/BsInventoryComponent.h"
 
 
@@ -39,7 +39,6 @@ void ABsSeveredHeadBase::SetAttached(bool bAttached)
 	}
 }
 
-
 void ABsSeveredHeadBase::EnableMeshOverlap()
 {
 	if (HeadMesh)
@@ -65,4 +64,14 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 	
 }
 
-
+ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform,
+	FActorSpawnParameters& SpawnParameters)
+{
+	ABsProjectileBase* Projectile = nullptr;
+	UWorld* World = GetWorld();
+	if (ProjectileClass && World)
+	{
+		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
+	}
+	return Projectile;
+}

@@ -1,8 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Component/BsHealthComponent.h"
-
+#include "Data/BsDamageType.h"
 
 // Sets default values for this component's properties
 UBsHealthComponent::UBsHealthComponent()
@@ -26,37 +25,71 @@ void UBsHealthComponent::BeginPlay()
 	}
 }
 
-void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
-	AController* InstigatedBy, AActor* DamageCauser)
+void UBsHealthComponent::ApplyDamage(float Damage)
 {
-
-	// TODO: Damage Type should determine if self damage is allowed
-	if (DamageCauser == DamagedActor || (DamageCauser && DamagedActor == DamageCauser->GetOwner()))
-	{
-		return;
-	}
-
-	if (DamageTypesToIgnore.Contains(DamageType->GetClass()))
-	{
-		return;
-	}
-	
 	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
 		OnDeath.Broadcast();
+		BleedTimerHandle.Invalidate();
+		CurrentBleedDamageType = nullptr;
 	}
 	OnHealthChanged.Broadcast();
 }
 
+void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
+                                       AController* InstigatedBy, AActor* DamageCauser)
+{
+
+	// TODO: Damage Type should determine if self damage is allowed
+	if (!DamagedActor || DamageCauser == DamagedActor || (DamageCauser && DamagedActor == DamageCauser->GetOwner()) || !DamageType)
+	{
+		return;
+	}
+	
+	if (DamageTypesToIgnore.Contains(DamageType->GetClass()))
+	{
+		return;
+	}
+	
+	if (const UBsBleedDamageType* BleedDamageType = Cast<UBsBleedDamageType>(DamageType))
+	{
+		CurrentBleedDamageType = BleedDamageType;
+		CurrentBleedDuration = 0.f;
+		ProcessBleedDamage();
+	}
+	ApplyDamage(Damage);
+}
+
+void UBsHealthComponent::ProcessBleedDamage()
+{
+	BleedTimerHandle.Invalidate();
+	if (CurrentBleedDamageType)
+	{
+		CurrentBleedDuration += CurrentBleedDamageType->GetBleedInterval();
+		if (CurrentBleedDuration < CurrentBleedDamageType->GetBleedDuration())
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				BleedTimerHandle,
+				this,
+				&UBsHealthComponent::ProcessBleedDamage,
+				CurrentBleedDamageType->GetBleedInterval(),
+				false
+				);
+			ApplyDamage(CurrentBleedDamageType->GetBleedDamage());
+		}
+		else
+		{
+			CurrentBleedDuration = 0.f;
+			CurrentBleedDamageType = nullptr;
+		}
+	}
+}
 
 // Called every frame
 void UBsHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                        FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
-

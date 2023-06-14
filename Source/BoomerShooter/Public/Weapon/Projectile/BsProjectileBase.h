@@ -8,7 +8,6 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 
-
 USTRUCT(BlueprintType)
 struct FProjectileDamageProperties
 {

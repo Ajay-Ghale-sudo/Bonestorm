@@ -1,11 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Weapon/BsWeaponBase.h"
-
 #include "Props/Head/BsSeveredHeadBase.h"
-
-
 // Sets default values
 ABsWeaponBase::ABsWeaponBase()
 {

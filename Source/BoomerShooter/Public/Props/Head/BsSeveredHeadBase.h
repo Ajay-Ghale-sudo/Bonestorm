@@ -5,6 +5,8 @@
 #include "GameFramework/Actor.h"
 #include "BsSeveredHeadBase.generated.h"
 
+class ABsProjectileBase;
+
 UCLASS()
 class BOOMERSHOOTER_API ABsSeveredHeadBase : public AActor
 {
@@ -19,6 +21,8 @@ public:
 	 * @param bAttached If the SeveredHead is attached or not.
 	 */
 	void SetAttached(bool bAttached);
+	
+	ABsProjectileBase* CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform, FActorSpawnParameters& SpawnParameters);
 
 protected:
 	// Called when the game starts or when spawned

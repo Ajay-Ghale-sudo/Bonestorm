@@ -42,8 +42,6 @@ protected:
 	
 	UFUNCTION()
 	void ProcessBleedDamage();
-
-	FTimerHandle BleedTimerHandle;
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
@@ -59,6 +57,8 @@ protected:
 	const UBsBleedDamageType* CurrentBleedDamageType;
 	
 	float CurrentBleedDuration = 0.f;
+
+	FTimerHandle BleedTimerHandle;
 public:
 
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }

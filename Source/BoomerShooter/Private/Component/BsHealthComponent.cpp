@@ -75,7 +75,7 @@ void UBsHealthComponent::ProcessBleedDamage()
 				this,
 				&UBsHealthComponent::ProcessBleedDamage,
 				CurrentBleedDamageType->GetBleedInterval(),
-				true
+				false
 				);
 			ApplyDamage(CurrentBleedDamageType->GetBleedDamage());
 		}

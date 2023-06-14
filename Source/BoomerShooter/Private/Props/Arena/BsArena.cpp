@@ -47,7 +47,6 @@ void ABsArena::StartArena()
 
 void ABsArena::EndArena()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Ending Arena")));
 	bArenaActive = false;
 	SetDoorsLocked(bArenaActive);
 	OnArenaFinished.Broadcast();
@@ -83,7 +82,6 @@ void ABsArena::OnSpawnedEnemyDeath()
 			ArenaConfig.SpawnedEnemies.RemoveAt(index);
 		}
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString::Printf(TEXT("Amount of enemies remaining in wave: %d"), ArenaConfig.SpawnedEnemies.Num()));
 	if (ArenaConfig.SpawnedEnemies.Num() > 0)
 	{
 		// If number of spawned enemies is greater than zero, do nothing.

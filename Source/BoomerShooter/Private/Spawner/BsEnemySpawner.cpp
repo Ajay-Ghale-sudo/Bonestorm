@@ -29,7 +29,7 @@ void ABsEnemySpawner::StartSpawnTimer()
 	if (World && SpawnEnemyClass)
 	{
         FTimerManager& TimerManager = GetWorldTimerManager();
-        //TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
+        TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemyCallback, SpawnInterval, true);
 	}
 }
 
@@ -50,6 +50,11 @@ ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 	}
 	StopSpawnTimer();
 	return SpawnedEnemy;
+}
+
+void ABsEnemySpawner::SpawnEnemyCallback()
+{
+	SpawnEnemy();
 }
 
 void ABsEnemySpawner::StopSpawnTimer()

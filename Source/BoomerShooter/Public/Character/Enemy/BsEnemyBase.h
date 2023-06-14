@@ -13,6 +13,8 @@ class ABsWeaponBase;
 class UBsHealthComponent;
 class UAnimMontage;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsEnemyEventWithCaller, ABsEnemyBase*, Enemy);
+
 UCLASS()
 class BOOMERSHOOTER_API ABsEnemyBase : public ACharacter, public IReceiveDamage
 {
@@ -42,6 +44,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanMeleeAttackTarget(AActor* Target);
 
+public:
+	FBsEnemyEventWithCaller OnThisEnemyDeath;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

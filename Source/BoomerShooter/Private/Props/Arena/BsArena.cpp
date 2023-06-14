@@ -42,6 +42,7 @@ void ABsArena::StartArena()
 	SetDoorsLocked(bArenaActive);
 	ArenaVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	OnArenaStarted.Broadcast();
+	OnThisArenaStarted.Broadcast(this);
 	NextWave();
 }
 
@@ -54,9 +55,9 @@ void ABsArena::EndArena()
 
 void ABsArena::ActivateSpawner()
 {
-	for (auto Spawner : ArenaConfig.EnemySpawnPoints)
+	for (const auto Spawner : ArenaConfig.EnemySpawnPoints)
 	{
-		// Make array of spawned enemies (for now, skeletons).
+		// Make array of spawned enemies
 		if (ABsEnemyBase* Enemy = Spawner->SpawnEnemy())
 		{
 			ArenaConfig.SpawnedEnemies.Add(Enemy);
@@ -67,7 +68,7 @@ void ABsArena::ActivateSpawner()
 		}
 		else
 		{
-			// @TODO Handle if enemy failed to spawn, currently covered in spawner by spawnparams, but should be done here.
+			// @TODO Handle if enemy failed to spawn
 		}
 	}
 }

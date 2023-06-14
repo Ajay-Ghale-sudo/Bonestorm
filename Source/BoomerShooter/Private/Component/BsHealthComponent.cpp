@@ -36,6 +36,11 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 	{
 		return;
 	}
+
+	if (DamageTypesToIgnore.Contains(DamageType->GetClass()))
+	{
+		return;
+	}
 	
 	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);

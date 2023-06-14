@@ -2,10 +2,12 @@
 
 #pragma once
 
+#include "Data/AttackResult.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "BsEnemyBase.generated.h"
 
+class UBoxComponent;
 class ABsSeveredHeadBase;
 class ABsWeaponBase;
 class UBsHealthComponent;
@@ -34,6 +36,12 @@ public:
 	virtual void ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage) override;
 	//	                   		 \\
 
+	UFUNCTION(BlueprintCallable)
+	virtual EAttackResult MeleeAttack();
+
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanMeleeAttackTarget(AActor* Target);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,6 +57,10 @@ protected:
 	void EnableAttack();
 	virtual void Attack();
 	virtual void OnAttack();
+	virtual void BindMeleeHitBox();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetMeleeHitBoxEnabled(bool bEnabled);
 
 	UFUNCTION()
 	virtual void StartHitStun();
@@ -62,6 +74,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBsHealthComponent* HealthComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UBoxComponent* MeleeHitBox;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	TSubclassOf<ABsSeveredHeadBase> SeveredHeadClass;
 	
@@ -78,6 +93,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	float AttackCooldown = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float MeleeAttackRange = 300.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float MeleeAttackDamage = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	FName RootBoneName = FName("Pelvis");

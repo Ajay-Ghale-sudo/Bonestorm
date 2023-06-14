@@ -39,6 +39,9 @@ protected:
 	void ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 	
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
+	TSet<TSubclassOf<UDamageType>> DamageTypesToIgnore;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float CurrentHealth = 100.f;
 

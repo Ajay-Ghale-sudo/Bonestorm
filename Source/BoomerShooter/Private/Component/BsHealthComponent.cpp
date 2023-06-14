@@ -56,7 +56,6 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 	if (const UBsBleedDamageType* BleedDamageType = Cast<UBsBleedDamageType>(DamageType))
 	{
 		CurrentBleedDamageType = BleedDamageType;
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, FString("Bleeding"));
 		CurrentBleedDuration = 0.f;
 		ProcessBleedDamage();
 	}

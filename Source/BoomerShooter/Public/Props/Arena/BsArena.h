@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Data/BsArenaConfig.h"
 #include "GameFramework/Actor.h"
 #include "BsArena.generated.h"
 
@@ -35,6 +36,15 @@ protected:
 	
 	UFUNCTION()
 	void EndArena();
+
+	UFUNCTION()
+	void ActivateSpawner();
+
+	UFUNCTION()
+	void OnSpawnedEnemyDeath();
+
+	UFUNCTION()
+	void NextWave();
 	
 	UFUNCTION()
 	void SetDoorsLocked(bool bLockDoors);
@@ -48,4 +58,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arena")
 	bool bArenaActive = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Arena|Enemies")
+	FBsArenaConfig ArenaConfig;
 };

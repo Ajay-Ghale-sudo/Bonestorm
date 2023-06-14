@@ -29,20 +29,32 @@ void ABsEnemySpawner::StartSpawnTimer()
 	if (World && SpawnEnemyClass)
 	{
         FTimerManager& TimerManager = GetWorldTimerManager();
-        TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemy, SpawnInterval, true);
+        TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemyCallback, SpawnInterval, true);
 	}
 }
 
-void ABsEnemySpawner::SpawnEnemy()
+ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 {
 	UWorld* World = GetWorld();
+	ABsEnemyBase* SpawnedEnemy = nullptr;
 	if (World && CurrentSpawnAmount < MaxSpawnAmount)
 	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		FTransform SpawnTransform = GetTransform();
-		World->SpawnActor(SpawnEnemyClass, &SpawnTransform);
-		CurrentSpawnAmount++;
+		SpawnedEnemy = Cast<ABsEnemyBase>(World->SpawnActor(SpawnEnemyClass, &SpawnTransform));
+		if (SpawnedEnemy)
+		{
+			++CurrentSpawnAmount;
+		}
 	}
 	StopSpawnTimer();
+	return SpawnedEnemy;
+}
+
+void ABsEnemySpawner::SpawnEnemyCallback()
+{
+	SpawnEnemy();
 }
 
 void ABsEnemySpawner::StopSpawnTimer()

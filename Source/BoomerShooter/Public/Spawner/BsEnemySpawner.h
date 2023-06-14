@@ -27,8 +27,11 @@ public:
 	 * @brief Virtual function for spawning enemies
 	 **/
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
-	virtual void SpawnEnemy();
+	virtual ABsEnemyBase* SpawnEnemy();
 
+	UFUNCTION()
+	void SpawnEnemyCallback();
+	
 	/**
 	 * @brief Invalidates spawn timer, stopping enemies from spawning
 	 **/

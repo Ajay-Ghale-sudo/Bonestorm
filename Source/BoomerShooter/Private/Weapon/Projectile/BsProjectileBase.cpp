@@ -28,6 +28,11 @@ ABsProjectileBase::ABsProjectileBase()
 	ProjectileCollision->SetCollisionObjectType(ECC_Projectile);	
 }
 
+void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
+{
+	ProjectileDamageProperties.ProjectileDamageType = DamageType;
+}
+
 // Called when the game starts or when spawned
 void ABsProjectileBase::BeginPlay()
 {

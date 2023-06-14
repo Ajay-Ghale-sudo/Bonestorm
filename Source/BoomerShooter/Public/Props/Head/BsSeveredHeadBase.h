@@ -6,6 +6,7 @@
 #include "BsSeveredHeadBase.generated.h"
 
 class ABsProjectileBase;
+class UDamageType;
 
 UCLASS()
 class BOOMERSHOOTER_API ABsSeveredHeadBase : public AActor
@@ -41,7 +42,6 @@ protected:
 	UFUNCTION()
 	void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
-
 protected:
 	// TODO: This should be a Skeletal Mesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
@@ -49,6 +49,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
 	bool bIsAttached;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	TSubclassOf<UDamageType> HeadDamageType;
 
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }

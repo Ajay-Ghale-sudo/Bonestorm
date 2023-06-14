@@ -2,9 +2,10 @@
 
 
 #include "Character/Enemy/BsEnemyBase.h"
-
 #include "Component/BsHealthComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/AttackResult.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Hazard/BsHazardBase.h"
@@ -28,6 +29,9 @@ void ABsEnemyBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	BindMeleeHitBox();
+	SetMeleeHitBoxEnabled(false);
+	
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsEnemyBase::Die);
@@ -52,6 +56,7 @@ void ABsEnemyBase::Die()
 	bIsAlive = false;
 	SeverHead();
 	TriggerRagdoll();
+	SetMeleeHitBoxEnabled(false);
 }
 
 void ABsEnemyBase::TriggerRagdoll()
@@ -113,6 +118,19 @@ void ABsEnemyBase::OnAttack()
 		AttackCooldown,
 		false
 	);
+}
+
+void ABsEnemyBase::BindMeleeHitBox()
+{
+	// Nothing by default
+}
+
+void ABsEnemyBase::SetMeleeHitBoxEnabled(bool bEnabled)
+{
+	if (MeleeHitBox)
+	{
+		MeleeHitBox->SetCollisionEnabled(bEnabled ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	}
 }
 
 void ABsEnemyBase::StartHitStun()
@@ -183,4 +201,23 @@ void ABsEnemyBase::ReceiveHazardDamage(ABsHazardBase* Hazard, const float Damage
 	if (!Hazard) return;
 	
 	TakeDamage(Damage, FDamageEvent(), Hazard->GetInstigatorController(), Hazard);
+}
+
+EAttackResult ABsEnemyBase::MeleeAttack()
+{
+	return EAttackResult::EAR_None;
+}
+
+bool ABsEnemyBase::CanMeleeAttackTarget(AActor* Target)
+{
+	if (!Target || !CanAttack()) return false;
+
+	if (FVector::Dist(GetActorLocation(), Target->GetActorLocation()) <= MeleeAttackRange)
+	{
+		// TODO: Is the target in front of the enemy?
+		// TODO: Do we have LOS?
+		return true;
+	}
+
+	return false;
 }

@@ -16,8 +16,7 @@ public:
 	// Sets default values for this character's properties
 	ABsSkeleton();
 
-	UFUNCTION(BlueprintCallable)
-	void MeleeAttack();
+	virtual EAttackResult MeleeAttack() override;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -25,6 +24,12 @@ protected:
 	virtual void Die() override;
 	virtual void Attack() override;
 
+	virtual void BindMeleeHitBox() override;
+
+	UFUNCTION()
+	void OnMeleeHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	                          UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	                          const FHitResult& SweepResult);
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skeleton")
 	UAnimMontage* MeleeAttackMontage;

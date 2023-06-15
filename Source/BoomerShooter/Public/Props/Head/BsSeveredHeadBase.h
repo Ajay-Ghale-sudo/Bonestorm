@@ -8,6 +8,7 @@
 class ABsProjectileBase;
 class UDamageType;
 
+DECLARE_MULTICAST_DELEGATE(FBsSeveredHeadEvent)
 UCLASS()
 class BOOMERSHOOTER_API ABsSeveredHeadBase : public AActor
 {
@@ -25,6 +26,18 @@ public:
 	
 	ABsProjectileBase* CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform, FActorSpawnParameters& SpawnParameters);
 
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float ChargeCost = 10.f;
+
+	float CurrentCharge = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float MaxCharge = 100.f;
+	
+	FBsSeveredHeadEvent OnDetachedHead;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

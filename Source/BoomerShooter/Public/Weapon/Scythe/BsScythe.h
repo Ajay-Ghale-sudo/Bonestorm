@@ -7,7 +7,6 @@
 #include "BsScythe.generated.h"
 
 class UBsGrappleHookComponent;
-
 class UBoxComponent;
 class ABsProjectileBase;
 

@@ -22,7 +22,8 @@ void ABsSeveredHeadBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	EnableMeshOverlap();	
+	EnableMeshOverlap();
+	CurrentCharge = MaxCharge;
 }
 
 void ABsSeveredHeadBase::SetAttached(bool bAttached)
@@ -64,17 +65,25 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 }
 
 ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform,
-	FActorSpawnParameters& SpawnParameters)
+                                                        FActorSpawnParameters& SpawnParameters)
 {
 	ABsProjectileBase* Projectile = nullptr;
-	UWorld* World = GetWorld();
-	if (ProjectileClass && World)
-	{
-		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
-		if (Projectile)
-		{
-			Projectile->SetDamageType(HeadDamageType);
-		}
+    UWorld* World = GetWorld();
+    if (ProjectileClass && World)
+    {
+    	if (Projectile)
+    	{
+    		Projectile->SetDamageType(HeadDamageType);
+    	}
+    	CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
+    	if (CurrentCharge > 0.f)
+    	{
+    		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters));
+    	}
+    	else
+    	{
+    		OnDetachedHead.Broadcast();
+    	}
 	}
 	return Projectile;
 }

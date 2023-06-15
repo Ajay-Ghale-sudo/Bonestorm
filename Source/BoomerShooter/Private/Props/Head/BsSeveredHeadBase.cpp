@@ -57,7 +57,6 @@ void ABsSeveredHeadBase::DisableMeshOverlap()
 	}
 }
 
-
 void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
@@ -72,6 +71,10 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
 	if (ProjectileClass && World)
 	{
 		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
+		if (Projectile)
+		{
+			Projectile->SetDamageType(HeadDamageType);
+		}
 	}
 	return Projectile;
 }

@@ -45,6 +45,11 @@ void ABsProjectileBase::BeginPlay()
 	}
 }
 
+void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
+{
+	ProjectileDamageProperties.ProjectileDamageType = DamageType;
+}
+
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
 													   UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {

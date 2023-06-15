@@ -161,23 +161,24 @@ void ABsScythe::RangeAttack()
 		{
 			Projectile = Cast<ABsProjectileBase>(World->SpawnActor(RangedConfig.ProjectileClass, &SpawnTransform, SpawnParams));
 		}
+		
 		if (Projectile)
 		{
 			Projectile->SetOwner(GetOwner());
 			Projectile->SetInstigator(GetInstigator());
 			PlayMontage(RangedAttackMontage);
 			OnRangedAttack();
-
-			RangedConfig.bCanFire = false;
-			World->GetTimerManager()
-				.SetTimer(
-					RangedConfig.FireRateTimerHandle,
-					this,
-					&ABsScythe::EnableRangedFire,
-					RangedConfig.FireRate,
-					false
-				);
 		}
+
+		RangedConfig.bCanFire = false;
+		World->GetTimerManager()
+			.SetTimer(
+				RangedConfig.FireRateTimerHandle,
+				this,
+				&ABsScythe::EnableRangedFire,
+				RangedConfig.FireRate,
+				false
+		);
 	}
 }
 

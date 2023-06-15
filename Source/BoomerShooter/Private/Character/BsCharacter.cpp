@@ -402,11 +402,15 @@ void ABsCharacter::Interact()
 	if (const UWorld* World = GetWorld())
 	{
 		FHitResult InteractTraceResult;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(this);
+
 		World->LineTraceSingleByChannel(
 			InteractTraceResult,
 			CameraComponent->GetComponentLocation(),
 			CameraComponent->GetComponentLocation() + CameraComponent->GetForwardVector() * InteractConfig.InteractRange,
-			ECollisionChannel::ECC_Visibility
+			ECollisionChannel::ECC_Visibility,
+			QueryParams
 		);
 
 		if (InteractTraceResult.bBlockingHit)

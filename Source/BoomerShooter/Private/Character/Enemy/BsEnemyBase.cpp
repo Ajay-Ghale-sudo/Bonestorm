@@ -53,6 +53,9 @@ void ABsEnemyBase::Tick(float DeltaTime)
 
 void ABsEnemyBase::Die()
 {
+	// Do nothing if we're already dead.
+	if (!bIsAlive) return;
+	
 	bIsAlive = false;
 	SeverHead();
 	TriggerRagdoll();

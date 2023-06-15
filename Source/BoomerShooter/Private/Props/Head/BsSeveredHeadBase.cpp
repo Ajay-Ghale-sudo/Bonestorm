@@ -78,7 +78,7 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
     	CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
     	if (CurrentCharge > 0.f)
     	{
-    		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
+    		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters));
     	}
     	else
     	{

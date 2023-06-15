@@ -45,6 +45,11 @@ void ABsProjectileBase::BeginPlay()
 	}
 }
 
+void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
+{
+	ProjectileDamageProperties.ProjectileDamageType = DamageType;
+}
+
 void ABsProjectileBase::StopMovementAndDisableCollision()
 {
 	if (ProjectileMovement)

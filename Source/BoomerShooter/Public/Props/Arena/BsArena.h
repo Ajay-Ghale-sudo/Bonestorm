@@ -10,6 +10,7 @@ class UBoxComponent;
 class ABsDoorBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsArenaEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsArenaEventWithCaller, ABsArena*, Arena);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsArena : public AActor
@@ -23,6 +24,9 @@ public:
 public:
 	FBsArenaEvent OnArenaStarted;
 	FBsArenaEvent OnArenaFinished;
+
+	FBsArenaEventWithCaller OnThisArenaStarted;
+	FBsArenaEventWithCaller OnThisArenaFinished;
 
 protected:
 	// Called when the game starts or when spawned
@@ -61,4 +65,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Arena|Enemies")
 	FBsArenaConfig ArenaConfig;
+
+public:
+	FORCEINLINE FBsArenaConfig GetArenaConfig() const { return ArenaConfig; }
 };

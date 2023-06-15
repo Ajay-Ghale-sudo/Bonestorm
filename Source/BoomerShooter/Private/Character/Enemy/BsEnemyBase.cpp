@@ -60,6 +60,7 @@ void ABsEnemyBase::Die()
 	SeverHead();
 	TriggerRagdoll();
 	SetMeleeHitBoxEnabled(false);
+	OnThisEnemyDeath.Broadcast(this);
 }
 
 void ABsEnemyBase::TriggerRagdoll()

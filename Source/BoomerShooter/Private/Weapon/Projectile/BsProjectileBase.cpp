@@ -28,11 +28,6 @@ ABsProjectileBase::ABsProjectileBase()
 	ProjectileCollision->SetCollisionObjectType(ECC_Projectile);	
 }
 
-void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
-{
-	ProjectileDamageProperties.ProjectileDamageType = DamageType;
-}
-
 // Called when the game starts or when spawned
 void ABsProjectileBase::BeginPlay()
 {
@@ -48,6 +43,11 @@ void ABsProjectileBase::BeginPlay()
 	{
 		ProjectileMovement->InitialSpeed = ProjectileDamageProperties.ProjectileSpeed;
 	}
+}
+
+void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
+{
+	ProjectileDamageProperties.ProjectileDamageType = DamageType;
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,

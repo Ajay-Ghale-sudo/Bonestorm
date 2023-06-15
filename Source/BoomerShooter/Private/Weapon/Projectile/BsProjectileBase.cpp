@@ -45,8 +45,18 @@ void ABsProjectileBase::BeginPlay()
 	}
 }
 
+void ABsProjectileBase::StopMovementAndDisableCollision()
+{
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->StopMovementImmediately();
+	}
+
+	SetActorEnableCollision(false);
+}
+
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
-													   UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+                                                       UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	OnProjectileHitInternal(OnComponentHit, OtherActor, OtherComp, NormalImpulse, Hit);
 }
@@ -66,11 +76,16 @@ void ABsProjectileBase::OnProjectileOverlap_Implementation(UPrimitiveComponent* 
 void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (UBsHealthComponent* HealthComponent = Cast<UBsHealthComponent>(OtherActor->GetComponentByClass(UBsHealthComponent::StaticClass())))
+	if (OtherActor && OtherActor != GetOwner())
 	{
-		OtherActor->TakeDamage(ProjectileDamageProperties.ProjectileDamage, FDamageEvent(ProjectileDamageProperties.ProjectileDamageType), GetInstigatorController(), this);
+		// TODO: Handle penetration.
+		OtherActor->TakeDamage(
+			ProjectileDamageProperties.ProjectileDamage,
+			FDamageEvent(ProjectileDamageProperties.ProjectileDamageType),
+			GetInstigatorController(),
+			this
+		);
+		StopMovementAndDisableCollision();
+		Destroy();
 	}
 }
-
-
-

@@ -57,6 +57,11 @@ void ABsWeaponBase::Fire()
 	{
 		return;
 	}
+	if (AttachedSeveredHead != nullptr && AttachedSeveredHead->bShouldDetach == true)
+	{
+		DetachSeveredHead();
+		return;
+	}
 	
 	bCanAttack = false;
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsWeaponBase::EnableAttack, AttackRate, false);

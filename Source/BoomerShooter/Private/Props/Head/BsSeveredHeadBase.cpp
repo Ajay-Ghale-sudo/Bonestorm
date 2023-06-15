@@ -70,7 +70,6 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
 	UWorld* World = GetWorld();
 	if (ProjectileClass && World)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("Skull Projectile"));
 		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
 		if (Projectile)
 		{

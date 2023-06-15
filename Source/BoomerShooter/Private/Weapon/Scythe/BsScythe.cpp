@@ -159,7 +159,6 @@ void ABsScythe::RangeAttack()
 		}
 		if (!Projectile)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("Base Projectile"));
 			Projectile = Cast<ABsProjectileBase>(World->SpawnActor(RangedConfig.ProjectileClass, &SpawnTransform, SpawnParams));
 		}
 		if (Projectile)

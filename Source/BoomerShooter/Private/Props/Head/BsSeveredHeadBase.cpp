@@ -69,18 +69,21 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
 {
 	ABsProjectileBase* Projectile = nullptr;
     UWorld* World = GetWorld();
-    if (ProjectileClass && World && CurrentCharge >= 0.f)
+    if (ProjectileClass && World)
     {
-        Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
-        CurrentCharge = CurrentCharge - ChargeCost;
-        if (Projectile)
-        {
-        	Projectile->SetDamageType(HeadDamageType);
-        }
+    	if (Projectile)
+    	{
+    		Projectile->SetDamageType(HeadDamageType);
+    	}
+    	CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
+    	if (CurrentCharge > 0.f)
+    	{
+    		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass ,&SpawnTransform, SpawnParameters));
+    	}
+    	else
+    	{
+    		OnDetachedHead.Broadcast();
+    	}
 	}
-    else
-    {
-    	bShouldDetach = true;
-    }
 	return Projectile;
 }

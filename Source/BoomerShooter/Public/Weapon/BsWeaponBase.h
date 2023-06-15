@@ -49,6 +49,7 @@ public:
 	/**
 	 * @brief Detaches the currently Attached SeveredHead.
 	 */
+	UFUNCTION()
 	void DetachSeveredHead();
 
 public:

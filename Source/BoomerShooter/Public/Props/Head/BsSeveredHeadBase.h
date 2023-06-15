@@ -8,6 +8,7 @@
 class ABsProjectileBase;
 class UDamageType;
 
+DECLARE_MULTICAST_DELEGATE(FBsSeveredHeadEvent)
 UCLASS()
 class BOOMERSHOOTER_API ABsSeveredHeadBase : public AActor
 {
@@ -34,9 +35,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	float MaxCharge = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	bool bShouldDetach = false;
+	
+	FBsSeveredHeadEvent OnDetachedHead;
 	
 protected:
 	// Called when the game starts or when spawned

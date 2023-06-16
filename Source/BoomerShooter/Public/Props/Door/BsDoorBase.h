@@ -6,6 +6,7 @@
 #include "Interfaces/Interactable.h"
 #include "BsDoorBase.generated.h"
 
+class UWidgetComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsDoorEvent);
 
@@ -54,6 +55,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
 	UStaticMeshComponent* DoorMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
+	UWidgetComponent* DoorStatusWidgetComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Door")
 	bool bIsOpen = false;
@@ -92,5 +96,8 @@ protected:
 	 * @brief The speed at which the door opens and closes.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Door")
-	float DoorSpeed = 5.f;	
+	float DoorSpeed = 5.f;
+
+public:
+	FORCEINLINE bool IsLocked() const { return bLocked; }
 };

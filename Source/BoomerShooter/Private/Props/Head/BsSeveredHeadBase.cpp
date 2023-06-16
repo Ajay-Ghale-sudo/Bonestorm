@@ -71,16 +71,17 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
     UWorld* World = GetWorld();
     if (ProjectileClass && World)
     {
-    	if (Projectile)
-    	{
-    		Projectile->SetDamageType(HeadDamageType);
-    	}
-    	CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
+    	
     	if (CurrentCharge > 0.f)
     	{
+    		CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
     		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters));
+		    if (Projectile)
+		    {
+    			Projectile->SetDamageType(HeadDamageType);
+		    }
     	}
-    	else
+    	if (CurrentCharge <= 0.f)
     	{
     		OnDetachedHead.Broadcast();
     	}

@@ -2,6 +2,8 @@
 
 
 #include "Props/Door/BsDoorBase.h"
+#include "Components/WidgetComponent.h"
+#include "UI/Widget/BsDoorIndicatorWidget.h"
 
 
 // Sets default values
@@ -13,6 +15,9 @@ ABsDoorBase::ABsDoorBase()
 
 	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
 	SetRootComponent(DoorMesh);
+	DoorStatusWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("DoorWidget"));
+	DoorStatusWidgetComponent->SetupAttachment(RootComponent);
+	DoorStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
 }
 
 void ABsDoorBase::Interact(AActor* Interactor)
@@ -30,6 +35,14 @@ void ABsDoorBase::BeginPlay()
 
 	InitialTransform = GetTransform();
 	TargetTransform = GetTransform();
+
+	if (DoorStatusWidgetComponent)
+	{
+		if (UBsDoorIndicatorWidget* DoorWidget = Cast<UBsDoorIndicatorWidget>(DoorStatusWidgetComponent->GetWidget()))
+		{
+			DoorWidget->SetDoorIndicator(this);
+		}
+	}
 }
 
 void ABsDoorBase::Tick(float DeltaSeconds)
@@ -90,6 +103,7 @@ void ABsDoorBase::CloseDoor()
 void ABsDoorBase::SetLocked(bool bLock)
 {
 	bLocked = bLock;
+	OnDoorStateChanged.Broadcast();
 }
 
 bool ABsDoorBase::CanOpen()

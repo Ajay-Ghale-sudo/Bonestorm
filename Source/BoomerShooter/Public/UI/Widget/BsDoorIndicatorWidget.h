@@ -6,6 +6,7 @@
 #include "BsDoorIndicatorWidget.generated.h"
 
 class ABsDoorBase;
+
 UCLASS()
 class BOOMERSHOOTER_API UBsDoorIndicatorWidget : public UUserWidget
 {

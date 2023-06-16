@@ -46,6 +46,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
 	TSet<TSubclassOf<UDamageType>> DamageTypesToIgnore;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
+	TSoftObjectPtr<AActor> LastDamagedBy;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float CurrentHealth = 100.f;
@@ -63,4 +66,5 @@ public:
 
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	FORCEINLINE AActor* GetLastDamagedBy() const { return LastDamagedBy.Get(); }
 };

@@ -31,3 +31,9 @@ class UBsSkeletonMeleeDamageType : public UBsDamageType
 {
 	GENERATED_BODY()
 };
+
+UCLASS()
+class UBsExplosionDamageType : public UBsDamageType
+{
+	GENERATED_BODY()	
+};

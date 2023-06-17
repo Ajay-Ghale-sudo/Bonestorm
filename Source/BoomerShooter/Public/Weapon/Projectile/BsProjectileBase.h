@@ -43,6 +43,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void StopMovementAndDisableCollision();
+	virtual void OnImpact();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileHit(UPrimitiveComponent* OnComponentHit, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
@@ -74,4 +75,5 @@ protected:
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 	FORCEINLINE FProjectileDamageProperties GetProjectileDamageProperties() const { return ProjectileDamageProperties; }
+	FORCEINLINE float GetProjectileDamage() const { return ProjectileDamageProperties.ProjectileDamage; }
 };

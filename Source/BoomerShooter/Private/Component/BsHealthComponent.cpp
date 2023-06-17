@@ -2,6 +2,7 @@
 
 #include "Component/BsHealthComponent.h"
 #include "Data/BsDamageType.h"
+#include "Weapon/Projectile/BsExplosiveProjectile.h"
 
 // Sets default values for this component's properties
 UBsHealthComponent::UBsHealthComponent()
@@ -61,6 +62,20 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 		CurrentBleedDuration = 0.f;
 		ProcessBleedDamage();
 	}
+	else if (const UBsExplosionDamageType* ExplosionDamageType = Cast<UBsExplosionDamageType>(DamageType))
+	{
+		ABsExplosiveProjectile* Projectile = Cast<ABsExplosiveProjectile>(DamageCauser);
+		const AActor* CurrentOwner = GetOwner();
+		if (CurrentOwner && Projectile)
+		{
+			FVector LaunchVector = CurrentOwner->GetActorLocation() - Projectile->GetActorLocation();
+			LaunchVector.Normalize();
+			LaunchVector *= Projectile->GetExplosionImpulse();
+			
+			OnExplosionHit.Broadcast(LaunchVector);
+		}
+	}
+	
 	ApplyDamage(Damage);
 }
 

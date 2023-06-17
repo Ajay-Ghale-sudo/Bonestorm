@@ -52,6 +52,9 @@ struct FBsScytheBlockConfig
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
 	float ParryCooldown = 1.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float BlockingDamageReduction = 0.3f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
 	bool bCanParry = true;
 
@@ -123,7 +126,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
 	virtual bool CanAttack() const override;
-	virtual bool BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual float BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void StartBlock() override;
 	virtual void StopBlock() override;
 	void StartParry();

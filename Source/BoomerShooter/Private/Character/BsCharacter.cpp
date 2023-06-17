@@ -74,14 +74,15 @@ void ABsCharacter::BeginPlay()
 	}
 }
 
-bool ABsCharacter::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser) const
+float ABsCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
 {
+	float ActualDamage = Damage;
 	if (Weapon && Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser))
 	{
-		return false;
+		ActualDamage = Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser);		
 	}
-	return Super::ShouldTakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	return Super::TakeDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 }
 
 // Called every frame

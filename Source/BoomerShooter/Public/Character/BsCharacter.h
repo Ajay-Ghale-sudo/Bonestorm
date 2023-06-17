@@ -52,7 +52,7 @@ protected:
 	/**
 	 *
 	 */
-	virtual bool ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
+	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	/**
 	 * @briefHandles the Move input action.

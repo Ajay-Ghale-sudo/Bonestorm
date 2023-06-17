@@ -73,10 +73,10 @@ void ABsWeaponBase::SecondaryFire()
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsWeaponBase::EnableAttack, AttackRate, false);
 }
 
-bool ABsWeaponBase::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+float ABsWeaponBase::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	return false;
+	return Damage;
 }
 
 void ABsWeaponBase::StartBlock()

@@ -21,7 +21,7 @@ public:
 	virtual void Fire();
 	UFUNCTION(BlueprintCallable)
 	virtual void SecondaryFire();
-	virtual bool BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	virtual float BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 	virtual void StartBlock();
 	virtual void StopBlock();
 	

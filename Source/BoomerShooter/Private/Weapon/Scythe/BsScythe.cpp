@@ -113,29 +113,36 @@ bool ABsScythe::CanAttack() const
 	return true;
 }
 
-bool ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (BlockConfig.bParrying)
 	{
+		Damage = 0.f;
 		if (DamageCauser)
 		{
 			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
 		}
-		return true;
+		return Damage;
+	}
+	if (BlockConfig.bBlocking)
+	{
+		Damage = Damage * BlockConfig.BlockingDamageReduction;
+		return Damage;
 	}
 	return Super::BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void ABsScythe::StartBlock()
 {
-	BlockConfig.bBlocking = true;
 	StartParry();
+	BlockConfig.bBlocking = true;
 }
 
 void ABsScythe::StopBlock()
 {
 	BlockConfig.ParryTimerHandle.Invalidate();
 	BlockConfig.bBlocking = false;
+	StopParry();
 }
 
 void ABsScythe::StartParry()

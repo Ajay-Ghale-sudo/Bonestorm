@@ -1,9 +1,9 @@
 #include "Weapon/Scythe/BsScythe.h"
 
 #include "BoomerShooter.h"
-#include "Camera/CameraComponent.h"
 #include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/Projectile/BsGrappleProjectile.h"
@@ -117,6 +117,12 @@ void ABsScythe::EnableRangedFire()
 	RangedConfig.bCanFire = true;
 }
 
+void ABsScythe::MeleeAttackFinished()
+{
+	bIsAttacking = false;
+	bCanAttack = true;
+}
+
 void ABsScythe::Fire()
 {
 	if (!CanAttack()) return;
@@ -187,7 +193,8 @@ void ABsScythe::MeleeAttack()
 	OnMeleeAttack();
 	PlayMontage(MeleeAttackMontage);
 	bCanAttack = false;
-	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsScythe::EnableAttack, AttackDuration, false);
+	bIsAttacking = true;
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsScythe::MeleeAttackFinished, AttackDuration, false);
 }
 
 void ABsScythe::SecondaryAttack()
@@ -262,7 +269,6 @@ void ABsScythe::Throw()
 	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	ThrowStartLocation = GetActorLocation();
 
-	bIsAttacking = true;
 	bThrown = true;
 	bCanAttack = false;
 }
@@ -272,6 +278,13 @@ void ABsScythe::Equip()
 	Super::Equip();
 
 	SetActorRelativeLocation(FVector::ZeroVector);
+}
+
+void ABsScythe::DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead)
+{
+	if (HasAttachedHead()) return;
+
+	AttachSeveredHead(DecapitatedHead);
 }
 
 void ABsScythe::OnGrappleHookDetached()
@@ -285,15 +298,6 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 {
 	if (bThrown)
 	{
-		
- 		if (IReceiveDamage* DamageActor = Cast<IReceiveDamage>(OtherActor))
-		{
- 			if (!bIsAttacking) return;
- 			
-			DamageActor->ReceiveMeleeDamage(SweepResult, this, MeleeDamage);
- 			return;
-		}
-
 		if (OtherActor == GetOwner())
 		{
 			return;
@@ -301,8 +305,6 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 		
 		if (UBsGrapplePointComponent* GrapplePointComponent = OtherActor->GetComponentByClass<UBsGrapplePointComponent>())
 		{
-			if (!bThrown) return;
-
 			AttachToComponent(GrapplePointComponent, FAttachmentTransformRules::KeepWorldTransform);
 			bAttachedToGrapplePoint = true;
 			GrappleHookComponent->AttachToGrapplePoint(GrapplePointComponent);
@@ -321,6 +323,9 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			return;
 		}
 
+
+		// TODO: Need Scythe Damage Type.
+		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
 		bReturningToOwner = true;
 	}
 }
@@ -328,7 +333,7 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 void ABsScythe::OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	if (bIsAttacking)
+	if (!bThrown && bIsAttacking)
 	{
 		if (IReceiveDamage* DamageActor = Cast<IReceiveDamage>(OtherActor))
 		{

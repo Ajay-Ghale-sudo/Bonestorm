@@ -101,6 +101,8 @@ void ABsWeaponBase::Equip()
 
 void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 {
+	if (!SeveredHead) return;
+	
 	if (AttachedSeveredHead)
 	{
 		DetachSeveredHead();

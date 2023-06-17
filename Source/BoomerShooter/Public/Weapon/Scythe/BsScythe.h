@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Interfaces/Decapitator.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Projectile/BsGrappleProjectile.h"
 #include "BsScythe.generated.h"
@@ -41,7 +42,7 @@ struct FScytheRangedConfig
  * 
  */
 UCLASS()
-class BOOMERSHOOTER_API ABsScythe : public ABsWeaponBase
+class BOOMERSHOOTER_API ABsScythe : public ABsWeaponBase, public IDecapitator
 {
 	GENERATED_BODY()
 
@@ -91,12 +92,16 @@ public:
 	virtual void Throw() override;
 	virtual void Equip() override;
 
+	virtual void DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead) override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
 	virtual bool CanAttack() const override;
 	void EnableRangedFire();
+
+	void MeleeAttackFinished();
 	
 	UFUNCTION()
 	void OnGrappleHookDetached();
@@ -129,9 +134,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
 	UBoxComponent* ScytheCollision;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Scythe")
-	bool bIsAttacking = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float AttackDuration = 0.5f;
@@ -170,7 +172,6 @@ protected:
 	FScytheRangedConfig RangedConfig;
 
 public:
-	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }
 	FORCEINLINE bool IsGrappling() const { return bGrappling; }
 	FORCEINLINE bool IsThrown() const { return bThrown; }
 	FORCEINLINE bool IsReturningToOwner() const { return bReturningToOwner; }

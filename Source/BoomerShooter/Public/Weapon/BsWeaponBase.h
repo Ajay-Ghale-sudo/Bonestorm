@@ -92,6 +92,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	bool bCanAttack = true;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Scythe")
+	bool bIsAttacking = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FVector SeveredHeadScale = FVector(0.5f, 0.5f, 0.5f); // TODO: Should this be handled on a per head basis?
 	
@@ -99,5 +102,7 @@ protected:
 	ABsSeveredHeadBase* AttachedSeveredHead;
 
 public:
+	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
+	FORCEINLINE bool HasAttachedHead() const { return AttachedSeveredHead != nullptr; }
 };

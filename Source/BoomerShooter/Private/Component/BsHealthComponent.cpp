@@ -52,6 +52,8 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 	{
 		return;
 	}
+
+	LastDamagedBy = DamageCauser;
 	
 	if (const UBsBleedDamageType* BleedDamageType = Cast<UBsBleedDamageType>(DamageType))
 	{

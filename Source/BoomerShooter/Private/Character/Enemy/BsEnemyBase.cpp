@@ -9,6 +9,7 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Hazard/BsHazardBase.h"
+#include "Interfaces/Decapitator.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
@@ -94,11 +95,20 @@ void ABsEnemyBase::SeverHead()
 		const FQuat InstigatorRotation = GetControlRotation().Quaternion();
 		SpawnTransform.SetRotation(InstigatorRotation);
 		SpawnTransform.SetScale3D(CurrentMesh->GetComponentScale());
+		
 		if (ABsSeveredHeadBase* SeveredHead = World->SpawnActor<ABsSeveredHeadBase>(SeveredHeadClass, SpawnTransform, SpawnParams))
 		{
 			// TODO: Launch Vector should be determined by the attack.
 			const FVector LaunchVector = FVector(0.f, 0.f, 600.f);
 			SeveredHead->GetHeadMesh()->AddImpulse(LaunchVector, NAME_None, true);
+
+			if (HealthComponent)
+			{
+				if (IDecapitator* Decapitator = Cast<IDecapitator>(HealthComponent->GetLastDamagedBy()))
+				{
+					Decapitator->DecapitatedActor(SeveredHead);
+				}	
+			}
 		}
 	}
 }

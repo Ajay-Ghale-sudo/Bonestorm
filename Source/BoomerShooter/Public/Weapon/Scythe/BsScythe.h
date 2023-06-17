@@ -38,6 +38,30 @@ struct FScytheRangedConfig
 	FTimerHandle FireRateTimerHandle;
 };
 
+USTRUCT(BlueprintType)
+struct FBsScytheBlockConfig
+{
+	GENERATED_BODY()
+
+	FTimerHandle ParryTimerHandle;
+	FTimerHandle ParryCooldownHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryDuration = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryCooldown = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bCanParry = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bBlocking = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bParrying = false;
+};
+
 /**
  * 
  */
@@ -99,6 +123,14 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
 	virtual bool CanAttack() const override;
+	virtual bool BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void StartBlock() override;
+	virtual void StopBlock() override;
+	void StartParry();
+	UFUNCTION()
+	void StopParry();
+	UFUNCTION()
+	void EnableParry();
 	void EnableRangedFire();
 
 	void MeleeAttackFinished();
@@ -170,6 +202,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	FScytheRangedConfig RangedConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	FBsScytheBlockConfig BlockConfig;
 
 public:
 	FORCEINLINE bool IsGrappling() const { return bGrappling; }

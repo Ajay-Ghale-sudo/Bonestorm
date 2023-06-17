@@ -74,6 +74,16 @@ void ABsCharacter::BeginPlay()
 	}
 }
 
+bool ABsCharacter::ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser) const
+{
+	if (Weapon && Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser))
+	{
+		return false;
+	}
+	return Super::ShouldTakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
 // Called every frame
 void ABsCharacter::Tick(float DeltaTime)
 {
@@ -122,7 +132,8 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
 
 		// Block
-		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::Block);
+		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::StartBlock);
+		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Completed, this, &ABsCharacter::StopBlock);
 
 		// Detach head from weapon
 		EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
@@ -355,9 +366,20 @@ void ABsCharacter::Attack()
 	}
 }
 
-void ABsCharacter::Block()
+void ABsCharacter::StartBlock()
 {
-	// TODO: Add block capability here, parrying should activate in first 0.2s of block
+	if (Weapon)
+	{
+		Weapon->StartBlock();
+	}
+}
+
+void ABsCharacter::StopBlock()
+{
+	if (Weapon)
+	{
+		Weapon->StopBlock();
+	}
 }
 
 void ABsCharacter::SecondaryAttack()

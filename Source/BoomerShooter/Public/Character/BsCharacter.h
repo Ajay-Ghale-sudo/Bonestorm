@@ -43,10 +43,16 @@ public:
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
+	FBsCharacterEvent OnParried;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/**
+	 *
+	 */
+	virtual bool ShouldTakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) const override;
 	
 	/**
 	 * @briefHandles the Move input action.
@@ -118,11 +124,16 @@ protected:
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+	
+	/**
+	 * @brief Start blocking with a weapon.
+	 */
+	void StartBlock();
 
 	/**
-	 * @brief Block with the weapon.
+	 * @brief Stops blocking with a weapon.
 	 */
-	void Block();
+	void StopBlock();
 
 	/**
 	 * @brief Uses secondary attack with the weapon

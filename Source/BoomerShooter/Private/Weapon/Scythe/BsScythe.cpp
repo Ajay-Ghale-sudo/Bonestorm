@@ -3,6 +3,7 @@
 #include "BoomerShooter.h"
 #include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Data/BsDamageType.h"
 #include "Engine/DamageEvents.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "Props/Head/BsSeveredHeadBase.h"
@@ -110,6 +111,53 @@ bool ABsScythe::CanAttack() const
 	}
 	
 	return true;
+}
+
+bool ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (BlockConfig.bParrying)
+	{
+		if (DamageCauser)
+		{
+			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
+		}
+		return true;
+	}
+	return Super::BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABsScythe::StartBlock()
+{
+	BlockConfig.bBlocking = true;
+	StartParry();
+}
+
+void ABsScythe::StopBlock()
+{
+	BlockConfig.ParryTimerHandle.Invalidate();
+	BlockConfig.bBlocking = false;
+}
+
+void ABsScythe::StartParry()
+{
+	if (BlockConfig.bCanParry)
+	{
+		BlockConfig.bParrying = true;
+		BlockConfig.bCanParry = false;
+		GetWorldTimerManager().SetTimer(BlockConfig.ParryTimerHandle, this, &ABsScythe::StopParry, BlockConfig.ParryDuration, false);
+	}
+}
+
+void ABsScythe::StopParry()
+{
+	BlockConfig.bParrying = false;
+	BlockConfig.ParryTimerHandle.Invalidate();
+	GetWorldTimerManager().SetTimer(BlockConfig.ParryCooldownHandle, this, &ABsScythe::EnableParry, BlockConfig.ParryCooldown);
+}
+
+void ABsScythe::EnableParry()
+{
+	BlockConfig.bCanParry = true;
 }
 
 void ABsScythe::EnableRangedFire()

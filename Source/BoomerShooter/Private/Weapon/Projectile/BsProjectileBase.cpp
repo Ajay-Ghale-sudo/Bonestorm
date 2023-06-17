@@ -60,6 +60,10 @@ void ABsProjectileBase::StopMovementAndDisableCollision()
 	SetActorEnableCollision(false);
 }
 
+void ABsProjectileBase::OnImpact()
+{
+}
+
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
                                                        UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -90,6 +94,7 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 			GetInstigatorController(),
 			this
 		);
+		OnImpact();
 		StopMovementAndDisableCollision();
 		Destroy();
 	}

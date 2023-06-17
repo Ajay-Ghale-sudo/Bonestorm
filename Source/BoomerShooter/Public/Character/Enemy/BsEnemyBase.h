@@ -13,6 +13,7 @@ class ABsWeaponBase;
 class UBsHealthComponent;
 class UAnimMontage;
 
+DECLARE_MULTICAST_DELEGATE(FBsEnemyEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsEnemyEventWithCaller, ABsEnemyBase*, Enemy);
 
 UCLASS()
@@ -45,6 +46,7 @@ public:
 	virtual bool CanMeleeAttackTarget(AActor* Target);
 
 public:
+	FBsEnemyEvent OnHitStun;
 	FBsEnemyEventWithCaller OnThisEnemyDeath;
 	
 protected:
@@ -63,6 +65,13 @@ protected:
 	virtual void Attack();
 	virtual void OnAttack();
 	virtual void BindMeleeHitBox();
+	
+	/**
+	 * @brief Launch this enemy from an explosion.
+	 * @param LaunchVector The direction and magnitude to launch this enemy.
+	 */
+	UFUNCTION()
+	virtual void ExplosionLaunch(FVector LaunchVector);
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void SetMeleeHitBoxEnabled(bool bEnabled);
@@ -122,7 +131,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	float HitStunDuration = 0.3f;
 
-	EMovementMode PreHitStunMovementMode = EMovementMode::MOVE_Walking;
+	float PreHitStunMaxWalkSpeed = 0.0f;
 	
 	
 public:

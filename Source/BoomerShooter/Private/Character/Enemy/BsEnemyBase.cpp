@@ -37,11 +37,12 @@ void ABsEnemyBase::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsEnemyBase::Die);
 		HealthComponent->OnTookDamage.AddDynamic(this, &ABsEnemyBase::StartHitStun);
+		HealthComponent->OnExplosionHit.AddUObject(this, &ABsEnemyBase::ExplosionLaunch);
 	}
 
 	if (const UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
-		PreHitStunMovementMode = MovementComponent->MovementMode;
+		PreHitStunMaxWalkSpeed = MovementComponent->MaxWalkSpeed;
 	}
 	
 }
@@ -139,6 +140,11 @@ void ABsEnemyBase::BindMeleeHitBox()
 	// Nothing by default
 }
 
+void ABsEnemyBase::ExplosionLaunch(FVector LaunchVector)
+{
+	LaunchCharacter(LaunchVector, true, true);
+}
+
 void ABsEnemyBase::SetMeleeHitBoxEnabled(bool bEnabled)
 {
 	if (MeleeHitBox)
@@ -156,8 +162,8 @@ void ABsEnemyBase::StartHitStun()
 	if (UCharacterMovementComponent* CMovement = GetCharacterMovement())
 	{
 		bHitStunned = true;
-		PreHitStunMovementMode = CMovement->MovementMode;
-		CMovement->DisableMovement();
+		PreHitStunMaxWalkSpeed = CMovement->MaxWalkSpeed;
+		CMovement->MaxWalkSpeed = 0.f;
 		
 		GetWorldTimerManager().SetTimer(
 			HitStunTimerHandle,
@@ -167,13 +173,15 @@ void ABsEnemyBase::StartHitStun()
 			false
 		);
 	}
+
+	OnHitStun.Broadcast();
 }
 
 void ABsEnemyBase::EndHitStun()
 {
 	if (UCharacterMovementComponent* CMovement = GetCharacterMovement())
 	{
-		CMovement->SetMovementMode(PreHitStunMovementMode);
+		CMovement->MaxWalkSpeed = PreHitStunMaxWalkSpeed;
 	}
 
 	bHitStunned = false;

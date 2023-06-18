@@ -50,7 +50,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	/**
-	 *
+	 * @brief Handles player taking damage with blocks and parries.
 	 */
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	

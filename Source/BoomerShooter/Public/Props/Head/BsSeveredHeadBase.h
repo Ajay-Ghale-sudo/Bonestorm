@@ -7,7 +7,7 @@
 
 class ABsProjectileBase;
 class UDamageType;
-class UBsHeadChargeWidget;
+class UWidgetComponent;
 
 DECLARE_MULTICAST_DELEGATE(FBsSeveredHeadEvent)
 UCLASS()
@@ -33,20 +33,6 @@ public:
 	UFUNCTION()
 	float BlockDamage(float Damage);
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	float ChargeCost = 10.f;
-
-	float CurrentCharge = 0.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	float MaxCharge = 100.f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	float ParryingChargeMultiplier = 1.25f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	float BlockChargeMultiplier = 1.25f;
 	
 	FBsSeveredHeadEvent OnDetachedHead;
 	FBsSeveredHeadEvent OnHeadChargeChanged;
@@ -79,6 +65,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	TSubclassOf<UDamageType> HeadDamageType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
+	UWidgetComponent* HeadWidgetComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float ChargeCost = 10.f;
+
+	float CurrentCharge = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float MaxCharge = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float ParryingChargeMultiplier = 1.25f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float BlockChargeMultiplier = 1.25f;
+
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
+	FORCEINLINE float GetCurrentCharge() const { return CurrentCharge; }
 };

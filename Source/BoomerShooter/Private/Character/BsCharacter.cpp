@@ -77,12 +77,11 @@ void ABsCharacter::BeginPlay()
 float ABsCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
 	AActor* DamageCauser)
 {
-	float ActualDamage = Damage;
-	if (Weapon && Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser))
+	if (Weapon) 
 	{
-		ActualDamage = Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser);		
+		Damage = Weapon->BlockIncomingDamage(Damage, DamageEvent, EventInstigator, DamageCauser);		
 	}
-	return Super::TakeDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }
 
 // Called every frame

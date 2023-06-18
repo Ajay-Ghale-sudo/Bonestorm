@@ -55,6 +55,14 @@ struct FBsScytheBlockConfig
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
 	float BlockingDamageReduction = 0.3f;
 
+	// Charge reduction later multiplied by the damage of the hit.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float BlockingChargeReduction = 1.25f;
+
+	// Adds head charge based on the damage of the hit parried
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryingChargeMultiplier = 1.25f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
 	bool bCanParry = true;
 

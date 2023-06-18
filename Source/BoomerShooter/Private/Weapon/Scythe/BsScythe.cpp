@@ -115,36 +115,32 @@ bool ABsScythe::CanAttack() const
 
 float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float InitialDamage = Damage;
+	float ActualDamage = Damage;
 	if (BlockConfig.bParrying)
 	{
 		if (AttachedSeveredHead)
 		{
-			FString SanFloat = FString::SanitizeFloat(AttachedSeveredHead->CurrentCharge);
-			AttachedSeveredHead->CurrentCharge = FMath::Clamp(AttachedSeveredHead->CurrentCharge + Damage * BlockConfig.ParryingChargeMultiplier, 0, AttachedSeveredHead->MaxCharge);
+			AttachedSeveredHead->ParryDamage(ActualDamage);
+			OnScytheParryEvent.Broadcast(ActualDamage);
 		}
-		InitialDamage = 0.f;
+		ActualDamage = 0.f;
 		if (DamageCauser)
 		{
-			DamageCauser->TakeDamage(InitialDamage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
+			DamageCauser->TakeDamage(ActualDamage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
 
 		}
-		return InitialDamage;
+		return ActualDamage;
 	}
 	if (BlockConfig.bBlocking)
 	{
-		InitialDamage = InitialDamage * BlockConfig.BlockingDamageReduction;
+		ActualDamage = ActualDamage * BlockConfig.BlockingDamageReduction;
 		if (AttachedSeveredHead)
 		{
-			AttachedSeveredHead->CurrentCharge = FMath::Clamp(AttachedSeveredHead->CurrentCharge - InitialDamage * BlockConfig.BlockingChargeReduction, 0, AttachedSeveredHead->MaxCharge);
-			if (AttachedSeveredHead->CurrentCharge <= 0.f)
-			{
-				DetachSeveredHead();
-			}
+			ActualDamage = AttachedSeveredHead->BlockDamage(ActualDamage);
 		}
-		return InitialDamage;
+		return ActualDamage;
 	}
-	return Super::BlockIncomingDamage(InitialDamage, DamageEvent, EventInstigator, DamageCauser);
+	return Super::BlockIncomingDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void ABsScythe::StartBlock()

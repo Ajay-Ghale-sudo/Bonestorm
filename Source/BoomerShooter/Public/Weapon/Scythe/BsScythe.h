@@ -73,6 +73,7 @@ struct FBsScytheBlockConfig
 	bool bParrying = false;
 };
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheBlockEvent, float Damage)
 /**
  * 
  */
@@ -128,6 +129,9 @@ public:
 	virtual void Equip() override;
 
 	virtual void DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead) override;
+
+	FBsScytheBlockEvent OnScytheParryEvent;
+	FBsScytheBlockEvent OnScytheBlockEvent;
 
 protected:
 	virtual void BeginPlay() override;

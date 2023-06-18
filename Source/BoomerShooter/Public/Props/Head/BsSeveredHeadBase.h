@@ -7,6 +7,7 @@
 
 class ABsProjectileBase;
 class UDamageType;
+class UBsHeadChargeWidget;
 
 DECLARE_MULTICAST_DELEGATE(FBsSeveredHeadEvent)
 UCLASS()
@@ -26,6 +27,11 @@ public:
 	
 	ABsProjectileBase* CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform, FActorSpawnParameters& SpawnParameters);
 
+	UFUNCTION()
+	float ParryDamage(float Damage);
+
+	UFUNCTION()
+	float BlockDamage(float Damage);
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
@@ -35,8 +41,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	float MaxCharge = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float ParryingChargeMultiplier = 1.25f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	float BlockChargeMultiplier = 1.25f;
 	
 	FBsSeveredHeadEvent OnDetachedHead;
+	FBsSeveredHeadEvent OnHeadChargeChanged;
 	
 protected:
 	// Called when the game starts or when spawned

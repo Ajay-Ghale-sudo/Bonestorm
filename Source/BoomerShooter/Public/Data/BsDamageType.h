@@ -27,6 +27,12 @@ public:
 };
 
 UCLASS()
+class UBsParryDamageType : public UBsDamageType
+{
+	GENERATED_BODY()	
+};
+
+UCLASS()
 class UBsSkeletonMeleeDamageType : public UBsDamageType
 {
 	GENERATED_BODY()

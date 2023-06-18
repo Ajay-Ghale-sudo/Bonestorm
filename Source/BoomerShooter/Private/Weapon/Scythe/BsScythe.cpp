@@ -3,6 +3,7 @@
 #include "BoomerShooter.h"
 #include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Data/BsDamageType.h"
 #include "Engine/DamageEvents.h"
 #include "Interfaces/ReceiveDamage.h"
 #include "Props/Head/BsSeveredHeadBase.h"
@@ -110,6 +111,71 @@ bool ABsScythe::CanAttack() const
 	}
 	
 	return true;
+}
+
+float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Damage;
+	if (BlockConfig.bParrying)
+	{
+		if (AttachedSeveredHead)
+		{
+			AttachedSeveredHead->ParryDamage(ActualDamage);
+			OnScytheParryEvent.Broadcast(ActualDamage);
+		}
+		ActualDamage = 0.f;
+		if (DamageCauser)
+		{
+			DamageCauser->TakeDamage(ActualDamage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
+
+		}
+		return ActualDamage;
+	}
+	if (BlockConfig.bBlocking)
+	{
+		ActualDamage = ActualDamage * BlockConfig.BlockingDamageReduction;
+		if (AttachedSeveredHead)
+		{
+			ActualDamage = AttachedSeveredHead->BlockDamage(ActualDamage);
+		}
+		return ActualDamage;
+	}
+	return Super::BlockIncomingDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+void ABsScythe::StartBlock()
+{
+	StartParry();
+	BlockConfig.bBlocking = true;
+}
+
+void ABsScythe::StopBlock()
+{
+	BlockConfig.ParryTimerHandle.Invalidate();
+	BlockConfig.bBlocking = false;
+	StopParry();
+}
+
+void ABsScythe::StartParry()
+{
+	if (BlockConfig.bCanParry)
+	{
+		BlockConfig.bParrying = true;
+		BlockConfig.bCanParry = false;
+		GetWorldTimerManager().SetTimer(BlockConfig.ParryTimerHandle, this, &ABsScythe::StopParry, BlockConfig.ParryDuration, false);
+	}
+}
+
+void ABsScythe::StopParry()
+{
+	BlockConfig.bParrying = false;
+	BlockConfig.ParryTimerHandle.Invalidate();
+	GetWorldTimerManager().SetTimer(BlockConfig.ParryCooldownHandle, this, &ABsScythe::EnableParry, BlockConfig.ParryCooldown);
+}
+
+void ABsScythe::EnableParry()
+{
+	BlockConfig.bCanParry = true;
 }
 
 void ABsScythe::EnableRangedFire()

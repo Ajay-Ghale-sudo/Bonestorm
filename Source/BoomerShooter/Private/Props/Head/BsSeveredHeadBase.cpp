@@ -58,6 +58,25 @@ void ABsSeveredHeadBase::DisableMeshOverlap()
 	}
 }
 
+float ABsSeveredHeadBase::ParryDamage(float Damage)
+{
+	CurrentCharge = FMath::Clamp(CurrentCharge + Damage * ParryingChargeMultiplier, 0, MaxCharge);
+	OnHeadChargeChanged.Broadcast();
+	return Damage;
+}
+
+float ABsSeveredHeadBase::BlockDamage(float Damage)
+{
+	CurrentCharge = FMath::Clamp(CurrentCharge - Damage * BlockChargeMultiplier, 0, MaxCharge);
+	if (CurrentCharge <= 0.f)
+	{
+		OnDetachedHead.Broadcast();
+		return Damage;
+	}
+	OnHeadChargeChanged.Broadcast();
+	return Damage;
+}
+
 void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
@@ -71,11 +90,11 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
     UWorld* World = GetWorld();
     if (ProjectileClass && World)
     {
-    	
     	if (CurrentCharge > 0.f)
     	{
     		CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
     		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters));
+    		OnHeadChargeChanged.Broadcast();
 		    if (Projectile)
 		    {
     			Projectile->SetDamageType(HeadDamageType);

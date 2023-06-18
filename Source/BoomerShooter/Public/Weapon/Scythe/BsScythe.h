@@ -38,6 +38,42 @@ struct FScytheRangedConfig
 	FTimerHandle FireRateTimerHandle;
 };
 
+USTRUCT(BlueprintType)
+struct FBsScytheBlockConfig
+{
+	GENERATED_BODY()
+
+	FTimerHandle ParryTimerHandle;
+	FTimerHandle ParryCooldownHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryDuration = 0.2f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryCooldown = 1.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float BlockingDamageReduction = 0.3f;
+
+	// Charge reduction later multiplied by the damage of the hit.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float BlockingChargeReduction = 1.25f;
+
+	// Adds head charge based on the damage of the hit parried
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
+	float ParryingChargeMultiplier = 1.25f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bCanParry = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bBlocking = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
+	bool bParrying = false;
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheBlockEvent, float Damage)
 /**
  * 
  */
@@ -94,11 +130,22 @@ public:
 
 	virtual void DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead) override;
 
+	FBsScytheBlockEvent OnScytheParryEvent;
+	FBsScytheBlockEvent OnScytheBlockEvent;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
 	virtual bool CanAttack() const override;
+	virtual float BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void StartBlock() override;
+	virtual void StopBlock() override;
+	void StartParry();
+	UFUNCTION()
+	void StopParry();
+	UFUNCTION()
+	void EnableParry();
 	void EnableRangedFire();
 
 	void MeleeAttackFinished();
@@ -170,6 +217,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	FScytheRangedConfig RangedConfig;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	FBsScytheBlockConfig BlockConfig;
 
 public:
 	FORCEINLINE bool IsGrappling() const { return bGrappling; }

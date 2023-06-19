@@ -296,7 +296,12 @@ void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 
 void ABsScythe::NextWeaponMode()
 {
-	WeaponMode = WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee;
+
+	// TODO: State, this should be a CanChangeWeaponMode() check
+	if (!bThrown)
+	{
+		WeaponMode = WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee;
+	}
 }
 
 void ABsScythe::SetAttacking(bool bNewAttacking)

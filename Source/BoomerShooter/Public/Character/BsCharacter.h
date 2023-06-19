@@ -43,7 +43,6 @@ public:
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
-	FBsCharacterEvent OnParried;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -96,6 +95,11 @@ protected:
 	 * @brief Add Dash Charge
 	 */
 	void AddDashCharge();
+
+	/**
+	 * @brief Temp, refund dash charge
+	 */
+	void RefundDashCharge();
 
 	/**
 	 * @brief Checks if the player can dash

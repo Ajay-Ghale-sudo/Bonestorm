@@ -147,6 +147,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	{
 		Weapon->SetOwner(this);
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
+		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::RefundDashCharge);
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
@@ -287,7 +288,7 @@ void ABsCharacter::AddDashCharge()
 {
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
-		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * GetWorld()->GetDeltaSeconds(), DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * DashConfig.DashChargeRate, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 	}
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
@@ -301,6 +302,12 @@ void ABsCharacter::AddDashCharge()
 		);
 	}
 	DashConfig.DashChargeTimerHandle.Invalidate();
+}
+
+void ABsCharacter::RefundDashCharge()
+{
+	DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashCost, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+	OnDashAmountChanged.Broadcast();
 }
 
 bool ABsCharacter::CanDash()

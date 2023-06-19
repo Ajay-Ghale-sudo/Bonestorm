@@ -97,7 +97,7 @@ struct FBsDashConfig
 
 	// Dash recharge rate interval
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	float DashChargeRate = 0.005f;
+	float DashChargeRate = 0.05f;
 
 	// Base dash recharge amount per second
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")

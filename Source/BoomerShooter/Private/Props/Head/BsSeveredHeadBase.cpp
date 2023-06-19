@@ -42,15 +42,14 @@ void ABsSeveredHeadBase::SetAttached(bool bAttached)
 	if (bIsAttached)
 	{
 		DisableMeshOverlap();
-		if (HeadWidgetComponent)
-		{
-			HeadWidgetComponent->SetVisibility(true);
-		}
 	}
 	else
 	{
 		EnableMeshOverlap();
-		HeadWidgetComponent->SetVisibility(false);
+	}
+	if (HeadWidgetComponent)
+	{
+		HeadWidgetComponent->SetVisibility(bIsAttached);
 	}
 }
 

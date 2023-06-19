@@ -6,6 +6,7 @@
 #include "BsWeaponBase.generated.h"
 
 class ABsSeveredHeadBase;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsWeaponBaseHealEvent, float, Healing);
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 
 UCLASS()
@@ -55,9 +56,13 @@ public:
 	UFUNCTION()
 	void DetachSeveredHead();
 
+	UFUNCTION()
+	void ConsumeHead();
+
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;
 	FBsWeaponBaseEvent OnWeaponParry;
+	FBsWeaponBaseHealEvent OnHeal;
 	
 protected:
 	// Called when the game starts or when spawned

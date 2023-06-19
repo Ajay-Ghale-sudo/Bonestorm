@@ -32,6 +32,8 @@ public:
 
 	UFUNCTION()
 	float BlockDamage(float Damage);
+
+	float Consume();
 public:
 	
 	FBsSeveredHeadEvent OnDetachedHead;
@@ -68,6 +70,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
 	UWidgetComponent* HeadWidgetComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
+	float HealingAmount = 30.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	float ChargeCost = 10.f;
 
@@ -85,4 +90,5 @@ protected:
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
 	FORCEINLINE float GetCurrentCharge() const { return CurrentCharge; }
+	FORCEINLINE float GetHeadHealAmount() const { return HealingAmount; }
 };

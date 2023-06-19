@@ -104,6 +104,12 @@ void UBsHealthComponent::ProcessBleedDamage()
 	}
 }
 
+void UBsHealthComponent::Heal(float Healing)
+{
+	CurrentHealth = FMath::Clamp(CurrentHealth + Healing, 0.f, MaxHealth);
+	OnHealthChanged.Broadcast();
+}
+
 // Called every frame
 void UBsHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                        FActorComponentTickFunction* ThisTickFunction)

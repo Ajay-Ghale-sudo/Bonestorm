@@ -51,6 +51,18 @@ bool ABsWeaponBase::CanAttack() const
 	return bCanAttack;
 }
 
+void ABsWeaponBase::ConsumeHead()
+{
+	// Getting/setting player head charge current stopgap for preventing players from re-grabbing detached head and healing from it
+	// @TODO Should probably be an animation that eats the head then destroys it, preventing this issue.
+	if (AttachedSeveredHead && AttachedSeveredHead->GetCurrentCharge() > 0)
+	{
+		OnHeal.Broadcast(AttachedSeveredHead->GetHeadHealAmount());
+		AttachedSeveredHead->Consume();
+		DetachSeveredHead();
+	}
+}
+
 void ABsWeaponBase::Fire()
 {
 	if (!bCanAttack)

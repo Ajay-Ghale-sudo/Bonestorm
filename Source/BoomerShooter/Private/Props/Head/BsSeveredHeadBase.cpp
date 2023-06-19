@@ -90,6 +90,13 @@ float ABsSeveredHeadBase::BlockDamage(float Damage)
 	return Damage;
 }
 
+float ABsSeveredHeadBase::Consume()
+{
+	CurrentCharge = 0.f;
+	OnHeadChargeChanged.Broadcast();
+	return HealingAmount;
+}
+
 void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {

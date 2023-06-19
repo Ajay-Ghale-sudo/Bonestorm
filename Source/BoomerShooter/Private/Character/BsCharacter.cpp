@@ -137,6 +137,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Detach head from weapon
 		EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
+
+		// Consume head on weapon
+		EnhancedInputComponent->BindAction(InputConfig.ConsumeHeadAction, ETriggerEvent::Started, this, &ABsCharacter::ConsumeHead);
 	}
 }
 
@@ -148,6 +151,10 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		Weapon->SetOwner(this);
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::RefundDashCharge);
+		if (HealthComponent)
+		{
+			Weapon->OnHeal.AddDynamic(HealthComponent, &UBsHealthComponent::Heal);
+		}
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
@@ -156,7 +163,6 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		GrappleHookComponent->OnGrappleHookPull.AddUObject(this, &ABsCharacter::PullGrapple);
 		GrappleHookComponent->SetEffectedCharacter(this); // TODO: Could replace with function bind that launched the character.
 	}
-
 	GrabCurrentWeapon();
 }
 
@@ -423,6 +429,14 @@ void ABsCharacter::DetachHead()
 	if (Weapon)
 	{
 		Weapon->DetachSeveredHead();
+	}
+}
+
+void ABsCharacter::ConsumeHead()
+{
+	if (Weapon)
+	{
+		Weapon->ConsumeHead();
 	}
 }
 

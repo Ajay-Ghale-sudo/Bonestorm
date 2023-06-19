@@ -160,6 +160,11 @@ protected:
 	void DetachHead();
 
 	/**
+	 * @brief Consume head on weapon
+	 */
+	void ConsumeHead();
+
+	/**
 	 * @brief Attempt to interact with an object in front of the character.
 	 */
 	void Interact();

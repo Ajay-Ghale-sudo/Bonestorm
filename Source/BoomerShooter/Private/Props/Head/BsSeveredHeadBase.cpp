@@ -4,6 +4,8 @@
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
 #include "Component/BsInventoryComponent.h"
+#include "Components/WidgetComponent.h"
+#include "UI/Widget/BsHeadChargeWidget.h"
 
 
 // Sets default values
@@ -15,6 +17,9 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 	HeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadMesh"));
 	HeadMesh->SetSimulatePhysics(true);
 	SetRootComponent(HeadMesh);
+	HeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	HeadWidgetComponent->SetVisibility(false);
+	HeadWidgetComponent->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +29,10 @@ void ABsSeveredHeadBase::BeginPlay()
 
 	EnableMeshOverlap();
 	CurrentCharge = MaxCharge;
+	if (UBsHeadChargeWidget* Widget = Cast<UBsHeadChargeWidget>(HeadWidgetComponent->GetWidget()))
+	{
+		Widget->BindToSeveredHead(this);
+	}
 }
 
 void ABsSeveredHeadBase::SetAttached(bool bAttached)
@@ -37,6 +46,10 @@ void ABsSeveredHeadBase::SetAttached(bool bAttached)
 	else
 	{
 		EnableMeshOverlap();
+	}
+	if (HeadWidgetComponent)
+	{
+		HeadWidgetComponent->SetVisibility(bIsAttached);
 	}
 }
 

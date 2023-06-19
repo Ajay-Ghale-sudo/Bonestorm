@@ -1,5 +1,4 @@
 #include "Weapon/Scythe/BsScythe.h"
-
 #include "BoomerShooter.h"
 #include "Component/BsGrappleHookComponent.h"
 #include "Components/BoxComponent.h"
@@ -129,6 +128,7 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 			DamageCauser->TakeDamage(ActualDamage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
 
 		}
+		OnWeaponParry.Broadcast();
 		return ActualDamage;
 	}
 	if (BlockConfig.bBlocking)

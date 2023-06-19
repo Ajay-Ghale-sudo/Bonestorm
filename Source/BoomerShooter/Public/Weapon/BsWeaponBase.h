@@ -57,6 +57,7 @@ public:
 
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;
+	FBsWeaponBaseEvent OnWeaponParry;
 	
 protected:
 	// Called when the game starts or when spawned

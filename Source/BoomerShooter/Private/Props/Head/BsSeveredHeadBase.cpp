@@ -22,6 +22,19 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 	HeadWidgetComponent->SetupAttachment(RootComponent);
 }
 
+bool ABsSeveredHeadBase::SetAttachable()
+{
+	if (CurrentCharge > 0)
+	{
+		bAttachable = true;
+	}
+	else
+	{
+		bAttachable = false;
+	}
+	return bAttachable;
+}
+
 // Called when the game starts or when spawned
 void ABsSeveredHeadBase::BeginPlay()
 {

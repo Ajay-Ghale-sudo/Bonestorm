@@ -38,6 +38,11 @@ public:
 	
 	FBsSeveredHeadEvent OnDetachedHead;
 	FBsSeveredHeadEvent OnHeadChargeChanged;
+
+	bool SetAttachable();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
+	bool bAttachable = true;
 	
 protected:
 	// Called when the game starts or when spawned

@@ -38,7 +38,6 @@ void ABsProjectileBase::BeginPlay()
 	{
 		ProjectileCollision->OnComponentHit.AddDynamic(this, &ABsProjectileBase::OnProjectileHit);
 		ProjectileCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsProjectileBase::OnProjectileOverlap);
-		TArray<AActor*> ActorsToIgnore;
 		UpdateMoveActorIgnore();
 	}
 

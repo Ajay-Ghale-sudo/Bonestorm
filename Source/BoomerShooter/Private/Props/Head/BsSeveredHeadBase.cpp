@@ -95,6 +95,7 @@ float ABsSeveredHeadBase::Consume()
 {
 	CurrentCharge = 0.f;
 	OnHeadChargeChanged.Broadcast();
+	OnDetachedHead.Broadcast();
 	return HealingAmount;
 }
 

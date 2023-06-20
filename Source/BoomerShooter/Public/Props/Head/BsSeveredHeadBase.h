@@ -34,12 +34,12 @@ public:
 	float BlockDamage(float Damage);
 
 	float Consume();
+
+	bool SetAttachable();
 public:
 	
 	FBsSeveredHeadEvent OnDetachedHead;
 	FBsSeveredHeadEvent OnHeadChargeChanged;
-
-	bool SetAttachable();
 
 protected:
 	// Called when the game starts or when spawned

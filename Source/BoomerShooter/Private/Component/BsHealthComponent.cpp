@@ -42,7 +42,6 @@ void UBsHealthComponent::ApplyDamage(float Damage)
 void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,
                                        AController* InstigatedBy, AActor* DamageCauser)
 {
-
 	// TODO: Damage Type should determine if self damage is allowed
 	if (!DamagedActor || DamageCauser == DamagedActor || (DamageCauser && DamagedActor == DamageCauser->GetOwner()) || !DamageType)
 	{

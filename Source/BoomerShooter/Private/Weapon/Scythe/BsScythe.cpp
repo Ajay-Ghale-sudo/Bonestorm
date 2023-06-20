@@ -125,8 +125,7 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 		ActualDamage = 0.f;
 		if (DamageCauser)
 		{
-			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
-
+			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), GetOwner());
 		}
 		OnWeaponParry.Broadcast();
 		return ActualDamage;

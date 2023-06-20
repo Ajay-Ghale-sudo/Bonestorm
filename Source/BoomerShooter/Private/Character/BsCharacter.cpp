@@ -140,6 +140,9 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 		// Consume head on weapon
 		EnhancedInputComponent->BindAction(InputConfig.ConsumeHeadAction, ETriggerEvent::Started, this, &ABsCharacter::ConsumeHead);
+
+		// Pause on button press
+		EnhancedInputComponent->BindAction(InputConfig.PauseAction, ETriggerEvent::Started, this, &ABsCharacter::Pause);
 	}
 }
 
@@ -572,6 +575,11 @@ void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
 		Head->SetActorEnableCollision(false);
 		Head->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	}
+}
+
+void ABsCharacter::Pause()
+{
+	OnPaused.Broadcast();
 }
 
 void ABsCharacter::Die()

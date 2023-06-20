@@ -125,7 +125,7 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 		ActualDamage = 0.f;
 		if (DamageCauser)
 		{
-			DamageCauser->TakeDamage(ActualDamage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
+			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), this);
 
 		}
 		OnWeaponParry.Broadcast();
@@ -133,11 +133,9 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 	}
 	if (BlockConfig.bBlocking)
 	{
-		ActualDamage = ActualDamage * BlockConfig.BlockingDamageReduction;
-		if (AttachedSeveredHead)
-		{
-			ActualDamage = AttachedSeveredHead->BlockDamage(ActualDamage);
-		}
+		ActualDamage = AttachedSeveredHead ?
+			AttachedSeveredHead->BlockDamage(ActualDamage) : ActualDamage * BlockConfig.BlockingDamageReduction;
+		
 		return ActualDamage;
 	}
 	return Super::BlockIncomingDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);

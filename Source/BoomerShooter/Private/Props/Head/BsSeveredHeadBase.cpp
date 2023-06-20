@@ -3,7 +3,6 @@
 
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/Projectile/BsProjectileBase.h"
-#include "Component/BsInventoryComponent.h"
 #include "Components/WidgetComponent.h"
 #include "UI/Widget/BsHeadChargeWidget.h"
 
@@ -21,7 +20,6 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 	HeadWidgetComponent->SetVisibility(false);
 	HeadWidgetComponent->SetupAttachment(RootComponent);
 }
-
 
 // Called when the game starts or when spawned
 void ABsSeveredHeadBase::BeginPlay()
@@ -44,14 +42,45 @@ void ABsSeveredHeadBase::SetAttached(bool bAttached)
 	{
 		DisableMeshOverlap();
 	}
-	else
+	// Only enable overlap if we have charge.
+	else if (CurrentCharge > 0.f)
 	{
 		EnableMeshOverlap();
 	}
+	
 	if (HeadWidgetComponent)
 	{
 		HeadWidgetComponent->SetVisibility(bIsAttached);
 	}
+}
+
+void ABsSeveredHeadBase::AttachHeadToComponent(USceneComponent* InParent, const FName& SocketName)
+{
+	if (!InParent || !HeadMesh) return;
+
+	SetOwner(InParent->GetOwner());
+	HeadMesh->SetSimulatePhysics(false);
+	HeadMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttachToComponent(InParent, FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
+	SetActorScale3D(SeveredHeadScale);
+	SetAttached(true);
+}
+
+void ABsSeveredHeadBase::DetachHead()
+{
+	if (!bIsAttached) return; // Already detached.
+	
+	DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SetOwner(nullptr);
+	if (HeadMesh)
+	{
+		HeadMesh->SetSimulatePhysics(true);
+		HeadMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
+	SetAttached(false);
+	PopHead();
+
+	OnDetachedHead.Broadcast();
 }
 
 void ABsSeveredHeadBase::EnableMeshOverlap()
@@ -74,29 +103,27 @@ void ABsSeveredHeadBase::DisableMeshOverlap()
 
 float ABsSeveredHeadBase::ParryDamage(float Damage)
 {
-	CurrentCharge = FMath::Clamp(CurrentCharge + Damage * ParryingChargeMultiplier, 0, MaxCharge);
-	OnHeadChargeChanged.Broadcast();
+	// Parrying increases charge
+	DepleteCharge(Damage * -ParryingChargeMultiplier);
 	return Damage;
 }
 
 float ABsSeveredHeadBase::BlockDamage(float Damage)
 {
-	CurrentCharge = FMath::Clamp(CurrentCharge - Damage * BlockChargeMultiplier, 0, MaxCharge);
-	if (CurrentCharge <= 0.f)
-	{
-		OnDetachedHead.Broadcast();
-		return Damage;
-	}
-	OnHeadChargeChanged.Broadcast();
-	return Damage;
+	DepleteCharge(Damage * BlockChargeMultiplier);
+	return Damage * BlockDamageReductionMultiplier;
 }
 
 float ABsSeveredHeadBase::Consume()
 {
-	CurrentCharge = 0.f;
-	OnHeadChargeChanged.Broadcast();
-	OnDetachedHead.Broadcast();
-	return HealingAmount;
+	if (MaxCharge <= 0.f) return 0.f;
+
+	// Amount to heal based on % of charge.
+	const float AmountToHeal = (CurrentCharge / MaxCharge) * HealingAmount;
+	// Deplete all charge
+	DepleteCharge(CurrentCharge);
+	
+	return AmountToHeal;
 }
 
 void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -105,27 +132,44 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 	
 }
 
+void ABsSeveredHeadBase::PopHead() const
+{
+	if (HeadMesh) return;
+	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, false);
+}
+
+void ABsSeveredHeadBase::DepleteCharge()
+{
+	DepleteCharge(ChargeCost);
+}
+
+void ABsSeveredHeadBase::DepleteCharge(const float Amount)
+{
+	CurrentCharge = FMath::Clamp(CurrentCharge - Amount, 0.f, MaxCharge);
+	OnHeadChargeChanged.Broadcast();
+
+	if (CurrentCharge <= 0.f)
+	{
+		DetachHead();
+	}
+}
+
 ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform,
                                                         FActorSpawnParameters& SpawnParameters)
 {
-	ABsProjectileBase* Projectile = nullptr;
     UWorld* World = GetWorld();
     if (ProjectileClass && World)
     {
     	if (CurrentCharge > 0.f)
     	{
-    		CurrentCharge = FMath::Clamp(CurrentCharge - ChargeCost, 0, MaxCharge);
-    		Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters));
+    		DepleteCharge();
     		OnHeadChargeChanged.Broadcast();
-		    if (Projectile)
+		    if (ABsProjectileBase* Projectile =  Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters)))
 		    {
     			Projectile->SetDamageType(HeadDamageType);
+		    	return Projectile;
 		    }
     	}
-    	if (CurrentCharge <= 0.f)
-    	{
-    		OnDetachedHead.Broadcast();
-    	}
 	}
-	return Projectile;
+	return nullptr;
 }

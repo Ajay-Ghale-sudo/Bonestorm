@@ -24,6 +24,18 @@ public:
 	 * @param bAttached If the SeveredHead is attached or not.
 	 */
 	void SetAttached(bool bAttached);
+
+	/**
+	 * @brief Attaches this to the Component.
+	 * @param InParent Parent to attach to.
+	 * @param SocketName Socket on the parent to attach to.
+	 */
+	void AttachHeadToComponent(USceneComponent* InParent, const FName& SocketName);
+
+	/**
+	 * @brief Detach the head.
+	 */
+	void DetachHead();
 	
 	ABsProjectileBase* CreateProjectile(TSubclassOf<ABsProjectileBase> ProjectileClass, const FTransform &SpawnTransform, FActorSpawnParameters& SpawnParameters);
 
@@ -57,13 +69,29 @@ protected:
 	UFUNCTION()
 	void OnMeshOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
+	/**
+	 * @brief Applies an impulse to head to make it fly off.
+	 */
+	void PopHead() const;
+
+	/**
+	 * @brief Depletes the Charge by the ChargeCost.
+	 */
+	void DepleteCharge();
+	
+	/**
+	 * @brief Depletes the Charge by the given Amount.
+	 * @param Amount Amount to Deplete the Charge by.
+	 */
+	void DepleteCharge(const float Amount);
+
 protected:
 	// TODO: This should be a Skeletal Mesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	UStaticMeshComponent* HeadMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
-	bool bIsAttached;
+	bool bIsAttached = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	TSubclassOf<UDamageType> HeadDamageType;
@@ -77,6 +105,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	float ChargeCost = 10.f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
 	float CurrentCharge = 0.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
@@ -88,8 +117,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	float BlockChargeMultiplier = 1.25f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
+	float BlockDamageReductionMultiplier = 0.40f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	FVector SeveredHeadScale = FVector(0.4f, 0.4f, 0.4f);
+
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
 	FORCEINLINE float GetCurrentCharge() const { return CurrentCharge; }
 	FORCEINLINE float GetHeadHealAmount() const { return HealingAmount; }
+	FORCEINLINE bool CanBeAttached() const { return !bIsAttached && CurrentCharge > 0.f; }
 };

@@ -129,7 +129,7 @@ void ABsWeaponBase::Equip()
 
 void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 {
-	if (!SeveredHead) return;
+	if (!SeveredHead || SeveredHead && !SeveredHead->SetAttachable()) return;
 	
 	if (AttachedSeveredHead)
 	{
@@ -162,7 +162,6 @@ void ABsWeaponBase::DetachSeveredHead()
 		AttachedSeveredHead->GetHeadMesh()->ComponentVelocity = FVector(0.f, 0.f, 0.f);
 		AttachedSeveredHead->GetHeadMesh()->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, false);
 		AttachedSeveredHead->OnDetachedHead.RemoveAll(this);
-		AttachedSeveredHead->SetAttachable();
 		AttachedSeveredHead = nullptr;
 	}
 }

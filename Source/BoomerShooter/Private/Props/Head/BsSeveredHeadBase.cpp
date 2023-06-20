@@ -106,6 +106,7 @@ float ABsSeveredHeadBase::BlockDamage(float Damage)
 float ABsSeveredHeadBase::Consume()
 {
 	CurrentCharge = 0.f;
+//	SetAttachable();
 	OnHeadChargeChanged.Broadcast();
 	return HealingAmount;
 }

@@ -41,9 +41,6 @@ public:
 
 	bool SetAttachable();
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
-	bool bAttachable = true;
-	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -68,6 +65,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
 	bool bIsAttached;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
+	bool bAttachable = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	TSubclassOf<UDamageType> HeadDamageType;
@@ -96,4 +96,5 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
 	FORCEINLINE float GetCurrentCharge() const { return CurrentCharge; }
 	FORCEINLINE float GetHeadHealAmount() const { return HealingAmount; }
+	FORCEINLINE bool GetHeadAttachable() const { return bAttachable; }
 };

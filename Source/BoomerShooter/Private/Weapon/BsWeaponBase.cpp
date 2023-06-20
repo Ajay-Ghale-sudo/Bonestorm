@@ -139,7 +139,7 @@ void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 	if (SeveredHead)
 	{
 		AttachedSeveredHead = SeveredHead;
-		if (AttachedSeveredHead->bAttachable)
+		if (AttachedSeveredHead->GetHeadAttachable())
 		{
 			AttachedSeveredHead->GetHeadMesh()->SetSimulatePhysics(false);
 			AttachedSeveredHead->SetAttached(true);

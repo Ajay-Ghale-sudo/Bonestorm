@@ -57,7 +57,7 @@ public:
 	void DetachSeveredHead();
 
 	UFUNCTION()
-	void ConsumeHead();
+	void ConsumeSeveredHead();
 
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;

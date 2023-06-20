@@ -436,7 +436,7 @@ void ABsCharacter::ConsumeHead()
 {
 	if (Weapon)
 	{
-		Weapon->ConsumeHead();
+		Weapon->ConsumeSeveredHead();
 	}
 }
 

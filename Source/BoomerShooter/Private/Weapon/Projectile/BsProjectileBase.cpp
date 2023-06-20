@@ -2,12 +2,13 @@
 
 
 #include "Weapon/Projectile/BsProjectileBase.h"
-
 #include "BoomerShooter.h"
 #include "Component/BsHealthComponent.h"
 #include "Components/SphereComponent.h"
+#include "Data/BsDamageType.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -37,6 +38,7 @@ void ABsProjectileBase::BeginPlay()
 	{
 		ProjectileCollision->OnComponentHit.AddDynamic(this, &ABsProjectileBase::OnProjectileHit);
 		ProjectileCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsProjectileBase::OnProjectileOverlap);
+		UpdateMoveActorIgnore();
 	}
 
 	if (ProjectileMovement)
@@ -50,14 +52,23 @@ void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
 	ProjectileDamageProperties.ProjectileDamageType = DamageType;
 }
 
-void ABsProjectileBase::StopMovementAndDisableCollision()
+void ABsProjectileBase::SetProjectileCollision(ECollisionEnabled::Type CollisionEnabled)
 {
-	if (ProjectileMovement)
+	if (ProjectileCollision)
 	{
-		ProjectileMovement->StopMovementImmediately();
+		ProjectileCollision->SetCollisionEnabled(CollisionEnabled);
 	}
+}
 
-	SetActorEnableCollision(false);
+void ABsProjectileBase::UpdateMoveActorIgnore()
+{
+	if (Owner)
+	{
+		TArray<AActor*> ActorsToIgnore;
+		Owner->GetAllChildActors(ActorsToIgnore);
+		ActorsToIgnore.Add(Owner);
+		ProjectileCollision->MoveIgnoreActors = ActorsToIgnore;
+	}
 }
 
 void ABsProjectileBase::OnImpact()
@@ -85,8 +96,11 @@ void ABsProjectileBase::OnProjectileOverlap_Implementation(UPrimitiveComponent* 
 void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != GetOwner())
+	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
 	{
+		SetActorHiddenInGame(true);
+		ProjectileMovement->StopMovementImmediately();
+		SetProjectileCollision(ECollisionEnabled::NoCollision);
 		// TODO: Handle penetration.
 		OtherActor->TakeDamage(
 			ProjectileDamageProperties.ProjectileDamage,
@@ -95,7 +109,47 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 			this
 		);
 		OnImpact();
-		StopMovementAndDisableCollision();
-		Destroy();
+		SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 	}
+}
+
+void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
+{
+	if (!bParried)
+	{
+		bParried = true;
+		const AActor* ProjectileOwner = GetOwner();
+		if (DamageCauser && ProjectileOwner)
+		{
+			SetOwner(DamageCauser);
+			UpdateMoveActorIgnore();
+			const FVector TargetLocation = ProjectileOwner->GetActorLocation();
+			const FVector InitLocation = GetActorLocation();
+			const FVector VelocityDirection = UKismetMathLibrary::FindLookAtRotation(InitLocation, TargetLocation).Vector();
+			if (ProjectileMovement)
+			{
+				SetActorHiddenInGame(false);
+				ProjectileMovement->Velocity = ProjectileMovement->MaxSpeed * VelocityDirection;
+				SetActorLocation(InitLocation + VelocityDirection * 100.f);
+				SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
+				ProjectileMovement->UpdateComponentVelocity();
+				SetLifeSpan(0);
+			}
+		}
+	}
+}
+
+float ABsProjectileBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	if (DamageCauser && DamageCauser->IsA(ABsProjectileBase::StaticClass()))
+	{
+		return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	} 
+	
+	if (DamageEvent.DamageTypeClass == UBsParryDamageType::StaticClass() && !bParried)
+	{
+		ProjectileParried(DamageCauser);
+	}
+	return Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 }

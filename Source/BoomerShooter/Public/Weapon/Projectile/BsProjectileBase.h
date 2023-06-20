@@ -41,8 +41,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	virtual void StopMovementAndDisableCollision();
+	
 	virtual void OnImpact();
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -59,6 +58,16 @@ protected:
 	UFUNCTION()
 	virtual void OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 							 bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void ProjectileParried(AActor* DamageCauser);
+
+	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	
+	virtual void SetProjectileCollision(ECollisionEnabled::Type CollisionEnabled);
+
+	void UpdateMoveActorIgnore();
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	UStaticMeshComponent* ProjectileMesh;
@@ -71,6 +80,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	FProjectileDamageProperties ProjectileDamageProperties;
+
+	bool bParried = false;
 
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

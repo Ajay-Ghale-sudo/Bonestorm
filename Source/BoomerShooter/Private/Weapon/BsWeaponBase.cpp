@@ -51,6 +51,15 @@ bool ABsWeaponBase::CanAttack() const
 	return bCanAttack;
 }
 
+void ABsWeaponBase::ConsumeSeveredHead()
+{
+	if (AttachedSeveredHead)
+	{
+		const float Amount = AttachedSeveredHead->Consume();
+		OnHeal.Broadcast(Amount);
+	}
+}
+
 void ABsWeaponBase::Fire()
 {
 	if (!bCanAttack)
@@ -117,7 +126,7 @@ void ABsWeaponBase::Equip()
 
 void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 {
-	if (!SeveredHead) return;
+	if (!SeveredHead || !SeveredHead->CanBeAttached()) return;
 	
 	if (AttachedSeveredHead)
 	{
@@ -127,11 +136,7 @@ void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 	if (SeveredHead)
 	{
 		AttachedSeveredHead = SeveredHead;
-		AttachedSeveredHead->GetHeadMesh()->SetSimulatePhysics(false);
-		AttachedSeveredHead->SetAttached(true);
-		AttachedSeveredHead->SetOwner(this);
-		AttachedSeveredHead->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale, "SeveredHeadSocket");
-		AttachedSeveredHead->SetActorRelativeScale3D(SeveredHeadScale);
+		AttachedSeveredHead->AttachHeadToComponent(WeaponMesh, FName("SeveredHeadSocket"));
 		AttachedSeveredHead->OnDetachedHead.AddUObject(this, &ABsWeaponBase::DetachSeveredHead);
 	}
 }
@@ -140,13 +145,8 @@ void ABsWeaponBase::DetachSeveredHead()
 {
 	if (AttachedSeveredHead)
 	{
-		AttachedSeveredHead->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		AttachedSeveredHead->SetAttached(false);
-		AttachedSeveredHead->SetOwner(nullptr);
-		AttachedSeveredHead->GetHeadMesh()->SetSimulatePhysics(true);
-		AttachedSeveredHead->GetHeadMesh()->ComponentVelocity = FVector(0.f, 0.f, 0.f);
-		AttachedSeveredHead->GetHeadMesh()->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, false);
 		AttachedSeveredHead->OnDetachedHead.RemoveAll(this);
+		AttachedSeveredHead->DetachHead();		
 		AttachedSeveredHead = nullptr;
 	}
 }

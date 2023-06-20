@@ -6,6 +6,7 @@
 #include "BsWeaponBase.generated.h"
 
 class ABsSeveredHeadBase;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsWeaponBaseHealEvent, float, Healing);
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 
 UCLASS()
@@ -55,9 +56,13 @@ public:
 	UFUNCTION()
 	void DetachSeveredHead();
 
+	UFUNCTION()
+	void ConsumeSeveredHead();
+
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;
 	FBsWeaponBaseEvent OnWeaponParry;
+	FBsWeaponBaseHealEvent OnHeal;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -98,9 +103,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Scythe")
 	bool bIsAttacking = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FVector SeveredHeadScale = FVector(0.5f, 0.5f, 0.5f); // TODO: Should this be handled on a per head basis?
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	ABsSeveredHeadBase* AttachedSeveredHead;

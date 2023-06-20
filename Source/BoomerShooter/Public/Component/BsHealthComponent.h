@@ -22,6 +22,9 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
+	
+	UFUNCTION()
+	void Heal(float Healing);
 
 public:
 	UPROPERTY(BlueprintAssignable)
@@ -64,7 +67,7 @@ protected:
 	const UBsBleedDamageType* CurrentBleedDamageType;
 	
 	float CurrentBleedDuration = 0.f;
-
+	
 	FTimerHandle BleedTimerHandle;
 public:
 

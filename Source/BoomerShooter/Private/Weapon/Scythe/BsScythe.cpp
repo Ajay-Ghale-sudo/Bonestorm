@@ -392,7 +392,6 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			return;
 		}
 
-
 		// TODO: Need Scythe Damage Type.
 		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
 		bReturningToOwner = true;
@@ -404,10 +403,7 @@ void ABsScythe::OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (!bThrown && bIsAttacking)
 	{
-		if (IReceiveDamage* DamageActor = Cast<IReceiveDamage>(OtherActor))
-		{
-			DamageActor->ReceiveMeleeDamage(SweepResult, this, MeleeDamage);
-		}
+		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
 	}
 }
 

@@ -16,6 +16,7 @@ class UInputAction;
 class ABsSeveredHeadBase;
 class UBsHealthComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 
 UCLASS()
@@ -43,6 +44,8 @@ public:
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FBsCharacterInputEvent OnPaused;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -190,6 +193,11 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
+
+	/*
+	 * @brief Pauses the game.
+	 */
+	void Pause();
 
 	UFUNCTION()
 	void Die();

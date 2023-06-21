@@ -184,6 +184,11 @@ void ABsScythe::MeleeAttackFinished()
 {
 	bIsAttacking = false;
 	bCanAttack = true;
+
+	if (MeleeCollision)
+	{
+		MeleeHitActors.Empty();
+	}
 }
 
 void ABsScythe::Fire()
@@ -402,7 +407,12 @@ void ABsScythe::OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 {
 	if (!bThrown && bIsAttacking)
 	{
-		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
+		// Only damage actors once per attack.
+		if (!MeleeHitActors.Contains(OtherActor))
+		{
+			MeleeHitActors.Add(OtherActor);
+			OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
+		}
 	}
 }
 

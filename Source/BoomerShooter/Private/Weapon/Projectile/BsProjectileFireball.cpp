@@ -19,10 +19,10 @@ ABsProjectileFireball::ABsProjectileFireball()
 // Called when the game starts or when spawned
 void ABsProjectileFireball::BeginPlay()
 {
-	Super::BeginPlay();
-
 	InitFX();
 	ShowProjectileFX();
+	
+	Super::BeginPlay();
 }
 
 void ABsProjectileFireball::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -37,12 +37,21 @@ void ABsProjectileFireball::OnProjectileOverlapInternal(UPrimitiveComponent* Ove
 }
 
 
-void ABsProjectileFireball::Impact()
+void ABsProjectileFireball::OnImpact()
 {
 	if (ProjectileImpactFXComponent)
 	{
 		ProjectileImpactFXComponent->Activate(true);
 	}
+
+	if (ProjectileFXComponent)
+	{
+		ProjectileFXComponent->SetVisibility(false);
+		ProjectileFXComponent->DeactivateImmediate();
+		ProjectileFXComponent->DestroyComponent();
+	}
+	
+	Super::OnImpact();
 }
 
 void ABsProjectileFireball::InitFX()

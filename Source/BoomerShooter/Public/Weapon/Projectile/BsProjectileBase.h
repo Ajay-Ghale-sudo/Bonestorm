@@ -24,7 +24,11 @@ struct FProjectileDamageProperties
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	bool bSupportsCheckProjectilePath = false;
+
+	FTimerHandle ImpactTimerHandle;	
 };
 
 UCLASS()
@@ -41,7 +45,10 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
+	virtual bool CheckProjectilePath();
+
+	UFUNCTION()
 	virtual void OnImpact();
 
 	UFUNCTION(BlueprintNativeEvent)
@@ -67,6 +74,8 @@ protected:
 	virtual void SetProjectileCollision(ECollisionEnabled::Type CollisionEnabled);
 
 	void UpdateMoveActorIgnore();
+
+	void ApplyDamageToActor(AActor* OtherActor);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")

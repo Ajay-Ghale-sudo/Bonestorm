@@ -221,6 +221,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	FBsScytheBlockConfig BlockConfig;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Scythe")
+	TArray<AActor*> MeleeHitActors;
+
 public:
 	FORCEINLINE bool IsGrappling() const { return bGrappling; }
 	FORCEINLINE bool IsThrown() const { return bThrown; }

@@ -45,6 +45,50 @@ void ABsProjectileBase::BeginPlay()
 	{
 		ProjectileMovement->InitialSpeed = ProjectileDamageProperties.ProjectileSpeed;
 	}
+
+	if (ProjectileDamageProperties.bSupportsCheckProjectilePath)
+	{
+		CheckProjectilePath();
+	}
+}
+
+bool ABsProjectileBase::CheckProjectilePath()
+{
+	if (UWorld* World = GetWorld())
+	{
+		const float ProjectileSpeed = ProjectileMovement ? ProjectileMovement->MaxSpeed : ProjectileDamageProperties.ProjectileSpeed;
+		// TODO: Magic Number should be determined from the projectile speed and current avg frame time.
+		float Distance = ProjectileSpeed * 0.16f; // How far the projectile will go. 
+		const FVector StartLocation = GetActorLocation();
+		const FVector EndLocation = GetActorLocation() + (GetActorForwardVector() * Distance);
+
+		TArray<FHitResult> HitResults;
+		FCollisionQueryParams CollisionQueryParams;
+		CollisionQueryParams.AddIgnoredActor(this);
+		CollisionQueryParams.AddIgnoredActor(GetOwner());
+		CollisionQueryParams.bTraceComplex = true;
+		
+		World->LineTraceMultiByChannel(HitResults, StartLocation, EndLocation, ECC_Projectile, CollisionQueryParams);
+
+		bool bHit = false;
+		for (auto HitResult : HitResults)
+		{
+			if (HitResult.GetActor())
+			{
+				const float TravelDistance = (HitResult.ImpactPoint - GetActorLocation()).Size();
+				const float TravelTime = UKismetMathLibrary::SafeDivide(TravelDistance, ProjectileSpeed);
+				
+				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::OnImpact, TravelTime, false);
+				ApplyDamageToActor(HitResult.GetActor());
+				SetProjectileCollision(ECollisionEnabled::NoCollision);
+				bHit = true;
+				break;
+			}
+		}
+		return bHit;
+	}
+
+	return false;
 }
 
 void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
@@ -71,8 +115,24 @@ void ABsProjectileBase::UpdateMoveActorIgnore()
 	}
 }
 
+void ABsProjectileBase::ApplyDamageToActor(AActor* OtherActor)
+{
+	if (OtherActor && OtherActor != GetOwner())
+	{
+		OtherActor->TakeDamage(
+				ProjectileDamageProperties.ProjectileDamage,
+				FDamageEvent(ProjectileDamageProperties.ProjectileDamageType),
+				GetInstigatorController(),
+				this
+		);
+	}
+}
+
 void ABsProjectileBase::OnImpact()
 {
+	SetActorHiddenInGame(true);
+	ProjectileMovement->StopMovementImmediately();
+	SetProjectileCollision(ECollisionEnabled::NoCollision);
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
@@ -98,17 +158,9 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 {
 	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
 	{
-		SetActorHiddenInGame(true);
-		ProjectileMovement->StopMovementImmediately();
-		SetProjectileCollision(ECollisionEnabled::NoCollision);
-		// TODO: Handle penetration.
-		OtherActor->TakeDamage(
-			ProjectileDamageProperties.ProjectileDamage,
-			FDamageEvent(ProjectileDamageProperties.ProjectileDamageType),
-			GetInstigatorController(),
-			this
-		);
 		OnImpact();
+		// TODO: Handle penetration.
+		ApplyDamageToActor(OtherActor);
 		SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 	}
 }

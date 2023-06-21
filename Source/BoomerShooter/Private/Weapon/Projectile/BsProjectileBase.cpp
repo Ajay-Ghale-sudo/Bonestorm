@@ -73,6 +73,7 @@ void ABsProjectileBase::UpdateMoveActorIgnore()
 
 void ABsProjectileBase::OnImpact()
 {
+	OnProjectileImpact.Broadcast();
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,

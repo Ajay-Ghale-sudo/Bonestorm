@@ -27,6 +27,7 @@ struct FProjectileDamageProperties
 	
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsProjectileEvent);
 UCLASS()
 class BOOMERSHOOTER_API ABsProjectileBase : public AActor
 {
@@ -38,10 +39,15 @@ public:
 
 	void SetDamageType(TSubclassOf<UDamageType> DamageType);
 
+public:
+	UPROPERTY(BlueprintAssignable)
+	FBsProjectileEvent OnProjectileImpact;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
+
+	UFUNCTION()
 	virtual void OnImpact();
 
 	UFUNCTION(BlueprintNativeEvent)

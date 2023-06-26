@@ -130,6 +130,7 @@ public:
 
 	virtual void DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead) override;
 
+public:
 	FBsScytheBlockEvent OnScytheParryEvent;
 	FBsScytheBlockEvent OnScytheBlockEvent;
 

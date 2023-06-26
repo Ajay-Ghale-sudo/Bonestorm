@@ -3,6 +3,7 @@
 
 #include "Character/Enemy/BsEnemyBase.h"
 #include "Component/BsHealthComponent.h"
+#include "Component/Audio/BsEnemyAudioComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Data/AttackResult.h"
@@ -23,6 +24,7 @@ ABsEnemyBase::ABsEnemyBase()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
+	EnemyAudioComponent = CreateDefaultSubobject<UBsEnemyAudioComponent>(TEXT("EnemyAudioComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +65,7 @@ void ABsEnemyBase::Die()
 	TriggerRagdoll();
 	SetMeleeHitBoxEnabled(false);
 	OnThisEnemyDeath.Broadcast(this);
+	OnDeath.Broadcast();
 }
 
 void ABsEnemyBase::TriggerRagdoll()

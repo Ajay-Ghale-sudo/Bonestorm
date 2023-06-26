@@ -1,5 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 #include "Weapon/BsWeaponBase.h"
+
+#include "Component/Audio/BsAudioComponentBase.h"
+#include "Component/Audio/BsWeaponAudioComponent.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 // Sets default values
 ABsWeaponBase::ABsWeaponBase()
@@ -10,6 +13,8 @@ ABsWeaponBase::ABsWeaponBase()
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMesh");
 	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(WeaponMesh);
+
+	AudioComponent = CreateDefaultSubobject<UBsWeaponAudioComponent>("AudioComponent");
 }
 
 // Called when the game starts or when spawned
@@ -57,6 +62,7 @@ void ABsWeaponBase::ConsumeSeveredHead()
 	{
 		const float Amount = AttachedSeveredHead->Consume();
 		OnHeal.Broadcast(Amount);
+		OnWeaponHeal.Broadcast();
 	}
 }
 
@@ -117,11 +123,12 @@ void ABsWeaponBase::Drop()
 
 void ABsWeaponBase::Throw()
 {
+	OnWeaponThrow.Broadcast();
 }
 
 void ABsWeaponBase::Equip()
 {
-
+	OnWeaponEquip.Broadcast();
 }
 
 void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)

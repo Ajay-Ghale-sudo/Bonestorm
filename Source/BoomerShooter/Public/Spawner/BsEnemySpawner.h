@@ -2,10 +2,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Character/Enemy/BsEnemyBase.h"
 #include "GameFramework/Actor.h"
 #include "BsEnemySpawner.generated.h"
+
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class BOOMERSHOOTER_API ABsEnemySpawner : public AActor
@@ -41,6 +43,18 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/*
+	 * @brief Initialize SFX related to enemy spawns.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void InitFx();
+
+	/*
+	 * @brief Create SFX at location.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Spawn")
+	void SpawnFXAtLocation() const;
 	
 protected:
 	/**
@@ -48,6 +62,18 @@ protected:
 	 **/
 	UPROPERTY(EditAnywhere, Category = "Spawn")
 	TSubclassOf<ABsEnemyBase> SpawnEnemyClass;
+
+	/*
+	 * @brief Niagara system for enemy spawn FX.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	UNiagaraSystem* SpawnFX;
+	
+	/*
+	 * @brief Niagara component for enemy spawn SFX.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	UNiagaraComponent* SpawnFXComponent;
 
 	/**
 	 * @brief Interval in seconds that the timer spawns enemies

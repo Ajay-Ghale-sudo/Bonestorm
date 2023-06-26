@@ -3,6 +3,9 @@
 
 #include "Spawner/BsEnemySpawner.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
 
 // Sets default values
 ABsEnemySpawner::ABsEnemySpawner()
@@ -21,6 +24,27 @@ void ABsEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	if (bSpawnOnBeginPlay) StartSpawnTimer();
+	InitFx();
+}
+
+void ABsEnemySpawner::InitFx()
+{
+	if (SpawnFX)
+	{
+		SpawnFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			SpawnFX,
+			GetActorLocation(),
+			FRotator::ZeroRotator);
+	}
+}
+
+void ABsEnemySpawner::SpawnFXAtLocation() const
+{
+	if (SpawnFXComponent)
+	{
+		SpawnFXComponent->Activate(true);
+	}
 }
 
 void ABsEnemySpawner::StartSpawnTimer()
@@ -46,6 +70,7 @@ ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 		if (SpawnedEnemy)
 		{
 			++CurrentSpawnAmount;
+			SpawnFXAtLocation();
 		}
 	}
 	StopSpawnTimer();

@@ -120,14 +120,16 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 		if (AttachedSeveredHead)
 		{
 			AttachedSeveredHead->ParryDamage(ActualDamage);
-			OnScytheParryEvent.Broadcast(ActualDamage);
 		}
+		OnScytheParryEvent.Broadcast(ActualDamage);
+		OnWeaponParry.Broadcast();
+		
 		ActualDamage = 0.f;
 		if (DamageCauser)
 		{
 			DamageCauser->TakeDamage(Damage, FDamageEvent(UBsParryDamageType::StaticClass()), GetInstigatorController(), GetOwner());
 		}
-		OnWeaponParry.Broadcast();
+		
 		return ActualDamage;
 	}
 	if (BlockConfig.bBlocking)
@@ -135,6 +137,8 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 		ActualDamage = AttachedSeveredHead ?
 			AttachedSeveredHead->BlockDamage(ActualDamage) : ActualDamage * BlockConfig.BlockingDamageReduction;
 		
+		OnScytheBlockEvent.Broadcast(ActualDamage);
+		OnWeaponBlock.Broadcast();
 		return ActualDamage;
 	}
 	return Super::BlockIncomingDamage(ActualDamage, DamageEvent, EventInstigator, DamageCauser);
@@ -242,6 +246,7 @@ void ABsScythe::RangeAttack()
 			Projectile->SetInstigator(GetInstigator());
 			PlayMontage(RangedAttackMontage);
 			OnRangedAttack();
+			OnWeaponFire.Broadcast();
 		}
 
 		RangedConfig.bCanFire = false;
@@ -259,6 +264,7 @@ void ABsScythe::RangeAttack()
 void ABsScythe::MeleeAttack()
 {
 	OnMeleeAttack();
+	OnWeaponMeleeAttack.Broadcast();
 	PlayMontage(MeleeAttackMontage);
 	bCanAttack = false;
 	bIsAttacking = true;
@@ -294,15 +300,15 @@ void ABsScythe::OnSecondaryAttack_Implementation()
 void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 {
 	WeaponMode = NewMode;
+	OnWeaponModeChanged.Broadcast();
 }
 
 void ABsScythe::NextWeaponMode()
 {
-
 	// TODO: State, this should be a CanChangeWeaponMode() check
 	if (!bThrown)
 	{
-		WeaponMode = WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee;
+		SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
 	}
 }
 

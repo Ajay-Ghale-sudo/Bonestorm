@@ -5,7 +5,10 @@
 #include "GameFramework/Actor.h"
 #include "BsWeaponBase.generated.h"
 
+class UBsWeaponAudioComponent;
+class UBsAudioComponentBase;
 class ABsSeveredHeadBase;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsWeaponBaseHealEvent, float, Healing);
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 
@@ -62,6 +65,15 @@ public:
 public:
 	FBsWeaponBaseEvent OnWeaponCaught;
 	FBsWeaponBaseEvent OnWeaponParry;
+	FBsWeaponBaseEvent OnWeaponBlock;
+	FBsWeaponBaseEvent OnWeaponThrow;
+	FBsWeaponBaseEvent OnWeaponEquip;
+	FBsWeaponBaseEvent OnWeaponModeChanged;
+	FBsWeaponBaseEvent OnWeaponFire;
+	FBsWeaponBaseEvent OnWeaponMeleeAttack;
+	FBsWeaponBaseEvent OnWeaponHit;
+	FBsWeaponBaseEvent OnWeaponHeal;
+	
 	FBsWeaponBaseHealEvent OnHeal;
 	
 protected:
@@ -92,6 +104,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	USkeletalMeshComponent* WeaponMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapon|Audio")
+	UBsWeaponAudioComponent* AudioComponent;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float AttackRate = 0.1f;

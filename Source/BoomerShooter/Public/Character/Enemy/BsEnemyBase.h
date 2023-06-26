@@ -7,6 +7,7 @@
 #include "Interfaces/ReceiveDamage.h"
 #include "BsEnemyBase.generated.h"
 
+class UBsEnemyAudioComponent;
 class UBoxComponent;
 class ABsSeveredHeadBase;
 class ABsWeaponBase;
@@ -47,6 +48,7 @@ public:
 
 public:
 	FBsEnemyEvent OnHitStun;
+	FBsEnemyEvent OnDeath;
 	FBsEnemyEventWithCaller OnThisEnemyDeath;
 	
 protected:
@@ -87,6 +89,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBsHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UBsEnemyAudioComponent* EnemyAudioComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UBoxComponent* MeleeHitBox;
@@ -136,4 +141,5 @@ protected:
 	
 public:
 	FORCEINLINE bool GetIsAlive() const { return bIsAlive; }
+	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
 };

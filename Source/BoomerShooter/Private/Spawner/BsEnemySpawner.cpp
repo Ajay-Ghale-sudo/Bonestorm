@@ -1,8 +1,6 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Spawner/BsEnemySpawner.h"
-
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
@@ -24,10 +22,9 @@ void ABsEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	if (bSpawnOnBeginPlay) StartSpawnTimer();
-	InitFx();
 }
 
-void ABsEnemySpawner::InitFx()
+void ABsEnemySpawner::SpawnFXAtLocation()
 {
 	if (SpawnFX)
 	{
@@ -35,15 +32,12 @@ void ABsEnemySpawner::InitFx()
 			this,
 			SpawnFX,
 			GetActorLocation(),
-			FRotator::ZeroRotator);
-	}
-}
-
-void ABsEnemySpawner::SpawnFXAtLocation() const
-{
-	if (SpawnFXComponent)
-	{
-		SpawnFXComponent->Activate(true);
+			GetActorRotation(),
+			GetActorScale(),
+			true,
+			true,
+			ENCPoolMethod::AutoRelease,
+			true);
 	}
 }
 

@@ -45,16 +45,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	/*
-	 * @brief Initialize SFX related to enemy spawns.
+	 * @brief Spawn SFX at location.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
-	void InitFx();
-
-	/*
-	 * @brief Create SFX at location.
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Spawn")
-	void SpawnFXAtLocation() const;
+	void SpawnFXAtLocation();
 	
 protected:
 	/**
@@ -72,7 +66,7 @@ protected:
 	/*
 	 * @brief Niagara component for enemy spawn SFX.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawn")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawn")
 	UNiagaraComponent* SpawnFXComponent;
 
 	/**

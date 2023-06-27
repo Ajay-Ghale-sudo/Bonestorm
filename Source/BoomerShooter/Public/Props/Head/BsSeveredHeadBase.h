@@ -25,6 +25,18 @@ public:
 	 */
 	void SetAttached(bool bAttached);
 
+	UFUNCTION()
+	/**
+	 * @brief Shows the WidgetComponent.
+	 */
+	void ShowWidget() const;
+
+	UFUNCTION()
+	/**
+	 * @brief Hides the WidgetComponent.
+	 */
+	void HideWidget() const;
+	
 	/**
 	 * @brief Attaches this to the Component.
 	 * @param InParent Parent to attach to.

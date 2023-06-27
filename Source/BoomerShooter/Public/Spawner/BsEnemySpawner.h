@@ -45,7 +45,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	/*
-	 * @brief Spawn SFX at location.
+	 * @brief Spawn VFX at location.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Spawn")
 	void SpawnFXAtLocation();

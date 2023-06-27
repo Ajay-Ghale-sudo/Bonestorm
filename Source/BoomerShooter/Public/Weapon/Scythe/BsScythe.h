@@ -208,6 +208,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float ThrowDistance = 3000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
+	TSubclassOf<UDamageType> ThrownDamageType = UDamageType::StaticClass();
+
 	/**
 	 * @brief Distance before the scythe is returned to the owner.
 	 */

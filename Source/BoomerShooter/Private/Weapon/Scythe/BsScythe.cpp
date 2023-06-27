@@ -402,8 +402,7 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			return;
 		}
 
-		// TODO: Need Scythe Damage Type.
-		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
+		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(ThrownDamageType), GetInstigatorController(), this);
 		bReturningToOwner = true;
 	}
 }

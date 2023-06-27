@@ -104,8 +104,8 @@ void ABsExplosiveProjectile::CreateExplosion()
 	ShowImpactFX();	
 }
 
-void ABsExplosiveProjectile::OnImpact()
+void ABsExplosiveProjectile::Impact()
 {
-	Super::OnImpact();
+	Super::Impact();
 	CreateExplosion();
 }

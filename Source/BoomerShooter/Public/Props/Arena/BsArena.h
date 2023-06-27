@@ -11,6 +11,7 @@ class ABsDoorBase;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsArenaEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsArenaEventWithCaller, ABsArena*, Arena);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsArenaSpawnEvent, ABsEnemyBase* /*SpawnedEnemy*/);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsArena : public AActor
@@ -27,6 +28,8 @@ public:
 
 	FBsArenaEventWithCaller OnThisArenaStarted;
 	FBsArenaEventWithCaller OnThisArenaFinished;
+
+	FBsArenaSpawnEvent OnEnemySpawned;
 
 protected:
 	// Called when the game starts or when spawned

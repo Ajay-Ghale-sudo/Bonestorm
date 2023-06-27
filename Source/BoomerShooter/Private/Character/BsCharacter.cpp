@@ -154,6 +154,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (Weapon)
 	{
 		Weapon->SetOwner(this);
+		Weapon->Equip();
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::RefundDashCharge);
 		if (HealthComponent)
@@ -462,6 +463,7 @@ void ABsCharacter::Interact()
 			{
 				if (Weapon != HitWeapon)
 				{
+					if (Weapon)	Weapon->Drop();
 					SetWeapon(HitWeapon);
 				}
 			}

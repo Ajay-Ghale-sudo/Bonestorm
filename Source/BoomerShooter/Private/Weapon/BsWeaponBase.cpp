@@ -129,6 +129,12 @@ void ABsWeaponBase::Throw()
 void ABsWeaponBase::Equip()
 {
 	OnWeaponEquip.Broadcast();
+	if (WeaponMesh)
+	{
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		WeaponMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
 }
 
 void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)

@@ -99,47 +99,49 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		
-		//Jumping
-		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ABsCharacter::Jump);
-		EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		if (bAlive)
+		{
+			//Jumping
+			EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Started, this, &ABsCharacter::Jump);
+			EnhancedInputComponent->BindAction(InputConfig.JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-		//Moving
-		EnhancedInputComponent->BindAction(InputConfig.MoveAction, ETriggerEvent::Triggered, this, &ABsCharacter::Move);
+			//Moving
+			EnhancedInputComponent->BindAction(InputConfig.MoveAction, ETriggerEvent::Triggered, this, &ABsCharacter::Move);
 
-		//Looking
-		EnhancedInputComponent->BindAction(InputConfig.LookAction, ETriggerEvent::Triggered, this, &ABsCharacter::Look);
+			//Looking
+			EnhancedInputComponent->BindAction(InputConfig.LookAction, ETriggerEvent::Triggered, this, &ABsCharacter::Look);
 
-		// Dash
-		EnhancedInputComponent->BindAction(InputConfig.DashAction, ETriggerEvent::Started, this, &ABsCharacter::Dash);
+			// Dash
+			EnhancedInputComponent->BindAction(InputConfig.DashAction, ETriggerEvent::Started, this, &ABsCharacter::Dash);
 
-		// Attack
-		EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Triggered, this, &ABsCharacter::Attack);
+			// Attack
+			EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Triggered, this, &ABsCharacter::Attack);
 
-		// Secondary Attack
-		EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+			// Secondary Attack
+			EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
 
-		// Switch weapon attack mode
-		EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
+			// Switch weapon attack mode
+			EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
 
-		// Interact
-		EnhancedInputComponent->BindAction(InputConfig.InteractAction, ETriggerEvent::Started, this, &ABsCharacter::Interact);
+			// Interact
+			EnhancedInputComponent->BindAction(InputConfig.InteractAction, ETriggerEvent::Started, this, &ABsCharacter::Interact);
 
-		// Sliding
-		EnhancedInputComponent->BindAction(InputConfig.SlideAction, ETriggerEvent::Started, this, &ABsCharacter::StartSliding);
+			// Sliding
+			EnhancedInputComponent->BindAction(InputConfig.SlideAction, ETriggerEvent::Started, this, &ABsCharacter::StartSliding);
 
-		// Throw
-		EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
+			// Throw
+			EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
 
-		// Block
-		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::StartBlock);
-		EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Completed, this, &ABsCharacter::StopBlock);
+			// Block
+			EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::StartBlock);
+			EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Completed, this, &ABsCharacter::StopBlock);
 
-		// Detach head from weapon
-		EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
+			// Detach head from weapon
+			EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
 
-		// Consume head on weapon
-		EnhancedInputComponent->BindAction(InputConfig.ConsumeHeadAction, ETriggerEvent::Started, this, &ABsCharacter::ConsumeHead);
+			// Consume head on weapon
+			EnhancedInputComponent->BindAction(InputConfig.ConsumeHeadAction, ETriggerEvent::Started, this, &ABsCharacter::ConsumeHead);
+		}
 
 		// Pause on button press
 		EnhancedInputComponent->BindAction(InputConfig.PauseAction, ETriggerEvent::Started, this, &ABsCharacter::Pause);
@@ -584,11 +586,18 @@ void ABsCharacter::Pause()
 
 void ABsCharacter::Die()
 {
-	bAlive = true;
+	bAlive = false;
 
 	if (Weapon)
 	{
 		Weapon->Drop();
+	}
+
+	if (InputComponent)
+	{
+		InputComponent->AxisBindings.Empty();
+		InputComponent->ClearActionBindings();
+		SetupPlayerInputComponent(InputComponent);
 	}
 }
 

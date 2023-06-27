@@ -32,6 +32,8 @@ void ABsSeveredHeadBase::BeginPlay()
 	{
 		Widget->BindToSeveredHead(this);
 	}
+
+	PopHead();
 }
 
 void ABsSeveredHeadBase::SetAttached(bool bAttached)
@@ -41,16 +43,33 @@ void ABsSeveredHeadBase::SetAttached(bool bAttached)
 	if (bIsAttached)
 	{
 		DisableMeshOverlap();
+		ShowWidget();
 	}
-	// Only enable overlap if we have charge.
-	else if (CurrentCharge > 0.f)
+	else 
 	{
-		EnableMeshOverlap();
+		HideWidget();
+		
+		// Only enable overlap if we have charge.
+		if (CurrentCharge > 0.f)
+		{
+			EnableMeshOverlap();
+		}
 	}
-	
+}
+
+void ABsSeveredHeadBase::ShowWidget() const
+{
 	if (HeadWidgetComponent)
 	{
-		HeadWidgetComponent->SetVisibility(bIsAttached);
+		HeadWidgetComponent->SetVisibility(true);
+	}
+}
+
+void ABsSeveredHeadBase::HideWidget() const
+{
+	if (HeadWidgetComponent)
+	{
+		HeadWidgetComponent->SetVisibility(false);
 	}
 }
 
@@ -134,8 +153,8 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 
 void ABsSeveredHeadBase::PopHead() const
 {
-	if (HeadMesh) return;
-	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, false);
+	if (!HeadMesh || bIsAttached) return;
+	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, true);
 }
 
 void ABsSeveredHeadBase::DepleteCharge()

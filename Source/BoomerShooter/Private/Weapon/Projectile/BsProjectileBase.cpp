@@ -8,6 +8,7 @@
 #include "Data/BsDamageType.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -26,7 +27,8 @@ ABsProjectileBase::ABsProjectileBase()
 	ProjectileCollision = CreateDefaultSubobject<USphereComponent>("ProjectileCollision");
 	ProjectileCollision->SetupAttachment(ProjectileMesh);
 	ProjectileCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	ProjectileCollision->SetCollisionObjectType(ECC_Projectile);	
+	ProjectileCollision->SetCollisionObjectType(ECC_Projectile);
+	ProjectileCollision->bReturnMaterialOnMove = true;
 }
 
 // Called when the game starts or when spawned
@@ -67,6 +69,7 @@ bool ABsProjectileBase::CheckProjectilePath()
 		CollisionQueryParams.AddIgnoredActor(this);
 		CollisionQueryParams.AddIgnoredActor(GetOwner());
 		CollisionQueryParams.bTraceComplex = true;
+		CollisionQueryParams.bReturnPhysicalMaterial = true;
 		
 		World->LineTraceMultiByChannel(HitResults, StartLocation, EndLocation, ECC_Projectile, CollisionQueryParams);
 
@@ -78,7 +81,8 @@ bool ABsProjectileBase::CheckProjectilePath()
 				const float TravelDistance = (HitResult.ImpactPoint - GetActorLocation()).Size();
 				const float TravelTime = UKismetMathLibrary::SafeDivide(TravelDistance, ProjectileSpeed);
 				
-				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::OnImpact, TravelTime, false);
+				LastHitResult = HitResult;
+				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::Impact, TravelTime, false);
 				ApplyDamageToActor(HitResult.GetActor());
 				SetProjectileCollision(ECollisionEnabled::NoCollision);
 				bHit = true;
@@ -128,11 +132,12 @@ void ABsProjectileBase::ApplyDamageToActor(AActor* OtherActor)
 	}
 }
 
-void ABsProjectileBase::OnImpact()
+void ABsProjectileBase::Impact()
 {
 	SetActorHiddenInGame(true);
 	ProjectileMovement->StopMovementImmediately();
 	SetProjectileCollision(ECollisionEnabled::NoCollision);
+	OnImpact.Broadcast(LastHitResult);
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
@@ -144,21 +149,51 @@ void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnCo
 void ABsProjectileBase::OnProjectileHitInternal(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
+	LastHitResult = Hit;
 }
 
 void ABsProjectileBase::OnProjectileOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	LastHitResult = SweepResult;
 	OnProjectileOverlapInternal(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
 
 void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	LastHitResult = SweepResult;
+	// If we don't have a sweep, we'll need to do a line trace to find the hit result.
+	if (!bFromSweep)
+	{
+		if (const UWorld* World = GetWorld())
+		{
+			FCollisionQueryParams CollisionParameters;
+			CollisionParameters.AddIgnoredActor(this);
+			CollisionParameters.AddIgnoredActor(GetOwner());
+			CollisionParameters.bReturnPhysicalMaterial = true;
+			CollisionParameters.bTraceComplex = true;
+			
+			TArray<FHitResult> HitResults;
+			// TODO: Should this be an Overlap test instead?
+			World->LineTraceMultiByChannel(
+				HitResults,
+				GetActorLocation(),
+				GetActorLocation() + (GetActorForwardVector() * 500.f),
+				ECC_Projectile,
+				CollisionParameters
+			);
+
+			if (!HitResults.IsEmpty())
+			{
+				LastHitResult = HitResults[0];
+			}
+		}
+	}
+	
 	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
 	{
-		OnImpact();
+		Impact();
 		// TODO: Handle penetration.
 		ApplyDamageToActor(OtherActor);
 		SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);

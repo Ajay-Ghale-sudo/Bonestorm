@@ -145,6 +145,8 @@ void ABsWeaponBase::AttachSeveredHead(ABsSeveredHeadBase* SeveredHead)
 		AttachedSeveredHead = SeveredHead;
 		AttachedSeveredHead->AttachHeadToComponent(WeaponMesh, FName("SeveredHeadSocket"));
 		AttachedSeveredHead->OnDetachedHead.AddUObject(this, &ABsWeaponBase::DetachSeveredHead);
+		OnWeaponThrow.AddUObject(AttachedSeveredHead, &ABsSeveredHeadBase::HideWidget);
+		OnWeaponCaught.AddUObject(AttachedSeveredHead, &ABsSeveredHeadBase::ShowWidget);
 	}
 }
 
@@ -153,6 +155,8 @@ void ABsWeaponBase::DetachSeveredHead()
 	if (AttachedSeveredHead)
 	{
 		AttachedSeveredHead->OnDetachedHead.RemoveAll(this);
+		OnWeaponThrow.RemoveAll(AttachedSeveredHead);
+		OnWeaponCaught.RemoveAll(AttachedSeveredHead);
 		AttachedSeveredHead->DetachHead();		
 		AttachedSeveredHead = nullptr;
 	}

@@ -8,6 +8,9 @@
 class USphereComponent;
 class UProjectileMovementComponent;
 
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsProjectileHitEvent, const FHitResult& /*HitResult*/);
+
 USTRUCT(BlueprintType)
 struct FProjectileDamageProperties
 {
@@ -42,6 +45,9 @@ public:
 
 	void SetDamageType(TSubclassOf<UDamageType> DamageType);
 
+public:
+	FBsProjectileHitEvent OnImpact;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,7 +55,7 @@ protected:
 	virtual bool CheckProjectilePath();
 
 	UFUNCTION()
-	virtual void OnImpact();
+	virtual void Impact();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnProjectileHit(UPrimitiveComponent* OnComponentHit, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse,
@@ -92,8 +98,11 @@ protected:
 
 	bool bParried = false;
 
+	FHitResult LastHitResult;
+
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 	FORCEINLINE FProjectileDamageProperties GetProjectileDamageProperties() const { return ProjectileDamageProperties; }
+	FORCEINLINE USphereComponent* GetProjectileCollision() const { return ProjectileCollision; }
 	FORCEINLINE float GetProjectileDamage() const { return ProjectileDamageProperties.ProjectileDamage; }
 };

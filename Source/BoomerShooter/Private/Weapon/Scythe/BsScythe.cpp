@@ -398,12 +398,12 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			if (!AttachedSeveredHead)
 			{
 				AttachSeveredHead(SeveredHead);
+				bReturningToOwner = true;
 			}
 			return;
 		}
 
-		// TODO: Need Scythe Damage Type.
-		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
+		OtherActor->TakeDamage(MeleeDamage, FDamageEvent(ThrownDamageType), GetInstigatorController(), this);
 		bReturningToOwner = true;
 	}
 }

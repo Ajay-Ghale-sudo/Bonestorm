@@ -138,7 +138,6 @@ void ABsSeveredHeadBase::PopHead() const
 {
 	if (!HeadMesh || bIsAttached) return;
 	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, true);
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("PopHead"));
 }
 
 void ABsSeveredHeadBase::DepleteCharge()

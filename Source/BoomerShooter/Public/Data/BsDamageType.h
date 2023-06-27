@@ -43,3 +43,9 @@ class UBsExplosionDamageType : public UBsDamageType
 {
 	GENERATED_BODY()	
 };
+
+UCLASS()
+class UBsThrownScytheDamageType : public UBsDamageType
+{
+	GENERATED_BODY()
+};

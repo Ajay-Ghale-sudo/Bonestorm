@@ -32,6 +32,8 @@ void ABsSeveredHeadBase::BeginPlay()
 	{
 		Widget->BindToSeveredHead(this);
 	}
+
+	PopHead();
 }
 
 void ABsSeveredHeadBase::SetAttached(bool bAttached)
@@ -151,8 +153,8 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 
 void ABsSeveredHeadBase::PopHead() const
 {
-	if (HeadMesh) return;
-	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, false);
+	if (!HeadMesh || bIsAttached) return;
+	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, true);
 }
 
 void ABsSeveredHeadBase::DepleteCharge()

@@ -4,7 +4,6 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 
-
 // Sets default values
 ABsEnemySpawner::ABsEnemySpawner()
 {
@@ -21,7 +20,6 @@ void ABsEnemySpawner::Tick(float DeltaTime)
 void ABsEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
-	if (bSpawnOnBeginPlay) StartSpawnTimer();
 }
 
 void ABsEnemySpawner::SpawnFXAtLocation()
@@ -41,21 +39,11 @@ void ABsEnemySpawner::SpawnFXAtLocation()
 	}
 }
 
-void ABsEnemySpawner::StartSpawnTimer()
-{
-	UWorld* World = GetWorld();
-	if (World && SpawnEnemyClass)
-	{
-        FTimerManager& TimerManager = GetWorldTimerManager();
-        TimerManager.SetTimer(EnemySpawnTimerHandle, this, &ABsEnemySpawner::SpawnEnemyCallback, SpawnInterval, true);
-	}
-}
-
 ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 {
 	UWorld* World = GetWorld();
 	ABsEnemyBase* SpawnedEnemy = nullptr;
-	if (World && CurrentSpawnAmount < MaxSpawnAmount)
+	if (World)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -63,20 +51,8 @@ ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 		SpawnedEnemy = Cast<ABsEnemyBase>(World->SpawnActor(SpawnEnemyClass, &SpawnTransform));
 		if (SpawnedEnemy)
 		{
-			++CurrentSpawnAmount;
 			SpawnFXAtLocation();
 		}
 	}
-	StopSpawnTimer();
 	return SpawnedEnemy;
-}
-
-void ABsEnemySpawner::SpawnEnemyCallback()
-{
-	SpawnEnemy();
-}
-
-void ABsEnemySpawner::StopSpawnTimer()
-{
-	EnemySpawnTimerHandle.Invalidate();
 }

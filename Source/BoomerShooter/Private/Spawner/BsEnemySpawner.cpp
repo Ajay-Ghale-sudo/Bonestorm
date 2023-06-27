@@ -1,7 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "Spawner/BsEnemySpawner.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 
 // Sets default values
@@ -21,6 +22,23 @@ void ABsEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	if (bSpawnOnBeginPlay) StartSpawnTimer();
+}
+
+void ABsEnemySpawner::SpawnFXAtLocation()
+{
+	if (SpawnFX)
+	{
+		SpawnFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			this,
+			SpawnFX,
+			GetActorLocation(),
+			GetActorRotation(),
+			GetActorScale(),
+			true,
+			true,
+			ENCPoolMethod::AutoRelease,
+			true);
+	}
 }
 
 void ABsEnemySpawner::StartSpawnTimer()
@@ -46,6 +64,7 @@ ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 		if (SpawnedEnemy)
 		{
 			++CurrentSpawnAmount;
+			SpawnFXAtLocation();
 		}
 	}
 	StopSpawnTimer();

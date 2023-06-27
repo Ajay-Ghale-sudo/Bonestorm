@@ -24,7 +24,7 @@ struct FBsArenaConfig
 	 *		 (stops enemies from spawning into player damage and dying instantly)
 	 **/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Arena Config", meta = (AllowPrivateAccess = "true"))
-	float RoundDelay = 0.f;
+	float WaveDelay = 0.f;
 
 	/*
 	 * @brief This float determines individual spawn delay for individual spawners, allowing more configurable spawns.

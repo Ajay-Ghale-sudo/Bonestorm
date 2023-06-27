@@ -97,14 +97,14 @@ void ABsArena::NextWave()
 {
 	if (++ArenaConfig.CurrentArenaWave <= ArenaConfig.MaxArenaWaves)
 	{
-		if (ArenaConfig.RoundDelay <= 0)
+		if (ArenaConfig.WaveDelay <= 0)
 		{
 			// TODO: Should check to see what round it is, if the spawner is active on this round, etc.
 			ActivateSpawner();
 		}
 		else
 		{
-			GetWorldTimerManager().SetTimer(ArenaConfig.NextWaveSpawnTimerHandle, this, &ABsArena::ActivateSpawner, ArenaConfig.RoundDelay, false);
+			GetWorldTimerManager().SetTimer(ArenaConfig.NextWaveSpawnTimerHandle, this, &ABsArena::ActivateSpawner, ArenaConfig.WaveDelay, false);
 		}
 	}
 	else

@@ -37,7 +37,7 @@ void ABsProjectileFireball::OnProjectileOverlapInternal(UPrimitiveComponent* Ove
 }
 
 
-void ABsProjectileFireball::OnImpact()
+void ABsProjectileFireball::Impact()
 {
 	if (ProjectileImpactFXComponent)
 	{
@@ -51,7 +51,7 @@ void ABsProjectileFireball::OnImpact()
 		ProjectileFXComponent->DestroyComponent();
 	}
 	
-	Super::OnImpact();
+	Super::Impact();
 }
 
 void ABsProjectileFireball::InitFX()

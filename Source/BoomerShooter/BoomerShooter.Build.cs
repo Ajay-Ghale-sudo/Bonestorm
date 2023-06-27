@@ -16,7 +16,8 @@ public class BoomerShooter : ModuleRules
 			"InputCore",
 			"UMG",
 			"SlateCore",
-			"Niagara"
+			"Niagara",
+			"PhysicsCore",
 			
 		});
 

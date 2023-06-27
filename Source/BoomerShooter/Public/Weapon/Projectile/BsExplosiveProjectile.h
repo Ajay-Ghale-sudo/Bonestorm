@@ -59,7 +59,7 @@ protected:
 	/**
 	 * @brief Overridden from ABsProjectileBase. Called when this projectile impacts with another actor.
 	 */
-	virtual void OnImpact() override;
+	virtual void Impact() override;
 
 protected:
 

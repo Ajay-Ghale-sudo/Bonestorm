@@ -398,6 +398,7 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			if (!AttachedSeveredHead)
 			{
 				AttachSeveredHead(SeveredHead);
+				bReturningToOwner = true;
 			}
 			return;
 		}

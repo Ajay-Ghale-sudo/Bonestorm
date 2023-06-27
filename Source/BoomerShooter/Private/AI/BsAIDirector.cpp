@@ -2,6 +2,8 @@
 
 
 #include "AI/BsAIDirector.h"
+
+#include "AI/BsAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Props/Arena/BsArena.h"
 #include "Character/Enemy/BsEnemyBase.h"
@@ -32,6 +34,7 @@ void UBsAIDirector::InitArenas()
 			{
 				Arena->OnThisArenaStarted.AddDynamic(this, &UBsAIDirector::OnArenaStarted);
 				Arena->OnThisArenaFinished.AddDynamic(this, &UBsAIDirector::OnArenaFinished);
+				Arena->OnEnemySpawned.AddUObject(this, &UBsAIDirector::OnArenaEnemySpawned);
 				Arenas.Add(Arena);
 			}
 		}
@@ -48,12 +51,27 @@ void UBsAIDirector::InitEnemies()
 	}
 }
 
+void UBsAIDirector::MakeEnemyFocusPlayer(ABsEnemyBase* Enemy)
+{
+	const UWorld* World = GetWorld();
+	if (Enemy && World)
+	{
+		ABsAIController* AIController = Cast<ABsAIController>(Enemy->GetController());
+		APlayerController* PC = World->GetFirstPlayerController();
+		if (AIController && PC)
+		{
+			AIController->SetFocus(PC->GetPawn());
+		}
+	}
+}
+
 void UBsAIDirector::OnArenaStarted(ABsArena* StartedArena)
 {
 	if (ActiveArena)
 	{
 		ActiveArena->OnThisArenaStarted.RemoveDynamic(this, &UBsAIDirector::OnArenaStarted);
 		ActiveArena->OnThisArenaFinished.RemoveDynamic(this, &UBsAIDirector::OnArenaFinished);
+		ActiveArena->OnEnemySpawned.RemoveAll(this);
 	}
 
 	ActiveArena = StartedArena;
@@ -65,6 +83,7 @@ void UBsAIDirector::OnArenaFinished(ABsArena* StartedArena)
 	{
 		ActiveArena->OnThisArenaStarted.RemoveDynamic(this, &UBsAIDirector::OnArenaStarted);
 		ActiveArena->OnThisArenaFinished.RemoveDynamic(this, &UBsAIDirector::OnArenaFinished);
+		ActiveArena->OnEnemySpawned.RemoveAll(this);
 		ActiveArena = nullptr;
 	}
 }
@@ -76,6 +95,11 @@ void UBsAIDirector::OnActorSpawned(AActor* SpawnedActor)
 		Enemy->OnThisEnemyDeath.AddDynamic(this, &UBsAIDirector::OnEnemyDeath);
 		ActiveEnemies.Add(Enemy);
 	}
+}
+
+void UBsAIDirector::OnArenaEnemySpawned(ABsEnemyBase* Enemy)
+{
+	MakeEnemyFocusPlayer(Enemy);
 }
 
 void UBsAIDirector::OnEnemyDeath(ABsEnemyBase* Enemy)

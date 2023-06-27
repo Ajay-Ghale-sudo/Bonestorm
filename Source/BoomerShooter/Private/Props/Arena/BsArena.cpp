@@ -61,6 +61,7 @@ void ABsArena::ActivateSpawner()
 		if (ABsEnemyBase* Enemy = Spawner->SpawnEnemy())
 		{
 			ArenaConfig.SpawnedEnemies.Add(Enemy);
+			OnEnemySpawned.Broadcast(Enemy);
 			if (UBsHealthComponent* HealthComponent = Enemy->FindComponentByClass<UBsHealthComponent>())
 			{
 				HealthComponent->OnDeath.AddDynamic(this, &ABsArena::OnSpawnedEnemyDeath);

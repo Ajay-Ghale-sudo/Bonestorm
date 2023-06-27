@@ -5,6 +5,7 @@
 #include "UObject/Object.h"
 #include "BsAIDirector.generated.h"
 
+class ABsCharacter;
 class ABsEnemyBase;
 class ABsArena;
 
@@ -27,6 +28,12 @@ protected:
 	 */
 	void InitEnemies();
 
+	/**
+	 * @brief Makes an Enemy focus the player.
+	 * @param Enemy Enemy to make focus the player.
+	 */
+	void MakeEnemyFocusPlayer(ABsEnemyBase* Enemy);
+
 	UFUNCTION()
 	void OnArenaStarted(ABsArena* StartedArena);
 	UFUNCTION()
@@ -34,6 +41,9 @@ protected:
 
 	UFUNCTION()
 	void OnActorSpawned(AActor* SpawnedActor);
+
+	UFUNCTION()
+	void OnArenaEnemySpawned(ABsEnemyBase* Enemy);
 
 	UFUNCTION()
 	void OnEnemyDeath(ABsEnemyBase* Enemy);

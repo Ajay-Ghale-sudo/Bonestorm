@@ -53,4 +53,6 @@ protected:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawn")
 	UNiagaraComponent* SpawnFXComponent;
+
+	// TODO: Create functionality to prevent enemies from spawning inside of objects.
 };

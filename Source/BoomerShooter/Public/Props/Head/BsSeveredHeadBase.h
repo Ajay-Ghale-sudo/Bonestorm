@@ -106,7 +106,10 @@ protected:
 	bool bIsAttached = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
-	TSubclassOf<UDamageType> HeadDamageType;
+	TSubclassOf<UDamageType> HeadDamageType = UDamageType::StaticClass();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
+	TSubclassOf<ABsProjectileBase> HeadProjectileClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Head")
 	UWidgetComponent* HeadWidgetComponent;

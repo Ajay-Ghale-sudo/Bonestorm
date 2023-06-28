@@ -45,6 +45,7 @@ void UBsImpactFxManager::OnActorSpawned(AActor* SpawnedActor)
 {
 	if (ABsProjectileBase* Projectile = Cast<ABsProjectileBase>(SpawnedActor))
 	{
-		Projectile->OnImpact.AddUObject(this, &UBsImpactFxManager::ResolveImpact);
+		// Only process impact if damage was caused. This handles the case where projectiles are parried.
+		Projectile->OnDealtDamage.AddUObject(this, &UBsImpactFxManager::ResolveImpact);
 	}
 }

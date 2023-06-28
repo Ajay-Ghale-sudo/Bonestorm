@@ -198,6 +198,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
 	UAnimMontage* RangedAttackMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* BlockMontage;
+
 	bool bThrown = false;
 	bool bReturningToOwner = false;
 	bool bAttachedToGrapplePoint = false;

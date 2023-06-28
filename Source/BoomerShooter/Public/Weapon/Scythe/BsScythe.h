@@ -200,6 +200,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
 	UAnimMontage* BlockMontage;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+    UAnimMontage* ParryMontage;
 
 	bool bThrown = false;
 	bool bReturningToOwner = false;

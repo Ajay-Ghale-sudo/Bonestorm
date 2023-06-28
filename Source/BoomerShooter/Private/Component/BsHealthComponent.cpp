@@ -40,7 +40,6 @@ void UBsHealthComponent::ApplyDamage(float Damage)
 	}
 	else if (HealthPercentage < LowHealthThreshold)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, FString::Printf(TEXT("Health Percentage: %f"), HealthPercentage));
 		OnLowHealth.Broadcast();
 	}
 	OnHealthChanged.Broadcast();

@@ -39,6 +39,18 @@ class UBsSkeletonMeleeDamageType : public UBsDamageType
 };
 
 UCLASS()
+class UBsGunnerDamageType : public UBsDamageType
+{
+	GENERATED_BODY()
+};
+
+UCLASS()
+class UBsRangedEnemyDamageType : public UBsDamageType
+{
+	GENERATED_BODY()
+};
+
+UCLASS()
 class UBsExplosionDamageType : public UBsDamageType
 {
 	GENERATED_BODY()	

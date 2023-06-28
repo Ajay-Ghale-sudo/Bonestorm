@@ -245,8 +245,13 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 	}
 }
 
+void ABsProjectileBase::SpawnParryFX()
+{
+	
+}
+
 float ABsProjectileBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+                                    AActor* DamageCauser)
 {
 	if (DamageCauser && DamageCauser->IsA(ABsProjectileBase::StaticClass()))
 	{

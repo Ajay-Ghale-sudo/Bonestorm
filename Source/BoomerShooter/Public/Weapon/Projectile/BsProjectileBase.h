@@ -7,6 +7,8 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsProjectileHitEvent, const FHitResult& /*HitResult*/);
@@ -87,6 +89,9 @@ protected:
 	UFUNCTION()
 	void ProjectileParried(AActor* DamageCauser);
 
+	UFUNCTION()
+	virtual void SpawnParryFX();
+
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
 	virtual void SetProjectileCollision(ECollisionEnabled::Type CollisionEnabled);
@@ -101,6 +106,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	USphereComponent* ProjectileCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraSystem* ParryTrailFX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraComponent* ParryTrailComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
+	FName ParryTrailAttachPoint = NAME_None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	UProjectileMovementComponent* ProjectileMovement;

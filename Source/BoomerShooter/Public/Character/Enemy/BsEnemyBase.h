@@ -83,6 +83,9 @@ protected:
 	virtual void StartHitStun();
 
 	UFUNCTION()
+	virtual void ApplyHitStun(float Duration);
+
+	UFUNCTION()
 	virtual void EndHitStun();
 
 	UFUNCTION()
@@ -146,8 +149,10 @@ protected:
 	float PreHitStunMaxWalkSpeed = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	float LowHealthHitStunDuration = 2.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
 	UMaterialInstance* LowHealthMaterial;
-	
 	
 public:
 	FORCEINLINE bool GetIsAlive() const { return bIsAlive; }

@@ -170,6 +170,9 @@ void ABsSeveredHeadBase::DepleteCharge(const float Amount)
 	if (CurrentCharge <= 0.f)
 	{
 		DetachHead();
+		
+		// TODO: This shouldn't destroy explicitly. Needs to be resolved elsewhere where it can be overridden for fx to be played.
+		SetLifeSpan(2.f);
 	}
 }
 

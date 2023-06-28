@@ -83,6 +83,7 @@ bool ABsProjectileBase::CheckProjectilePath()
 				
 				LastHitResult = HitResult;
 				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::Impact, TravelTime, false);
+				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ResolveImpactTimerHandle, this, &ABsProjectileBase::ResolveImpact, TravelTime, false);
 				ApplyDamageToActor(HitResult.GetActor());
 				SetProjectileCollision(ECollisionEnabled::NoCollision);
 				bHit = true;
@@ -93,6 +94,14 @@ bool ABsProjectileBase::CheckProjectilePath()
 	}
 
 	return false;
+}
+
+void ABsProjectileBase::ResolveImpact()
+{
+	if (DamageDealt > 0.f)
+	{
+		OnDealtDamage.Broadcast(LastHitResult);
+	}
 }
 
 void ABsProjectileBase::SetDamageType(TSubclassOf<UDamageType> DamageType)
@@ -119,17 +128,21 @@ void ABsProjectileBase::UpdateMoveActorIgnore()
 	}
 }
 
-void ABsProjectileBase::ApplyDamageToActor(AActor* OtherActor)
+float ABsProjectileBase::ApplyDamageToActor(AActor* OtherActor)
 {
+	float DamageApplied = 0.f;
 	if (OtherActor && OtherActor != GetOwner())
 	{
-		OtherActor->TakeDamage(
+		DamageApplied = OtherActor->TakeDamage(
 				ProjectileDamageProperties.ProjectileDamage,
 				FDamageEvent(ProjectileDamageProperties.ProjectileDamageType),
 				GetInstigatorController(),
 				this
 		);
 	}
+
+	DamageDealt += DamageApplied;
+	return DamageApplied;
 }
 
 void ABsProjectileBase::Impact()
@@ -137,7 +150,6 @@ void ABsProjectileBase::Impact()
 	SetActorHiddenInGame(true);
 	ProjectileMovement->StopMovementImmediately();
 	SetProjectileCollision(ECollisionEnabled::NoCollision);
-	OnImpact.Broadcast(LastHitResult);
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
@@ -194,8 +206,9 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
 	{
 		Impact();
-		// TODO: Handle penetration.
 		ApplyDamageToActor(OtherActor);
+		ResolveImpact();
+		// TODO: Handle penetration.
 		SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 	}
 }
@@ -206,8 +219,14 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 	{
 		bParried = true;
 		const AActor* ProjectileOwner = GetOwner();
-		if (DamageCauser && ProjectileOwner)
+		if (DamageCauser)
 		{
+			if (!ProjectileOwner)
+			{
+				// TODO: Handle case where projectile doesn't have an owner. Destroy or reflect back?
+				return;
+			}
+			Impact();
 			SetOwner(DamageCauser);
 			UpdateMoveActorIgnore();
 			const FVector TargetLocation = ProjectileOwner->GetActorLocation();

@@ -31,7 +31,8 @@ struct FProjectileDamageProperties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
 	bool bSupportsCheckProjectilePath = false;
 
-	FTimerHandle ImpactTimerHandle;	
+	FTimerHandle ImpactTimerHandle;
+	FTimerHandle ResolveImpactTimerHandle;
 };
 
 UCLASS()
@@ -46,13 +47,18 @@ public:
 	void SetDamageType(TSubclassOf<UDamageType> DamageType);
 
 public:
-	FBsProjectileHitEvent OnImpact;
+	FBsProjectileHitEvent OnDealtDamage;
 	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual bool CheckProjectilePath();
+
+	/**
+	 * @brief Resolves the impact. Should be called after Impact.
+	 */
+	void ResolveImpact();
 
 	UFUNCTION()
 	virtual void Impact();
@@ -81,7 +87,7 @@ protected:
 
 	void UpdateMoveActorIgnore();
 
-	void ApplyDamageToActor(AActor* OtherActor);
+	float ApplyDamageToActor(AActor* OtherActor);
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
@@ -99,6 +105,11 @@ protected:
 	bool bParried = false;
 
 	FHitResult LastHitResult;
+
+	/**
+	 * @brief Amount of damage dealt by this projectile.
+	 */
+	float DamageDealt = 0.f;
 
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

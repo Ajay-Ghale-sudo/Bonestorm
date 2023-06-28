@@ -36,6 +36,9 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FBsHealthComponentEvent OnHealthChanged;
 
+	UPROPERTY()
+	FBsHealthComponentEvent OnLowHealth;
+
 	FBsHealthComponentExplosionEvent OnExplosionHit;
 	
 protected:
@@ -67,6 +70,9 @@ protected:
 	const UBsBleedDamageType* CurrentBleedDamageType;
 	
 	float CurrentBleedDuration = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0") )
+	float LowHealthThreshold = 0.25f;
 	
 	FTimerHandle BleedTimerHandle;
 public:

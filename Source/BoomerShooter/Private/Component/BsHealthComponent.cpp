@@ -2,6 +2,7 @@
 
 #include "Component/BsHealthComponent.h"
 #include "Data/BsDamageType.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Weapon/Projectile/BsExplosiveProjectile.h"
 
 // Sets default values for this component's properties
@@ -30,11 +31,16 @@ void UBsHealthComponent::ApplyDamage(float Damage)
 {
 	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
+	float HealthPercentage = UKismetMathLibrary::SafeDivide(CurrentHealth, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
 		OnDeath.Broadcast();
 		BleedTimerHandle.Invalidate();
 		CurrentBleedDamageType = nullptr;
+	}
+	else if (HealthPercentage < LowHealthThreshold)
+	{
+		OnLowHealth.Broadcast();
 	}
 	OnHealthChanged.Broadcast();
 }

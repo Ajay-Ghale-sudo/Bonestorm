@@ -183,7 +183,7 @@ ABsProjectileBase* ABsSeveredHeadBase::CreateProjectile(TSubclassOf<ABsProjectil
     	{
     		DepleteCharge();
     		OnHeadChargeChanged.Broadcast();
-		    if (ABsProjectileBase* Projectile =  Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParameters)))
+		    if (ABsProjectileBase* Projectile =  Cast<ABsProjectileBase>(World->SpawnActor(HeadProjectileClass ? HeadProjectileClass : ProjectileClass, &SpawnTransform, SpawnParameters)))
 		    {
     			Projectile->SetDamageType(HeadDamageType);
 		    	return Projectile;

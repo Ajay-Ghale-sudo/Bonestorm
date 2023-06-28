@@ -65,6 +65,7 @@ void ABsEnemyBase::Die()
 	SeverHead();
 	TriggerRagdoll();
 	ClearOverlayMaterial();
+	HitStunTimerHandle.Invalidate();
 	SetMeleeHitBoxEnabled(false);
 	OnThisEnemyDeath.Broadcast(this);
 	OnDeath.Broadcast();
@@ -156,25 +157,33 @@ void ABsEnemyBase::SetMeleeHitBoxEnabled(bool bEnabled)
 
 void ABsEnemyBase::StartHitStun()
 {
-	if (bHitStunned) return;
-	
+	ApplyHitStun(HitStunDuration);
+}
+
+void ABsEnemyBase::ApplyHitStun(float Duration)
+{
+	if (bHitStunned)
+	{
+		if (Duration <= HitStunDuration)
+		{
+			return;
+		}
+	}
 	PlayMontage(HitStunMontage);
 	
 	if (UCharacterMovementComponent* CMovement = GetCharacterMovement())
 	{
 		bHitStunned = true;
-		PreHitStunMaxWalkSpeed = CMovement->MaxWalkSpeed;
 		CMovement->MaxWalkSpeed = 0.f;
 		
 		GetWorldTimerManager().SetTimer(
 			HitStunTimerHandle,
 			this,
 			&ABsEnemyBase::EndHitStun,
-			HitStunDuration, // TODO: This could be determined by the attack or the montage played.
+			Duration, 
 			false
 		);
 	}
-
 	OnHitStun.Broadcast();
 }
 
@@ -184,7 +193,7 @@ void ABsEnemyBase::EndHitStun()
 	{
 		CMovement->MaxWalkSpeed = PreHitStunMaxWalkSpeed;
 	}
-
+	ClearOverlayMaterial();
 	bHitStunned = false;
 }
 
@@ -193,6 +202,7 @@ void ABsEnemyBase::IndicateLowHealth()
 	if (USkeletalMeshComponent* CurrentMesh = GetMesh())
 	{
 		CurrentMesh->SetOverlayMaterial(LowHealthMaterial);
+		ApplyHitStun(LowHealthHitStunDuration);
 	}
 }
 

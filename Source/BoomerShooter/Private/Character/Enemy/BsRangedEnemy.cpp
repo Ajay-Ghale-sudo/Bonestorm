@@ -79,32 +79,37 @@ EAttackResult ABsRangedEnemy::RangeAttack(const ACharacter* Target)
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		const FTransform TargetTransform = Target->GetActorTransform();
+		const FVector AimLocation = Target->GetComponentsBoundingBox().GetCenter();
 		const FTransform SpawnTransform = GetMesh()->GetSocketTransform(FName("RangedAttackSocket"));
-		const FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnTransform.GetLocation(), TargetTransform.GetLocation());
+		const FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnTransform.GetLocation(), AimLocation);
 
 		
 		if (ABsProjectileBase* Projectile = World->SpawnActor<ABsProjectileBase>(ProjectileClass, SpawnTransform.GetLocation(), SpawnRotation, SpawnParameters))
 		{
 			if (UProjectileMovementComponent* ProjectileMovement = Projectile->GetProjectileMovement())
 			{
-				const float ProjectileSpeed = Projectile->GetProjectileDamageProperties().ProjectileSpeed;
+				const float ProjectileSpeed = ProjectileMovement->MaxSpeed;
 				if (ProjectileSpeed <= 0) return EAttackResult::EAR_None;
 				
 				// (Dist to target / bullet speed) * (target speed * target forward vec + target location)
-				const float TravelTime = FVector::Dist(TargetTransform.GetLocation(), SpawnTransform.GetLocation()) / ProjectileSpeed;
-				FVector TargetLocation = TargetTransform.GetLocation() + (Target->GetVelocity() * TravelTime);
+				const float TravelTime = FVector::Dist(AimLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
+				FVector TargetLocation = AimLocation + (Target->GetVelocity() * TravelTime);
 				
 				// How Long it would take us to hit the target where it currently is, provides us a time window to calculate the target's future position
 				const float TravelDistTime = FVector::Dist(TargetLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
-				TargetLocation = TargetTransform.GetLocation() + (Target->GetVelocity() * TravelDistTime);
+				TargetLocation = AimLocation + (Target->GetVelocity() * TravelDistTime);
 
 				if (Accuracy < 1.f)
 				{
-					FVector RandomVector = FMath::VRand() * (1.f - Accuracy) * 500.f;
+					FVector RandomVector = FMath::VRand() * (1.f - Accuracy) * AccuracyDeviation;
 					TargetLocation += RandomVector;
 				}
 				
 				FVector OutLaunchVelocity;
+				TArray<AActor*> ActorsToIgnore;
+				Target->GetAttachedActors(ActorsToIgnore);
+				ActorsToIgnore.Add(this);
+				
 				bool bHasAimSolution = UGameplayStatics::SuggestProjectileVelocity(
 					World,
 					OutLaunchVelocity,
@@ -113,12 +118,12 @@ EAttackResult ABsRangedEnemy::RangeAttack(const ACharacter* Target)
 					ProjectileSpeed,
 					false,
 					10.f,
-					ProjectileMovement->GetGravityZ(),
+					-1,
 					ESuggestProjVelocityTraceOption::DoNotTrace,
 					FCollisionResponseParams::DefaultResponseParam,
-					TArray<AActor*>(),
+					ActorsToIgnore,
 					false
-					);
+				);
 
 				if (bHasAimSolution)
 				{

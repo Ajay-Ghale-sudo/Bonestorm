@@ -59,7 +59,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual bool CheckProjectilePath();
+	virtual void CheckProjectilePath();
 
 	/**
 	 * @brief Resolves the impact. Should be called after Impact.

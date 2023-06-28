@@ -146,13 +146,15 @@ float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEve
 
 void ABsScythe::StartBlock()
 {
+	if (bThrown) return;
+	PlayMontage(BlockMontage);
 	StartParry();
 	BlockConfig.bBlocking = true;
 }
 
 void ABsScythe::StopBlock()
 {
-	BlockConfig.ParryTimerHandle.Invalidate();
+	ClearMontage(BlockMontage);
 	BlockConfig.bBlocking = false;
 	StopParry();
 }

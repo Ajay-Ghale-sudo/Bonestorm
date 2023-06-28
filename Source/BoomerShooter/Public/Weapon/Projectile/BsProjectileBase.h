@@ -25,6 +25,12 @@ struct FProjectileDamageProperties
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	float ProjectileLifeTime = 15.0f;
 
+	/**
+	 * @brief What speed increase should be applied when this projectile is parried.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	float ParrySpeedModifier = 3.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	TSubclassOf<UDamageType> ProjectileDamageType = UDamageType::StaticClass();
 

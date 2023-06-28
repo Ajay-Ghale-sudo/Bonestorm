@@ -235,7 +235,12 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 			if (ProjectileMovement)
 			{
 				SetActorHiddenInGame(false);
+				ProjectileMovement->MaxSpeed = ProjectileMovement->MaxSpeed * ProjectileDamageProperties.ParrySpeedModifier;
 				ProjectileMovement->Velocity = ProjectileMovement->MaxSpeed * VelocityDirection;
+				ProjectileMovement->HomingTargetComponent = ProjectileOwner->GetRootComponent();
+				ProjectileMovement->bIsHomingProjectile = true;
+				ProjectileMovement->HomingAccelerationMagnitude = ProjectileMovement->MaxSpeed;
+				
 				SetActorLocation(InitLocation + VelocityDirection * 100.f);
 				SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 				ProjectileMovement->UpdateComponentVelocity();

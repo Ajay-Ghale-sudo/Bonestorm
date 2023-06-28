@@ -39,6 +39,7 @@ void ABsEnemyBase::BeginPlay()
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsEnemyBase::Die);
 		HealthComponent->OnTookDamage.AddDynamic(this, &ABsEnemyBase::StartHitStun);
+		HealthComponent->OnLowHealth.AddDynamic(this, &ABsEnemyBase::IndicateLowHealth);
 		HealthComponent->OnExplosionHit.AddUObject(this, &ABsEnemyBase::ExplosionLaunch);
 	}
 
@@ -63,6 +64,7 @@ void ABsEnemyBase::Die()
 	bIsAlive = false;
 	SeverHead();
 	TriggerRagdoll();
+	ClearOverlayMaterial();
 	SetMeleeHitBoxEnabled(false);
 	OnThisEnemyDeath.Broadcast(this);
 	OnDeath.Broadcast();
@@ -184,6 +186,22 @@ void ABsEnemyBase::EndHitStun()
 	}
 
 	bHitStunned = false;
+}
+
+void ABsEnemyBase::IndicateLowHealth()
+{
+	if (USkeletalMeshComponent* CurrentMesh = GetMesh())
+	{
+		CurrentMesh->SetOverlayMaterial(LowHealthMaterial);
+	}
+}
+
+void ABsEnemyBase::ClearOverlayMaterial()
+{
+	if (USkeletalMeshComponent* CurrentMesh = GetMesh())
+	{
+		CurrentMesh->SetOverlayMaterial(nullptr);
+	}
 }
 
 

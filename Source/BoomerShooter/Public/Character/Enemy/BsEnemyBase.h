@@ -13,6 +13,7 @@ class ABsSeveredHeadBase;
 class ABsWeaponBase;
 class UBsHealthComponent;
 class UAnimMontage;
+class UMaterialInstance;
 
 DECLARE_MULTICAST_DELEGATE(FBsEnemyEvent);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsEnemyEventWithCaller, ABsEnemyBase*, Enemy);
@@ -84,6 +85,12 @@ protected:
 	UFUNCTION()
 	virtual void EndHitStun();
 
+	UFUNCTION()
+	virtual void IndicateLowHealth();
+
+	UFUNCTION()
+	virtual void ClearOverlayMaterial();
+	
 	void PlayMontage(UAnimMontage* MontageToPlay) const;
 
 protected:
@@ -137,6 +144,9 @@ protected:
 	float HitStunDuration = 0.3f;
 
 	float PreHitStunMaxWalkSpeed = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enemy")
+	UMaterialInstance* LowHealthMaterial;
 	
 	
 public:

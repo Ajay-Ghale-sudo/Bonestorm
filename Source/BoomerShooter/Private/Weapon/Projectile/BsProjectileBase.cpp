@@ -50,11 +50,11 @@ void ABsProjectileBase::BeginPlay()
 
 	if (ProjectileDamageProperties.bSupportsCheckProjectilePath)
 	{
-		CheckProjectilePath();
+		GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 	}
 }
 
-bool ABsProjectileBase::CheckProjectilePath()
+void ABsProjectileBase::CheckProjectilePath()
 {
 	if (UWorld* World = GetWorld())
 	{
@@ -73,7 +73,6 @@ bool ABsProjectileBase::CheckProjectilePath()
 		
 		World->LineTraceMultiByChannel(HitResults, StartLocation, EndLocation, ECC_Projectile, CollisionQueryParams);
 
-		bool bHit = false;
 		for (auto HitResult : HitResults)
 		{
 			if (HitResult.GetActor())
@@ -86,14 +85,10 @@ bool ABsProjectileBase::CheckProjectilePath()
 				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ResolveImpactTimerHandle, this, &ABsProjectileBase::ResolveImpact, TravelTime, false);
 				ApplyDamageToActor(HitResult.GetActor());
 				SetProjectileCollision(ECollisionEnabled::NoCollision);
-				bHit = true;
 				break;
 			}
 		}
-		return bHit;
 	}
-
-	return false;
 }
 
 void ABsProjectileBase::ResolveImpact()

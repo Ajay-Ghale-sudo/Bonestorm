@@ -267,4 +267,6 @@ public:
 
 	FORCEINLINE int32 GetDashAmount() const { return DashConfig.DashCurrentAmount; }
 	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE bool GetIsAlive() const { return bAlive; }
 };

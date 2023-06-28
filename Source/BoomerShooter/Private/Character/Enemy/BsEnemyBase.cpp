@@ -225,7 +225,7 @@ void ABsEnemyBase::PlayMontage(UAnimMontage* MontageToPlay) const
 
 bool ABsEnemyBase::CanAttack() const
 {
-	return bIsAlive && bCanAttack;
+	return bIsAlive && bCanAttack && !bHitStunned;
 }
 
 void ABsEnemyBase::ReceiveProjectileDamage(const FHitResult& HitResult, ABsProjectileBase* Projectile,

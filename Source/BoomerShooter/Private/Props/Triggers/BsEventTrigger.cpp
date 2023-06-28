@@ -13,17 +13,36 @@ ABsEventTrigger::ABsEventTrigger()
 	SetRootComponent(TriggerBox);
 }
 
-// Called when the game starts or when spawned
 void ABsEventTrigger::BeginPlay()
 {
 	Super::BeginPlay();
+	if (TriggerBox)
+	{
+		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ABsEventTrigger::OnTriggerComponentBeginOverlap);
+		TriggerBox->OnComponentEndOverlap.AddDynamic(this, &ABsEventTrigger::OnTriggerComponentEndOverlap);
+	}
+}
+
+void ABsEventTrigger::Triggered_Implementation()
+{
 	
 }
 
-// Called every frame
-void ABsEventTrigger::Tick(float DeltaTime)
+void ABsEventTrigger::OnTriggerComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	if (TriggerClass && OtherActor && OtherActor->IsA(TriggerClass))
+	{
+		Triggered();
+	}
+}
 
+void ABsEventTrigger::OnTriggerComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (TriggerClass && OtherActor && OtherActor->IsA(TriggerClass))
+	{
+		Triggered();
+	}
 }
 

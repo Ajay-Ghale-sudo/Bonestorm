@@ -52,5 +52,5 @@ protected:
 	 * @brief The maximum deviation from the target's location when aiming.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ranged Enemy")
-	float AccuracyDeviation = 500.0f;
+	float AccuracyDeviation = 250.0f;
 };

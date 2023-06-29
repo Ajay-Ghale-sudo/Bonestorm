@@ -3,6 +3,8 @@
 
 #include "Weapon/Projectile/BsProjectileBase.h"
 #include "BoomerShooter.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Component/BsHealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "Data/BsDamageType.h"
@@ -145,6 +147,7 @@ void ABsProjectileBase::Impact()
 	SetActorHiddenInGame(true);
 	ProjectileMovement->StopMovementImmediately();
 	SetProjectileCollision(ECollisionEnabled::NoCollision);
+	HideParryFX();
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
@@ -239,15 +242,50 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 				SetActorLocation(InitLocation + VelocityDirection * 100.f);
 				SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 				ProjectileMovement->UpdateComponentVelocity();
+				ShowParryFX();
 				SetLifeSpan(0);
 			}
 		}
 	}
 }
 
-void ABsProjectileBase::SpawnParryFX()
+
+void ABsProjectileBase::ShowParryFX()
 {
-	
+	if (ParryTrailFX)
+	{
+		ParryTrailComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParryTrailFX,
+			ProjectileMesh,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true,
+			false,
+			ENCPoolMethod::AutoRelease,
+			true);
+		ParryTrailComponent->Activate(true);
+	}
+}
+
+void ABsProjectileBase::HideParryFX()
+{
+	if (ParryTrailComponent)
+	{
+		ParryTrailComponent->SetActive(false);
+		// If DestroyComponent is called here immediately, it deletes the projectile trail, not allowing it to fade out.
+		// This preserves the visual effect while ensuring that the NiagaraComponent is destroyed.
+		// @TODO Magic number should be the amount of time remaining in the NiagaraSystem. 
+		GetWorldTimerManager().SetTimer(DestroyFXHandle, this, &ABsProjectileBase::DestroyParryFX, 2.0f, false);
+	}
+}
+
+void ABsProjectileBase::DestroyParryFX()
+{
+	if (ParryTrailComponent)
+	{
+		ParryTrailComponent->DestroyComponent();
+	}
 }
 
 float ABsProjectileBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,

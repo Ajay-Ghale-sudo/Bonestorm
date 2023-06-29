@@ -89,8 +89,12 @@ protected:
 	UFUNCTION()
 	void ProjectileParried(AActor* DamageCauser);
 
-	UFUNCTION()
-	virtual void SpawnParryFX();
+	void ShowParryFX();
+
+	void HideParryFX();
+
+	void DestroyParryFX();
+	
 
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
@@ -108,15 +112,6 @@ protected:
 	USphereComponent* ProjectileCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	UNiagaraSystem* ParryTrailFX;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-	UNiagaraComponent* ParryTrailComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Projectile")
-	FName ParryTrailAttachPoint = NAME_None;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
 	UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
@@ -130,6 +125,14 @@ protected:
 	 * @brief Amount of damage dealt by this projectile.
 	 */
 	float DamageDealt = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraSystem* ParryTrailFX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraComponent* ParryTrailComponent;
+
+	FTimerHandle DestroyFXHandle;
 
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

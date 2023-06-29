@@ -55,6 +55,7 @@ void ABsProjectileBase::BeginPlay()
 		GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 	}
 	InitParryFX();
+	SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 }
 
 void ABsProjectileBase::CheckProjectilePath()
@@ -293,7 +294,7 @@ void ABsProjectileBase::DestroyParryFX()
 {
 	if (ParryTrailComponent)
 	{
-		ParryTrailComponent->DestroyInstance();
+3		ParryTrailComponent->DestroyInstance();
 		ParryTrailComponent->ReleaseToPool();
 	}
 }

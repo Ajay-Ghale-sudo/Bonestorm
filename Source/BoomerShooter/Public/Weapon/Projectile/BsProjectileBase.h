@@ -67,7 +67,7 @@ protected:
 	 * @brief Resolves the impact. Should be called after Impact.
 	 */
 	void ResolveImpact();
-
+	
 	UFUNCTION()
 	virtual void Impact();
 
@@ -91,7 +91,7 @@ protected:
 
 	/*
 	 * @brief Initializes Parry NiagaraFX.
-	 * Also adds the ParryTrailComponent to the current World pool of NiagaraEffects.
+	 * Adds the ParryTrailComponent to the current World pool of NiagaraEffects.
 	 */
 	void InitParryFX();
 
@@ -150,6 +150,7 @@ protected:
 	UNiagaraComponent* ParryTrailComponent;
 
 	FTimerHandle DestroyFXHandle;
+	FTimerHandle DestroyProjectileHandle;
 
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

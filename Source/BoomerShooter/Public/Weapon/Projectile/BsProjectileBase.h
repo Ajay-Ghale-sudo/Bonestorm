@@ -89,10 +89,27 @@ protected:
 	UFUNCTION()
 	void ProjectileParried(AActor* DamageCauser);
 
+	/*
+	 * @brief Initializes Parry NiagaraFX.
+	 * Also adds the ParryTrailComponent to the current World pool of NiagaraEffects.
+	 */
+	void InitParryFX();
+
+	/*
+	 * @brief Makes ParryTrailComponent visible.
+	 */
 	void ShowParryFX();
 
+	/*
+	 * @brief Makes ParryTrailComponent invisible.
+	 * Sets a timer so the ParryTrailComponent doesn't get destroyed on hit (leaves a trail for a couple seconds)
+	 */
 	void HideParryFX();
-
+	
+	/*
+	 * @brief Destroys the instance of the ParryTrailComponent.
+	 *  Also releases it to the pool, allowing reuse of the same ParryTrailComponent without creating duplicates.
+	 */
 	void DestroyParryFX();
 	
 

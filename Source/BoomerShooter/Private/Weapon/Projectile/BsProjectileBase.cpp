@@ -54,6 +54,7 @@ void ABsProjectileBase::BeginPlay()
 	{
 		GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 	}
+	InitParryFX();
 }
 
 void ABsProjectileBase::CheckProjectilePath()
@@ -97,6 +98,7 @@ void ABsProjectileBase::ResolveImpact()
 {
 	if (DamageDealt > 0.f)
 	{
+		HideParryFX();
 		OnDealtDamage.Broadcast(LastHitResult);
 	}
 }
@@ -147,7 +149,6 @@ void ABsProjectileBase::Impact()
 	SetActorHiddenInGame(true);
 	ProjectileMovement->StopMovementImmediately();
 	SetProjectileCollision(ECollisionEnabled::NoCollision);
-	HideParryFX();
 }
 
 void ABsProjectileBase::OnProjectileHit_Implementation(UPrimitiveComponent* OnComponentHit, AActor* OtherActor,
@@ -224,7 +225,6 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 				// TODO: Handle case where projectile doesn't have an owner. Destroy or reflect back?
 				return;
 			}
-			Impact();
 			SetOwner(DamageCauser);
 			UpdateMoveActorIgnore();
 			const FVector TargetLocation = ProjectileOwner->GetActorLocation();
@@ -249,10 +249,10 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 	}
 }
 
-
-void ABsProjectileBase::ShowParryFX()
+void ABsProjectileBase::InitParryFX()
 {
-	if (ParryTrailFX)
+	UWorld* World = GetWorld();
+	if (ParryTrailFX && World)
 	{
 		ParryTrailComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParryTrailFX,
 			ProjectileMesh,
@@ -260,10 +260,19 @@ void ABsProjectileBase::ShowParryFX()
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
 			EAttachLocation::SnapToTarget,
-			true,
 			false,
-			ENCPoolMethod::AutoRelease,
+			false,
+			ENCPoolMethod::ManualRelease,
 			true);
+		ParryTrailComponent->OnPooledReuse(World);
+	}
+}
+
+
+void ABsProjectileBase::ShowParryFX()
+{
+	if (ParryTrailComponent)
+	{
 		ParryTrailComponent->Activate(true);
 	}
 }
@@ -275,8 +284,8 @@ void ABsProjectileBase::HideParryFX()
 		ParryTrailComponent->SetActive(false);
 		// If DestroyComponent is called here immediately, it deletes the projectile trail, not allowing it to fade out.
 		// This preserves the visual effect while ensuring that the NiagaraComponent is destroyed.
-		// @TODO Magic number should be the amount of time remaining in the NiagaraSystem. 
-		GetWorldTimerManager().SetTimer(DestroyFXHandle, this, &ABsProjectileBase::DestroyParryFX, 2.0f, false);
+		// @TODO Should likely destroy after the trail is no longer visible, instead of using a magic number.
+		GetWorldTimerManager().SetTimer(DestroyFXHandle, this, &ABsProjectileBase::DestroyParryFX, 1.0f, false);
 	}
 }
 
@@ -284,7 +293,8 @@ void ABsProjectileBase::DestroyParryFX()
 {
 	if (ParryTrailComponent)
 	{
-		ParryTrailComponent->DestroyComponent();
+		ParryTrailComponent->DestroyInstance();
+		ParryTrailComponent->ReleaseToPool();
 	}
 }
 

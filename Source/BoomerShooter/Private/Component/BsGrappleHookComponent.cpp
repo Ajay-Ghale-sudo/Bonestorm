@@ -5,6 +5,7 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/PostProcessComponent.h"
 #include "GameFramework/Character.h"
 #include "Weapon/Projectile/BsGrappleProjectile.h"
 
@@ -16,7 +17,8 @@ UBsGrappleHookComponent::UBsGrappleHookComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	// ...
+	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcessComponent"));
+	PostProcessComponent->bEnabled = false;
 }
 
 // Called when the game starts
@@ -132,6 +134,11 @@ void UBsGrappleHookComponent::PullOwnerToLocation()
 			GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UBsGrappleHookComponent::PullOwnerTick);
 
 		GrappleHookProperties.AttachTime += GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
+
+		if (PostProcessComponent)
+		{
+			PostProcessComponent->bEnabled = true;
+		}
 	}
 }
 
@@ -172,6 +179,11 @@ void UBsGrappleHookComponent::GrappleHookAttached()
 
 void UBsGrappleHookComponent::GrappleHookDetached()
 {
+	if (PostProcessComponent)
+	{
+		PostProcessComponent->bEnabled = false;
+	}
+	
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();
 	GrappleHookProperties.bIsAttached = false;
 	GrappleHookProperties.GrapplePointLocation = FVector::ZeroVector;

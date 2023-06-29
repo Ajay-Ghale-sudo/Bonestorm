@@ -6,6 +6,7 @@
 #include "BsGrappleHookComponent.generated.h"
 
 
+class UPostProcessComponent;
 class UBsGrapplePointComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -123,6 +124,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GrappleHook")
 	ACharacter* EffectedCharacter = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GrappleHook|FX")
+	UPostProcessComponent* PostProcessComponent;
 
 public:
 	FORCEINLINE bool IsGrappleHookAttached() const { return GrappleHookProperties.bIsAttached; }

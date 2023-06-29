@@ -294,7 +294,7 @@ void ABsProjectileBase::DestroyParryFX()
 {
 	if (ParryTrailComponent)
 	{
-3		ParryTrailComponent->DestroyInstance();
+		ParryTrailComponent->DestroyInstance();
 		ParryTrailComponent->ReleaseToPool();
 	}
 }

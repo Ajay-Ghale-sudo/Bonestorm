@@ -15,10 +15,23 @@ class BOOMERSHOOTER_API ABsEventTrigger : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ABsEventTrigger();
-	virtual void Tick(float DeltaTime) override;
-	
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Triggered();
+
+	UFUNCTION()
+	void OnTriggerComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnTriggerComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+protected:
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Triggers")
 	UBoxComponent* TriggerBox;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Triggers")
+	TSubclassOf<AActor> TriggerClass = AActor::StaticClass();
 	
 protected:
 	// Called when the game starts or when spawned

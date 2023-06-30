@@ -226,6 +226,7 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 				// TODO: Handle case where projectile doesn't have an owner. Destroy or reflect back?
 				return;
 			}
+			Impact();
 			SetOwner(DamageCauser);
 			UpdateMoveActorIgnore();
 			const FVector TargetLocation = ProjectileOwner->GetActorLocation();

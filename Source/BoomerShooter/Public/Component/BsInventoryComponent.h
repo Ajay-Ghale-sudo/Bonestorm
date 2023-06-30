@@ -25,6 +25,7 @@ public:
 
 
 	void AddKey(ABsKeyBase* Key);
+	UFUNCTION(BlueprintPure)
 	bool HasKey(EBsKeyType BsKey);
 
 	void AddSeveredHead(ABsSeveredHeadBase* SeveredHead);

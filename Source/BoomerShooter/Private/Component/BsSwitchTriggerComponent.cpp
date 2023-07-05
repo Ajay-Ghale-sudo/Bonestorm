@@ -64,7 +64,7 @@ void UBsSwitchTriggerComponent::OnSwitchToggled()
 
 void UBsSwitchTriggerComponent::TriggeredInternal()
 {
-	OnTriggered.Broadcast();
+	OnSwitchTriggered.Broadcast();
 }
 
 void UBsSwitchTriggerComponent::Triggered_Implementation()

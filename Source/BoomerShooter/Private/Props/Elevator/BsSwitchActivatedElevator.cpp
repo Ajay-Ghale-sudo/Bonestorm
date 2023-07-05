@@ -20,7 +20,7 @@ void ABsSwitchActivatedElevator::BindSwitchTrigger()
 {
 	if (SwitchTriggerComponent)
 	{
-		SwitchTriggerComponent->OnTriggered.AddDynamic(this, &ABsSwitchActivatedElevator::OnSwitchTriggered);
+		SwitchTriggerComponent->OnSwitchTriggered.AddDynamic(this, &ABsSwitchActivatedElevator::OnSwitchTriggered);
 	}
 }
 

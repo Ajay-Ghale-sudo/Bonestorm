@@ -54,7 +54,6 @@ void ABsProjectileBase::BeginPlay()
 	{
 		GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 	}
-	InitParryFX();
 	SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 }
 
@@ -99,7 +98,6 @@ void ABsProjectileBase::ResolveImpact()
 {
 	if (DamageDealt > 0.f)
 	{
-		HideParryFX();
 		OnDealtDamage.Broadcast(LastHitResult);
 	}
 }
@@ -119,7 +117,7 @@ void ABsProjectileBase::SetProjectileCollision(ECollisionEnabled::Type Collision
 
 void ABsProjectileBase::UpdateMoveActorIgnore()
 {
-	if (Owner)
+	if (Owner && ProjectileCollision)
 	{
 		TArray<AActor*> ActorsToIgnore;
 		Owner->GetAllChildActors(ActorsToIgnore);
@@ -203,7 +201,7 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 		}
 	}
 	
-	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
+	if (OtherActor && OtherActor != GetOwner())
 	{
 		Impact();
 		ApplyDamageToActor(OtherActor);
@@ -227,34 +225,35 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 				return;
 			}
 			Impact();
+			InitParryFX();
 			SetOwner(DamageCauser);
 			UpdateMoveActorIgnore();
+			ProjectileDamageProperties.ProjectileDamageType = UBsDamageType::StaticClass();
+			
 			const FVector TargetLocation = ProjectileOwner->GetActorLocation();
 			const FVector InitLocation = GetActorLocation();
 			const FVector VelocityDirection = UKismetMathLibrary::FindLookAtRotation(InitLocation, TargetLocation).Vector();
+			
 			if (ProjectileMovement)
 			{
-				SetActorHiddenInGame(false);
 				ProjectileMovement->MaxSpeed = ProjectileMovement->MaxSpeed * ProjectileDamageProperties.ParrySpeedModifier;
 				ProjectileMovement->Velocity = ProjectileMovement->MaxSpeed * VelocityDirection;
 				ProjectileMovement->HomingTargetComponent = ProjectileOwner->GetRootComponent();
 				ProjectileMovement->bIsHomingProjectile = true;
 				ProjectileMovement->HomingAccelerationMagnitude = ProjectileMovement->MaxSpeed;
-				
-				SetActorLocation(InitLocation + VelocityDirection * 100.f);
-				SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 				ProjectileMovement->UpdateComponentVelocity();
-				ShowParryFX();
-				SetLifeSpan(0);
 			}
+			
+			SetActorHiddenInGame(false);
+			SetLifeSpan(0);
+			SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 		}
 	}
 }
 
 void ABsProjectileBase::InitParryFX()
 {
-	UWorld* World = GetWorld();
-	if (ParryTrailFX && World)
+	if (ParryTrailFX)
 	{
 		ParryTrailComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParryTrailFX,
 			ProjectileMesh,
@@ -262,16 +261,14 @@ void ABsProjectileBase::InitParryFX()
 			FVector::ZeroVector,
 			FRotator::ZeroRotator,
 			EAttachLocation::SnapToTarget,
-			false,
-			false,
-			ENCPoolMethod::ManualRelease,
+			true,
+			true,
+			ENCPoolMethod::AutoRelease,
 			true);
-		ParryTrailComponent->OnPooledReuse(World);
 	}
 }
 
-
-void ABsProjectileBase::ShowParryFX()
+void ABsProjectileBase::ActivateParryFX()
 {
 	if (ParryTrailComponent)
 	{
@@ -279,24 +276,11 @@ void ABsProjectileBase::ShowParryFX()
 	}
 }
 
-void ABsProjectileBase::HideParryFX()
+void ABsProjectileBase::DeactivateParryFX()
 {
 	if (ParryTrailComponent)
 	{
 		ParryTrailComponent->SetActive(false);
-		// If DestroyComponent is called here immediately, it deletes the projectile trail, not allowing it to fade out.
-		// This preserves the visual effect while ensuring that the NiagaraComponent is destroyed.
-		// @TODO Should likely destroy after the trail is no longer visible, instead of using a magic number.
-		GetWorldTimerManager().SetTimer(DestroyFXHandle, this, &ABsProjectileBase::DestroyParryFX, 1.0f, false);
-	}
-}
-
-void ABsProjectileBase::DestroyParryFX()
-{
-	if (ParryTrailComponent)
-	{
-		ParryTrailComponent->DestroyInstance();
-		ParryTrailComponent->ReleaseToPool();
 	}
 }
 

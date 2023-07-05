@@ -26,6 +26,28 @@ void UBsGrappleHookComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (PostProcessComponent)
+	{
+		TArray<UMaterialInstanceDynamic*> DynamicMaterialInstances;
+		for (auto Blendable : PostProcessComponent->Settings.WeightedBlendables.Array)
+		{
+			if (UMaterialInstance* MaterialInstance = Cast<UMaterialInstance>(Blendable.Object))
+			{
+				UMaterialInstanceDynamic* DynamicMaterialInstance = UMaterialInstanceDynamic::Create(MaterialInstance, this);
+				DynamicMaterialInstances.Add(DynamicMaterialInstance);
+			}
+		}
+
+		// Replace Materials with Dynamic Versions
+		if (!DynamicMaterialInstances.IsEmpty())
+		{
+			PostProcessComponent->Settings.WeightedBlendables.Array.Empty();
+			for (auto DynamicMaterialInstance : DynamicMaterialInstances)
+			{
+				PostProcessComponent->Settings.AddBlendable(DynamicMaterialInstance, 1.f);
+			}
+		}
+	}
 	// ...
 }
 
@@ -77,6 +99,7 @@ void UBsGrappleHookComponent::DetachGrappleHook()
 	}
 	
 	OnGrappleHookDetached.Broadcast();
+	GrappleHookDetached();
 }
 
 void UBsGrappleHookComponent::PullOwnerToGrappleProjectile()
@@ -121,7 +144,7 @@ void UBsGrappleHookComponent::PullOwnerToLocation()
 		float Distance = FVector::Dist(Location, EffectedCharacter->GetActorLocation());
 		if (Distance <= GrappleHookProperties.DistanceCompletionThreshold || Distance >= GrappleHookProperties.MaxDistance)
 		{
-			GrappleHookDetached();
+			DetachGrappleHook();
 			return;
 		}
 		
@@ -138,6 +161,15 @@ void UBsGrappleHookComponent::PullOwnerToLocation()
 		if (PostProcessComponent)
 		{
 			PostProcessComponent->bEnabled = true;
+			for (auto Blendable : PostProcessComponent->Settings.WeightedBlendables.Array)
+			{
+				if (UMaterialInstanceDynamic* MaterialInstance = Cast<UMaterialInstanceDynamic>(Blendable.Object))
+				{
+					GrappleHookProperties.PostProcessBlendWeight =
+						FMath::Clamp(GrappleHookProperties.PostProcessBlendWeight + GrappleHookProperties.PostProcessBlendRate, 0.f, 1.f);
+					MaterialInstance->SetScalarParameterValue("Blend", GrappleHookProperties.PostProcessBlendWeight);
+				}
+			}
 		}
 	}
 }
@@ -182,6 +214,14 @@ void UBsGrappleHookComponent::GrappleHookDetached()
 	if (PostProcessComponent)
 	{
 		PostProcessComponent->bEnabled = false;
+		for (auto Blendable : PostProcessComponent->Settings.WeightedBlendables.Array)
+		{
+			if (UMaterialInstanceDynamic* MaterialInstance = Cast<UMaterialInstanceDynamic>(Blendable.Object))
+			{
+				GrappleHookProperties.PostProcessBlendWeight = 0.f;
+				MaterialInstance->SetScalarParameterValue("Blend", GrappleHookProperties.PostProcessBlendWeight);
+			}
+		}
 	}
 	
 	GrappleHookProperties.GrapplePullTimerHandle.Invalidate();

@@ -7,6 +7,8 @@
 
 class USphereComponent;
 class UProjectileMovementComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsProjectileHitEvent, const FHitResult& /*HitResult*/);
@@ -65,7 +67,7 @@ protected:
 	 * @brief Resolves the impact. Should be called after Impact.
 	 */
 	void ResolveImpact();
-
+	
 	UFUNCTION()
 	virtual void Impact();
 
@@ -86,6 +88,22 @@ protected:
 
 	UFUNCTION()
 	void ProjectileParried(AActor* DamageCauser);
+
+	/*
+	 * @brief Initializes Parry NiagaraFX.
+	 */
+	void InitParryFX();
+
+	/*
+	 * @brief Activates the ParryTrailComponent.
+	 */
+	void ActivateParryFX();
+
+	/*
+	 * @brief Deactivates the ParryTrailComponent.
+	 */
+	void DeactivateParryFX();
+	
 
 	virtual float TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
@@ -116,6 +134,15 @@ protected:
 	 * @brief Amount of damage dealt by this projectile.
 	 */
 	float DamageDealt = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraSystem* ParryTrailFX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+	UNiagaraComponent* ParryTrailComponent;
+
+	FTimerHandle DestroyFXHandle;
+	FTimerHandle DestroyProjectileHandle;
 
 public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }

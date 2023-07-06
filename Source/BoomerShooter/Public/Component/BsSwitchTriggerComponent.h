@@ -26,7 +26,8 @@ public:
 	/**
 	 * @brief Called when all switches are on
 	 */
-	FBsSwitchTriggerEvent OnTriggered;
+	UPROPERTY(BlueprintAssignable)
+	FBsSwitchTriggerEvent OnSwitchTriggered;
 	
 protected:
 	// Called when the game starts

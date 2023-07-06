@@ -3,6 +3,8 @@
 
 #include "Weapon/Projectile/BsProjectileBase.h"
 #include "BoomerShooter.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Component/BsHealthComponent.h"
 #include "Components/SphereComponent.h"
 #include "Data/BsDamageType.h"
@@ -52,6 +54,7 @@ void ABsProjectileBase::BeginPlay()
 	{
 		GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 	}
+	SetLifeSpan(ProjectileDamageProperties.ProjectileLifeTime);
 }
 
 void ABsProjectileBase::CheckProjectilePath()
@@ -114,7 +117,7 @@ void ABsProjectileBase::SetProjectileCollision(ECollisionEnabled::Type Collision
 
 void ABsProjectileBase::UpdateMoveActorIgnore()
 {
-	if (Owner)
+	if (Owner && ProjectileCollision)
 	{
 		TArray<AActor*> ActorsToIgnore;
 		Owner->GetAllChildActors(ActorsToIgnore);
@@ -198,7 +201,7 @@ void ABsProjectileBase::OnProjectileOverlapInternal(UPrimitiveComponent* Overlap
 		}
 	}
 	
-	if (OtherActor && OtherActor != GetOwner() && ProjectileMovement)
+	if (OtherActor && OtherActor != GetOwner())
 	{
 		Impact();
 		ApplyDamageToActor(OtherActor);
@@ -222,31 +225,67 @@ void ABsProjectileBase::ProjectileParried(AActor* DamageCauser)
 				return;
 			}
 			Impact();
+			InitParryFX();
 			SetOwner(DamageCauser);
 			UpdateMoveActorIgnore();
+			ProjectileDamageProperties.ProjectileDamageType = UBsDamageType::StaticClass();
+			
 			const FVector TargetLocation = ProjectileOwner->GetActorLocation();
 			const FVector InitLocation = GetActorLocation();
 			const FVector VelocityDirection = UKismetMathLibrary::FindLookAtRotation(InitLocation, TargetLocation).Vector();
+			
 			if (ProjectileMovement)
 			{
-				SetActorHiddenInGame(false);
 				ProjectileMovement->MaxSpeed = ProjectileMovement->MaxSpeed * ProjectileDamageProperties.ParrySpeedModifier;
 				ProjectileMovement->Velocity = ProjectileMovement->MaxSpeed * VelocityDirection;
 				ProjectileMovement->HomingTargetComponent = ProjectileOwner->GetRootComponent();
 				ProjectileMovement->bIsHomingProjectile = true;
 				ProjectileMovement->HomingAccelerationMagnitude = ProjectileMovement->MaxSpeed;
-				
-				SetActorLocation(InitLocation + VelocityDirection * 100.f);
-				SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 				ProjectileMovement->UpdateComponentVelocity();
-				SetLifeSpan(0);
 			}
+			
+			SetActorHiddenInGame(false);
+			SetLifeSpan(0);
+			SetProjectileCollision(ECollisionEnabled::QueryAndPhysics);
 		}
 	}
 }
 
+void ABsProjectileBase::InitParryFX()
+{
+	if (ParryTrailFX)
+	{
+		ParryTrailComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(ParryTrailFX,
+			ProjectileMesh,
+			NAME_None,
+			FVector::ZeroVector,
+			FRotator::ZeroRotator,
+			EAttachLocation::SnapToTarget,
+			true,
+			true,
+			ENCPoolMethod::AutoRelease,
+			true);
+	}
+}
+
+void ABsProjectileBase::ActivateParryFX()
+{
+	if (ParryTrailComponent)
+	{
+		ParryTrailComponent->Activate(true);
+	}
+}
+
+void ABsProjectileBase::DeactivateParryFX()
+{
+	if (ParryTrailComponent)
+	{
+		ParryTrailComponent->SetActive(false);
+	}
+}
+
 float ABsProjectileBase::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
-	AActor* DamageCauser)
+                                    AActor* DamageCauser)
 {
 	if (DamageCauser && DamageCauser->IsA(ABsProjectileBase::StaticClass()))
 	{

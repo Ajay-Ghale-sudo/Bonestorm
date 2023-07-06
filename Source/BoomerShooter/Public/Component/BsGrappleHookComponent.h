@@ -44,6 +44,12 @@ struct FGrappleHookProperties
 	float AttachTime = 0.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GrappleHook")
+	float PostProcessBlendWeight = 0.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="GrappleHook")
+	float PostProcessBlendRate = 0.03f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="GrappleHook")
 	bool bIsAttached = false;
 
 	FTimerHandle GrapplePullTimerHandle;

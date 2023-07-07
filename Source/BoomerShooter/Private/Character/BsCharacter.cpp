@@ -8,6 +8,7 @@
 #include "Component/BsGrappleHookComponent.h"
 #include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
+#include "Component/Audio/BsCharacterAudioComponent.h"
 #include "Component/Camera/BsCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -35,6 +36,7 @@ ABsCharacter::ABsCharacter()
 
 	InventoryComponent = CreateDefaultSubobject<UBsInventoryComponent>(TEXT("InventoryComponent"));
 	HealthComponent = CreateDefaultSubobject<UBsHealthComponent>(TEXT("HealthComponent"));
+	AudioComponent = CreateDefaultSubobject<UBsCharacterAudioComponent>(TEXT("AudioComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -265,6 +267,7 @@ void ABsCharacter::Dash()
 
 		TimerManager.ClearTimer(DashConfig.DashChargeTimerHandle);
 		AddDashCharge();
+		OnDash.Broadcast();
 	}
 }
 
@@ -509,6 +512,7 @@ void ABsCharacter::StartSliding()
 		Direction.Z = 0.f;
 		Direction.Normalize();
 		LaunchCharacter(Direction * SlideConfig.SlideStrength, false, false);
+		OnSlideStart.Broadcast();
 	}
 }
 
@@ -520,6 +524,7 @@ void ABsCharacter::StopSliding()
 		{
 			MovementComponent->GroundFriction = SlideConfig.PreSlideGroundFriction;
 		}
+		OnSlideStop.Broadcast();
 	}
 	
 	SlideConfig.bSliding = false;

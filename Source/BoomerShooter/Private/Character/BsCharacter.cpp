@@ -8,6 +8,7 @@
 #include "Component/BsGrappleHookComponent.h"
 #include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
+#include "Component/Camera/BsCameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -22,10 +23,10 @@ ABsCharacter::ABsCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent = CreateDefaultSubobject<UBsCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(GetCapsuleComponent());
 	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
-	CameraComponent->bUsePawnControlRotation = true;
+	CameraComponent->bUsePawnControlRotation = false;
 
 	WeaponSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpringArm"));
 	WeaponSpringArmComponent->SetupAttachment(CameraComponent);
@@ -185,6 +186,11 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
+
+		if (CameraComponent)
+		{
+			CameraComponent->AddToRoll(MovementVector.X);
+		}
 	}
 }
 
@@ -225,6 +231,12 @@ void ABsCharacter::Dash()
 		Direction = GetVelocity();
 	}
 	Direction.Normalize();
+
+	if (Direction.IsZero())
+	{
+		// No Direction to dash in
+		return;
+	}
 	
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down

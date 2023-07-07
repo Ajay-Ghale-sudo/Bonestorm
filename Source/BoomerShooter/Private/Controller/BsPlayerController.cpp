@@ -31,6 +31,12 @@ bool ABsPlayerController::SetPause(bool bPause, FCanUnpause CanUnpauseDelegate)
 	return bResult;
 }
 
+void ABsPlayerController::RestartLevel()
+{
+	Super::RestartLevel();
+	SetPause(false);
+}
+
 void ABsPlayerController::Quit()
 {
 	UKismetSystemLibrary::QuitGame(GetWorld(), this, EQuitPreference::Quit, false);

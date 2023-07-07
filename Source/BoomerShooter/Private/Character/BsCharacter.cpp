@@ -231,6 +231,12 @@ void ABsCharacter::Dash()
 		Direction = GetVelocity();
 	}
 	Direction.Normalize();
+
+	if (Direction.IsZero())
+	{
+		// No Direction to dash in
+		return;
+	}
 	
 	Direction *= (GetCharacterMovement()->IsFalling() ? DashConfig.BaseDashStrength : DashConfig.GroundDashStrength);
 	Direction.Z = 0.f; // No Dashing Up/Down

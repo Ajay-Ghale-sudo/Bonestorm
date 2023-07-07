@@ -16,6 +16,7 @@ class UCameraComponent;
 class UInputAction;
 class ABsSeveredHeadBase;
 class UBsHealthComponent;
+class UBsCharacterAudioComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
@@ -45,6 +46,11 @@ public:
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
+	FBsCharacterEvent OnDash;
+
+	FBsCharacterEvent OnSlideStart;
+	FBsCharacterEvent OnSlideStop;
+
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnPaused;
 	
@@ -251,6 +257,9 @@ protected:
      */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = PlayerStatus)
 	UBsHealthComponent* HealthComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Audio)
+	UBsCharacterAudioComponent* AudioComponent;
 
 	/**
 	 * @brief Currently Equipped Weapon.

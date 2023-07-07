@@ -13,8 +13,10 @@ public:
 	// Sets default values for this actor's properties
 	ABsPlayerController();
 
-	virtual bool SetPause(bool bPause, FCanUnpause CanUnpauseDelegate) override;
+	virtual bool SetPause(bool bPause, FCanUnpause CanUnpauseDelegate = FCanUnpause()) override;
 
+	virtual void RestartLevel() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void Quit();
 

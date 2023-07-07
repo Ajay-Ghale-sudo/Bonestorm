@@ -19,5 +19,8 @@ public:
 	FBsStartMenuWidgetEvent OnStart;
 
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+	FBsStartMenuWidgetEvent OnRestart;
+
+	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FBsStartMenuWidgetEvent OnQuit;
 };

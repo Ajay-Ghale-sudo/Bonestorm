@@ -8,6 +8,7 @@
 #include "BsCharacterStructs.h"
 #include "BsCharacter.generated.h"
 
+class UBsCameraComponent;
 class USpringArmComponent;
 class UBsInventoryComponent;
 class ABsWeaponBase;
@@ -237,7 +238,7 @@ protected:
 	 * @brief The Camera Component of the Character.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera)
-	UCameraComponent* CameraComponent;
+	UBsCameraComponent* CameraComponent;
 
 	/**
 	 * @brief Inventory Component of the Character.

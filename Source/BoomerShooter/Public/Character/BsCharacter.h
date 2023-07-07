@@ -43,6 +43,24 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeapon(ABsWeaponBase* InWeapon);
 
+	/**
+	 * @brief Toggle between Pause/Unpause
+	 */
+	UFUNCTION(BlueprintCallable)
+	void TogglePause();
+	
+	/*
+	 * @brief Pauses the game.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void Pause();
+
+	/**
+	 * @brief Unpauses the game.
+	 */
+	UFUNCTION(BlueprintCallable)
+	void Unpause();
+
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
@@ -53,6 +71,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnPaused;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
+	FBsCharacterInputEvent OnUnpaused;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -200,11 +221,6 @@ protected:
 	 * @param DeltaTime The time passed since the last frame.
 	 */
 	void SlideTick(float DeltaTime);
-
-	/*
-	 * @brief Pauses the game.
-	 */
-	void Pause();
 
 	UFUNCTION()
 	void Die();

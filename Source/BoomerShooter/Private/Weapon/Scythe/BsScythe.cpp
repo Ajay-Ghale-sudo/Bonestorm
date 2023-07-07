@@ -372,6 +372,7 @@ void ABsScythe::OnGrappleHookDetached()
 {
 	bAttachedToGrapplePoint = false;
 	bReturningToOwner = true;
+	PlayMontage(ThrowMontage);
 }
 
 void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

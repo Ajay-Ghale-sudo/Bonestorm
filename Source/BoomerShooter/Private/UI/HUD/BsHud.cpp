@@ -6,9 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "Character/BsCharacter.h"
 #include "Component/BsHealthComponent.h"
+#include "Controller/BsPlayerController.h"
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
+#include "UI/Widget/Menu/BsStartMenuWidget.h"
 
 
 // Sets default values
@@ -18,29 +20,117 @@ ABsHud::ABsHud()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void ABsHud::BeginPlay()
-{
-	Super::BeginPlay();
-
-	PlayerCharacter = Cast<ABsCharacter>(GetOwningPawn());
-	InitWidgets();
-}
-
 // Called every frame
 void ABsHud::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
 
+// Called when the game starts or when spawned
+void ABsHud::BeginPlay()
+{
+	Super::BeginPlay();
+
+	PlayerCharacter = Cast<ABsCharacter>(GetOwningPawn());
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->OnPaused.AddDynamic(this, &ABsHud::OnPause);
+		PlayerCharacter->OnUnpaused.AddDynamic(this, &ABsHud::OnUnpause);
+	}
+	
+	InitWidgets();
+	AddPlayerWidgetsToViewport();
+	ShowPlayerWidgets(true);
+}
+
+void ABsHud::OnPause()
+{
+	AddStartMenuWidgetToViewport();
+	ShowStartMenu(true);
+	ShowPlayerWidgets(false);
+}
+
+void ABsHud::OnUnpause()
+{
+	ShowStartMenu(false);
+	AddPlayerWidgetsToViewport();
+	ShowPlayerWidgets(true);
+}
+
+void ABsHud::AddStartMenuWidgetToViewport()
+{
+	if (StartMenuWidget)
+	{
+		StartMenuWidget->AddToViewport();
+	}
+}
+
+void ABsHud::AddPlayerWidgetsToViewport()
+{
+	if (DashAmountWidget)
+	{
+		DashAmountWidget->AddToViewport();
+	}
+	
+	if (HealthAmountWidget)
+	{
+		HealthAmountWidget->AddToViewport();
+	}
+	
+	if (CrosshairWidget)
+	{
+		CrosshairWidget->AddToViewport();
+	}
+}
+
+void ABsHud::ShowStartMenu(bool bShow)
+{
+	if (StartMenuWidget)
+	{
+		StartMenuWidget->SetVisibility(bShow ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	}
+}
+
+void ABsHud::ShowPlayerWidgets(bool bShow)
+{
+	const ESlateVisibility Visibility = bShow ? ESlateVisibility::Visible : ESlateVisibility::Collapsed;
+	if (DashAmountWidget)
+	{
+		DashAmountWidget->SetVisibility(Visibility);
+	}
+	
+	if (HealthAmountWidget)
+	{
+		HealthAmountWidget->SetVisibility(Visibility);
+	}
+	
+	if (CrosshairWidget)
+	{
+		CrosshairWidget->SetVisibility(Visibility);
+	}
+}
+
 void ABsHud::InitWidgets()
 {
+
+	if (StartMenuWidgetClass)
+	{
+		StartMenuWidget = CreateWidget<UBsStartMenuWidget>(GetWorld(), StartMenuWidgetClass);
+		if (StartMenuWidget && PlayerCharacter)
+		{
+			StartMenuWidget->OnStart.AddDynamic(PlayerCharacter, &ABsCharacter::Unpause);
+			if (ABsPlayerController* PC = Cast<ABsPlayerController>(GetOwningPlayerController()))
+			{
+				StartMenuWidget->OnQuit.AddDynamic(PC, &ABsPlayerController::Quit);
+			}
+		}
+	}
+	
 	if (DashAmountWidgetClass)
 	{
 		DashAmountWidget = CreateWidget<UBsDashAmountWidget>(GetWorld(), DashAmountWidgetClass);
 		if (DashAmountWidget && PlayerCharacter)
 		{
-			DashAmountWidget->AddToViewport();
 			DashAmountWidget->SetOwningPlayer(GetOwningPlayerController());
 			PlayerCharacter->OnDashAmountChanged.AddUObject(this, &ABsHud::UpdateDashAmount);
 			PlayerCharacter->OnDashEnabledChanged.AddUObject(this, &ABsHud::UpdateDashCooldown);
@@ -52,7 +142,6 @@ void ABsHud::InitWidgets()
 	if (CrosshairWidgetClass)
 	{
 		CrosshairWidget = CreateWidget<UBsCrosshairWidget>(GetWorld(), CrosshairWidgetClass);
-		CrosshairWidget->AddToViewport();
 	}
 	
 	if (HealthAmountWidgetClass && PlayerCharacter)
@@ -61,7 +150,6 @@ void ABsHud::InitWidgets()
 		if (HealthAmountWidget)
 		{
 			HealthAmountWidget->BindToHealthComponent(PlayerCharacter->FindComponentByClass<UBsHealthComponent>());
-			HealthAmountWidget->AddToViewport();
 		}
 	}
 }

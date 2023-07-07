@@ -14,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interfaces/Interactable.h"
+#include "Kismet/GameplayStatics.h"
 #include "Props/Head/BsSeveredHeadBase.h"
 #include "Weapon/BsWeaponBase.h"
 #include "Weapon/Scythe/BsScythe.h"
@@ -147,7 +148,7 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		}
 
 		// Pause on button press
-		EnhancedInputComponent->BindAction(InputConfig.PauseAction, ETriggerEvent::Started, this, &ABsCharacter::Pause);
+		EnhancedInputComponent->BindAction(InputConfig.PauseAction, ETriggerEvent::Started, this, &ABsCharacter::TogglePause);
 	}
 }
 
@@ -598,9 +599,28 @@ void ABsCharacter::OnSeveredHeadPickup(ABsSeveredHeadBase* Head)
 	}
 }
 
+void ABsCharacter::TogglePause()
+{
+	if (UGameplayStatics::IsGamePaused(GetWorld()))
+	{
+		Unpause();
+	}
+	else
+	{
+		Pause();
+	}
+}
+
 void ABsCharacter::Pause()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	OnPaused.Broadcast();
+}
+
+void ABsCharacter::Unpause()
+{
+	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	OnUnpaused.Broadcast();
 }
 
 void ABsCharacter::Die()

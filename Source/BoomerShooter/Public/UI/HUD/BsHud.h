@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class UBsStartMenuWidget;
 class UBsCrosshairWidget;
 class UBsDashAmountWidget;
 class UBsHealthAmountWidget;
@@ -22,9 +23,27 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void AddStartMenuWidgetToViewport();
+	
+	UFUNCTION(BlueprintCallable)
+	void AddPlayerWidgetsToViewport();
+
+	UFUNCTION(BlueprintCallable)
+	void ShowStartMenu(bool bShow);
+	
+	UFUNCTION(BlueprintCallable)
+	void ShowPlayerWidgets(bool bShow);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnPause();
+
+	UFUNCTION()
+	void OnUnpause();
 
 	void InitWidgets();
 	
@@ -60,6 +79,9 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsCrosshairWidget* CrosshairWidget;
 
-public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsStartMenuWidget"))
+	TSubclassOf<UUserWidget> StartMenuWidgetClass;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsStartMenuWidget* StartMenuWidget;
 };

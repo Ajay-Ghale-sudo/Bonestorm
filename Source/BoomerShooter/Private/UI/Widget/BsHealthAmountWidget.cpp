@@ -1,9 +1,15 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "UI/Widget/BsHealthAmountWidget.h"
-
 #include "Component/BsHealthComponent.h"
+
+void UBsHealthAmountWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	if (const APawn* OwningPawn = GetOwningPlayerPawn())
+	{
+		BindToHealthComponent(OwningPawn->FindComponentByClass<UBsHealthComponent>());
+	}
+}
 
 void UBsHealthAmountWidget::BindToHealthComponent(UBsHealthComponent* InHealthComponent)
 {

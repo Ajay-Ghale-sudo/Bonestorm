@@ -73,6 +73,7 @@ public:
 	FBsWeaponBaseEvent OnWeaponMeleeAttack;
 	FBsWeaponBaseEvent OnWeaponHit;
 	FBsWeaponBaseEvent OnWeaponHeal;
+	FBsWeaponBaseEvent OnWeaponHeadConsumed;
 	
 	FBsWeaponBaseHealEvent OnHeal;
 	

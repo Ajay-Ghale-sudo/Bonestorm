@@ -63,6 +63,7 @@ void ABsWeaponBase::ConsumeSeveredHead()
 		const float Amount = AttachedSeveredHead->Consume();
 		OnHeal.Broadcast(Amount);
 		OnWeaponHeal.Broadcast();
+		OnWeaponHeadConsumed.Broadcast();
 	}
 }
 

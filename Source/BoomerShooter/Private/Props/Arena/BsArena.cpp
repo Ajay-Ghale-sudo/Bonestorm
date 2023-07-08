@@ -51,6 +51,7 @@ void ABsArena::EndArena()
 	bArenaActive = false;
 	SetDoorsLocked(bArenaActive);
 	OnArenaFinished.Broadcast();
+	OnThisArenaFinished.Broadcast(this);
 }
 
 void ABsArena::ActivateSpawner()

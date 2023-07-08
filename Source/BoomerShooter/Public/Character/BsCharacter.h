@@ -69,6 +69,9 @@ public:
 	FBsCharacterEvent OnSlideStart;
 	FBsCharacterEvent OnSlideStop;
 
+	FBsCharacterEvent OnArenaStarted;
+	FBsCharacterEvent OnArenaEnded;
+
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnPaused;
 

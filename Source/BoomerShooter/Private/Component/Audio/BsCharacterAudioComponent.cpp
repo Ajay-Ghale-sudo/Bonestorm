@@ -18,6 +18,8 @@ void UBsCharacterAudioComponent::BindEvents()
 	CharacterOwner->OnDash.AddUObject(this, &UBsCharacterAudioComponent::OnDash);
 	CharacterOwner->OnSlideStart.AddUObject(this, &UBsCharacterAudioComponent::OnSlideStart);
 	CharacterOwner->OnSlideStop.AddUObject(this, &UBsCharacterAudioComponent::OnSlideStop);
+	CharacterOwner->OnArenaStarted.AddUObject(this, &UBsCharacterAudioComponent::PlayCombatMusic);
+	CharacterOwner->OnArenaEnded.AddUObject(this, &UBsCharacterAudioComponent::StopCombatMusic);
 }
 
 void UBsCharacterAudioComponent::UnbindEvents()
@@ -46,4 +48,34 @@ void UBsCharacterAudioComponent::OnSlideStop()
 	}
 
 	CharacterAudioData.SlideAudioComponent = nullptr;
+}
+
+void UBsCharacterAudioComponent::PlayCombatMusic()
+{
+	if (CharacterAudioData.CombatMusicAudioComponent)
+	{
+		CharacterAudioData.CombatMusicAudioComponent->Play();
+	}
+	else
+	{
+		CharacterAudioData.CombatMusicAudioComponent = PlaySound(CharacterAudioData.CombatMusic, nullptr, nullptr);
+	}
+
+	if (CharacterAudioData.CombatMusicAudioComponent)
+	{
+		if (!CharacterAudioData.CombatMusicAudioComponent->OnAudioFinished.IsAlreadyBound(this, &UBsCharacterAudioComponent::PlayCombatMusic))
+		{
+			CharacterAudioData.CombatMusicAudioComponent->OnAudioFinished.AddDynamic(this, &UBsCharacterAudioComponent::PlayCombatMusic);
+		}
+	}
+}
+
+void UBsCharacterAudioComponent::StopCombatMusic()
+{
+	if (CharacterAudioData.CombatMusicAudioComponent)
+	{
+		CharacterAudioData.CombatMusicAudioComponent->OnAudioFinished.RemoveAll(this);
+		CharacterAudioData.CombatMusicAudioComponent->Stop();
+		CharacterAudioData.CombatMusicAudioComponent->DestroyComponent();
+	}
 }

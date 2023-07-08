@@ -4,6 +4,7 @@
 #include "AI/BsAIDirector.h"
 
 #include "AI/BsAIController.h"
+#include "Character/BsCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Props/Arena/BsArena.h"
 #include "Character/Enemy/BsEnemyBase.h"
@@ -18,7 +19,9 @@ void UBsAIDirector::Init()
 	{
 		OnActorSpawnedDelegateHandle = World->AddOnActorSpawnedHandler(
 			FOnActorSpawned::FDelegate::CreateUObject(this, &UBsAIDirector::OnActorSpawned));
-	}	
+	}
+
+	Player = Cast<ABsCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
 void UBsAIDirector::InitArenas()
@@ -75,6 +78,12 @@ void UBsAIDirector::OnArenaStarted(ABsArena* StartedArena)
 	}
 
 	ActiveArena = StartedArena;
+
+	Player = Player ? Player : Cast<ABsCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (Player)
+	{
+		Player->OnArenaStarted.Broadcast();
+	}
 }
 
 void UBsAIDirector::OnArenaFinished(ABsArena* StartedArena)
@@ -85,6 +94,12 @@ void UBsAIDirector::OnArenaFinished(ABsArena* StartedArena)
 		ActiveArena->OnThisArenaFinished.RemoveDynamic(this, &UBsAIDirector::OnArenaFinished);
 		ActiveArena->OnEnemySpawned.RemoveAll(this);
 		ActiveArena = nullptr;
+	}
+
+	Player = Player ? Player : Cast<ABsCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (Player)
+	{
+		Player->OnArenaEnded.Broadcast();
 	}
 }
 
@@ -109,5 +124,3 @@ void UBsAIDirector::OnEnemyDeath(ABsEnemyBase* Enemy)
 	Enemy->OnThisEnemyDeath.RemoveDynamic(this, &UBsAIDirector::OnEnemyDeath);
 	ActiveEnemies.Remove(Enemy);
 }
-
-

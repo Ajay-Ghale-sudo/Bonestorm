@@ -61,6 +61,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Unpause();
 
+	virtual void FellOutOfWorld(const UDamageType& DmgType) override;
+
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;

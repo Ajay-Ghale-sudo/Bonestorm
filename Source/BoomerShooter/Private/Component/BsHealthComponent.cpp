@@ -27,13 +27,19 @@ void UBsHealthComponent::BeginPlay()
 	}
 }
 
-void UBsHealthComponent::ApplyDamage(float Damage)
+void UBsHealthComponent::ApplyDamage(float Damage, const UDamageType* DamageType)
 {
 	OnTookDamage.Broadcast();
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
 	float HealthPercentage = UKismetMathLibrary::SafeDivide(CurrentHealth, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
+		
+		if (DamageType && DamageType->IsA(UBsDecapitateDamageType::StaticClass()))
+		{
+			OnDecapitated.Broadcast();
+		}
+
 		OnDeath.Broadcast();
 		BleedTimerHandle.Invalidate();
 		CurrentBleedDamageType = nullptr;
@@ -81,7 +87,7 @@ void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const
 		}
 	}
 	
-	ApplyDamage(Damage);
+	ApplyDamage(Damage, DamageType);
 }
 
 void UBsHealthComponent::ProcessBleedDamage()

@@ -62,6 +62,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void TriggerRagdoll();
 
+	UFUNCTION()
 	virtual void SeverHead();
 
 	void EnableAttack();

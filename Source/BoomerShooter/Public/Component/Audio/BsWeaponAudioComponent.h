@@ -43,6 +43,9 @@ struct FWeaponAudioDate
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
 	USoundBase* WeaponMeleeAttackSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
+	USoundBase* WeaponHeadConsumedSound;
 	
 };
 
@@ -93,6 +96,9 @@ protected:
 
 	UFUNCTION()
 	void OnMeleeAttack();
+
+	UFUNCTION()
+	void OnWeaponHeadConsumed();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component", meta = (AllowPrivateAccess = "true"))

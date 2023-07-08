@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class UBsDamageIndicatorWidget;
 class UBsStartMenuWidget;
 class UBsCrosshairWidget;
 class UBsDashAmountWidget;
@@ -84,4 +85,10 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsStartMenuWidget* StartMenuWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsDamageIndicatorWidget"))
+	TSubclassOf<UBsDamageIndicatorWidget> DamageIndicatorWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsDamageIndicatorWidget* DamageIndicatorWidget;
 };

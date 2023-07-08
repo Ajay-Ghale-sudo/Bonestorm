@@ -420,7 +420,7 @@ void ABsScythe::OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		if (!MeleeHitActors.Contains(OtherActor))
 		{
 			MeleeHitActors.Add(OtherActor);
-			OtherActor->TakeDamage(MeleeDamage, FDamageEvent(), GetInstigatorController(), this);
+			OtherActor->TakeDamage(MeleeDamage, FDamageEvent(UBsMeleeScytheDamageType::StaticClass()), GetInstigatorController(), this);
 		}
 	}
 }

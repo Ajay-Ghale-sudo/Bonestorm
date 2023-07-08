@@ -232,6 +232,7 @@ void ABsCharacter::Dash()
 	if (Direction.IsZero())
 	{
 		Direction = GetVelocity();
+		Direction.Z = 0.f;
 	}
 	Direction.Normalize();
 
@@ -293,9 +294,9 @@ void ABsCharacter::DashTick(const float DeltaTime)
 	{
 		DashConfig.bDashing = false;
 		DashConfig.DashElapsedTime = 0.f;
-		FVector DashNormal = DashConfig.DashDirection;
-		DashNormal.Normalize();
-		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Length();
+		const FVector DashNormal = DashConfig.DashDirection.GetSafeNormal();
+		DashConfig.PreDashVelocity.Z = 0.f;
+		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size();
 		SetCanBeDamaged(true);
 	}	
 }

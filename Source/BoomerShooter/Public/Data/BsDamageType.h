@@ -5,7 +5,13 @@
 UCLASS()
 class UBsDamageType : public UDamageType
 {
-	GENERATED_BODY()	
+	GENERATED_BODY()
+};
+
+UCLASS()
+class UBsDecapitateDamageType : public UBsDamageType
+{
+	GENERATED_BODY()
 };
 
 UCLASS()
@@ -29,7 +35,7 @@ public:
 UCLASS()
 class UBsParryDamageType : public UBsDamageType
 {
-	GENERATED_BODY()	
+	GENERATED_BODY()
 };
 
 UCLASS()
@@ -57,7 +63,13 @@ class UBsExplosionDamageType : public UBsDamageType
 };
 
 UCLASS()
-class UBsThrownScytheDamageType : public UBsDamageType
+class UBsThrownScytheDamageType : public UBsDecapitateDamageType
+{
+	GENERATED_BODY()
+};
+
+UCLASS()
+class UBsMeleeScytheDamageType : public UBsDecapitateDamageType
 {
 	GENERATED_BODY()
 };

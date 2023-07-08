@@ -33,6 +33,7 @@ void UBsWeaponAudioComponent::BindEvents()
 	WeaponOwner->OnWeaponHit.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponHit);
 	WeaponOwner->OnWeaponHeal.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponHeal);
 	WeaponOwner->OnWeaponMeleeAttack.AddUObject(this, &UBsWeaponAudioComponent::OnMeleeAttack);
+	WeaponOwner->OnWeaponHeadConsumed.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponHeadConsumed);
 }
 
 void UBsWeaponAudioComponent::UnbindEvents()
@@ -49,6 +50,7 @@ void UBsWeaponAudioComponent::UnbindEvents()
 	WeaponOwner->OnWeaponHit.RemoveAll(this);
 	WeaponOwner->OnWeaponHeal.RemoveAll(this);
 	WeaponOwner->OnWeaponMeleeAttack.RemoveAll(this);
+	WeaponOwner->OnWeaponHeadConsumed.RemoveAll(this);
 }
 
 void UBsWeaponAudioComponent::OnWeaponCaught()
@@ -99,4 +101,9 @@ void UBsWeaponAudioComponent::OnWeaponHeal()
 void UBsWeaponAudioComponent::OnMeleeAttack()
 {
 	PlaySound(WeaponAudioData.WeaponMeleeAttackSound);
+}
+
+void UBsWeaponAudioComponent::OnWeaponHeadConsumed()
+{
+	PlaySound(WeaponAudioData.WeaponHeadConsumedSound);
 }

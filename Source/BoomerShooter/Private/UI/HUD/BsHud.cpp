@@ -121,6 +121,7 @@ void ABsHud::InitWidgets()
 			StartMenuWidget->OnStart.AddDynamic(PlayerCharacter, &ABsCharacter::Unpause);
 			if (ABsPlayerController* PC = Cast<ABsPlayerController>(GetOwningPlayerController()))
 			{
+				StartMenuWidget->OnRestart.AddDynamic(PC, &ABsPlayerController::RestartLevel);
 				StartMenuWidget->OnQuit.AddDynamic(PC, &ABsPlayerController::Quit);
 			}
 		}

@@ -29,6 +29,9 @@ public:
 public:
 	UPROPERTY(BlueprintAssignable)
 	FBsHealthComponentEvent OnDeath;
+	
+	UPROPERTY(BlueprintAssignable)
+	FBsHealthComponentEvent OnDecapitated;
 
 	UPROPERTY(BlueprintAssignable)
 	FBsHealthComponentEvent OnTookDamage;
@@ -45,7 +48,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	void ApplyDamage(float Damage);
+	void ApplyDamage(float Damage, const UDamageType* DamageType = nullptr);
 	
 	UFUNCTION()
 	void ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);

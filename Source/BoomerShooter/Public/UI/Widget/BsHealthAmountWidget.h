@@ -1,10 +1,7 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "Blueprint/UserWidget.h"
 #include "BsHealthAmountWidget.generated.h"
-
 
 class UBsHealthComponent;
 
@@ -26,6 +23,8 @@ protected:
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateWidget();
 
+	virtual void NativeConstruct() override;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
 	UBsHealthComponent* HealthComponent;
@@ -35,5 +34,4 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	float MaxHealthAmount = 1.f;
-	
 };

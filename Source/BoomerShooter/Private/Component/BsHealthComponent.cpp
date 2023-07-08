@@ -43,6 +43,11 @@ void UBsHealthComponent::ApplyDamage(float Damage)
 		OnLowHealth.Broadcast();
 	}
 	OnHealthChanged.Broadcast();
+	
+	if (LastDamagedBy.IsValid())
+	{
+		OnDamagedBy.Broadcast(LastDamagedBy.Get());
+	}
 }
 
 void UBsHealthComponent::ProcessDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType,

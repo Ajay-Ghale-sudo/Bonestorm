@@ -10,6 +10,7 @@
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
+#include "UI/Widget/Indicator/BsDamageIndicatorWidget.h"
 #include "UI/Widget/Menu/BsStartMenuWidget.h"
 
 
@@ -81,6 +82,11 @@ void ABsHud::AddPlayerWidgetsToViewport()
 	{
 		CrosshairWidget->AddToViewport();
 	}
+
+	if (DamageIndicatorWidget)
+	{
+		DamageIndicatorWidget->AddToViewport();
+	}
 }
 
 void ABsHud::ShowStartMenu(bool bShow)
@@ -107,6 +113,11 @@ void ABsHud::ShowPlayerWidgets(bool bShow)
 	if (CrosshairWidget)
 	{
 		CrosshairWidget->SetVisibility(Visibility);
+	}
+
+	if (DamageIndicatorWidget)
+	{
+		DamageIndicatorWidget->SetVisibility(Visibility);
 	}
 }
 
@@ -148,10 +159,11 @@ void ABsHud::InitWidgets()
 	if (HealthAmountWidgetClass && PlayerCharacter)
 	{
 		HealthAmountWidget = CreateWidget<UBsHealthAmountWidget>(GetWorld(), HealthAmountWidgetClass);
-		if (HealthAmountWidget)
-		{
-			HealthAmountWidget->BindToHealthComponent(PlayerCharacter->FindComponentByClass<UBsHealthComponent>());
-		}
+	}
+
+	if (DamageIndicatorWidgetClass)
+	{
+		DamageIndicatorWidget = CreateWidget<UBsDamageIndicatorWidget>(GetWorld(), DamageIndicatorWidgetClass);
 	}
 }
 

@@ -12,6 +12,7 @@
 #include "UI/Widget/BsHealthAmountWidget.h"
 #include "UI/Widget/Indicator/BsDamageIndicatorWidget.h"
 #include "UI/Widget/Menu/BsStartMenuWidget.h"
+#include "UI/Widget/Notification/BsNotificationWidget.h"
 
 
 // Sets default values
@@ -118,6 +119,15 @@ void ABsHud::ShowPlayerWidgets(bool bShow)
 	if (DamageIndicatorWidget)
 	{
 		DamageIndicatorWidget->SetVisibility(Visibility);
+	}
+}
+
+void ABsHud::AddNotification(const FText& Text, TSubclassOf<UBsNotificationWidget> NotificationClass)
+{
+	if (UBsNotificationWidget* NotificationWidget = CreateWidget<UBsNotificationWidget>(GetWorld(), NotificationClass ? NotificationClass : NotificationWidgetClass))
+	{
+		NotificationWidget->AddToViewport();
+		NotificationWidget->ShowNotification(Text);
 	}
 }
 

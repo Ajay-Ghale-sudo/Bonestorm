@@ -624,6 +624,14 @@ void ABsCharacter::Unpause()
 	OnUnpaused.Broadcast();
 }
 
+void ABsCharacter::FellOutOfWorld(const UDamageType& DmgType)
+{
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.Broadcast();
+	}
+}
+
 void ABsCharacter::Die()
 {
 	bAlive = false;

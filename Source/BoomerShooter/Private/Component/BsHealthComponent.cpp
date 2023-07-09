@@ -30,11 +30,10 @@ void UBsHealthComponent::BeginPlay()
 void UBsHealthComponent::ApplyDamage(float Damage, const UDamageType* DamageType)
 {
 	OnTookDamage.Broadcast();
-	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
+	CurrentHealth = FMath::Clamp(CurrentHealth - Damage * DamageModifier, 0.f, MaxHealth);
 	float HealthPercentage = UKismetMathLibrary::SafeDivide(CurrentHealth, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
-		
 		if (DamageType && DamageType->IsA(UBsDecapitateDamageType::StaticClass()))
 		{
 			OnDecapitated.Broadcast();

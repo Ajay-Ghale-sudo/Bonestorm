@@ -71,6 +71,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float MaxHealth = 100.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	float DamageModifier = 1.f;
+
 	UPROPERTY()
 	const UBsBleedDamageType* CurrentBleedDamageType;
 	

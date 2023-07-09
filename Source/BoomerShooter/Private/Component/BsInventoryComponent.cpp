@@ -23,6 +23,7 @@ void UBsInventoryComponent::AddKey(ABsKeyBase* Key)
 		FBsKeyData NewKey;
 		NewKey.CopyKeyData(Key->GetKeyData());
 		Keys.Add(NewKey);
+		OnKeyAdded.Broadcast(NewKey);
 		Key->Destroy();
 	}
 }

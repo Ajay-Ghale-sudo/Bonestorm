@@ -300,4 +300,6 @@ public:
 	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsAlive() const { return bAlive; }
+	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
+	FORCEINLINE UBsInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 };

@@ -1,8 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Component/Audio/BsCharacterAudioComponent.h"
 #include "Character/BsCharacter.h"
+#include "Component/BsInventoryComponent.h"
 #include "Components/AudioComponent.h"
 
 void UBsCharacterAudioComponent::BeginPlay()
@@ -20,6 +18,11 @@ void UBsCharacterAudioComponent::BindEvents()
 	CharacterOwner->OnSlideStop.AddUObject(this, &UBsCharacterAudioComponent::OnSlideStop);
 	CharacterOwner->OnArenaStarted.AddUObject(this, &UBsCharacterAudioComponent::PlayCombatMusic);
 	CharacterOwner->OnArenaEnded.AddUObject(this, &UBsCharacterAudioComponent::StopCombatMusic);
+
+	if (UBsInventoryComponent* InventoryComponent = CharacterOwner->GetInventoryComponent())
+	{
+		InventoryComponent->OnKeyAdded.AddUObject(this, &UBsCharacterAudioComponent::OnKeyPickup);
+	}
 }
 
 void UBsCharacterAudioComponent::UnbindEvents()
@@ -27,6 +30,15 @@ void UBsCharacterAudioComponent::UnbindEvents()
 	if (!CharacterOwner) return;
 
 	CharacterOwner->OnDash.RemoveAll(this);
+	CharacterOwner->OnSlideStart.RemoveAll(this);
+	CharacterOwner->OnSlideStop.RemoveAll(this);
+	CharacterOwner->OnArenaStarted.RemoveAll(this);
+	CharacterOwner->OnArenaEnded.RemoveAll(this);
+
+	if (UBsInventoryComponent* InventoryComponent = CharacterOwner->GetInventoryComponent())
+	{
+		InventoryComponent->OnKeyAdded.RemoveAll(this);
+	}
 }
 
 void UBsCharacterAudioComponent::OnDash()
@@ -78,4 +90,9 @@ void UBsCharacterAudioComponent::StopCombatMusic()
 		CharacterAudioData.CombatMusicAudioComponent->Stop();
 		CharacterAudioData.CombatMusicAudioComponent->DestroyComponent();
 	}
+}
+
+void UBsCharacterAudioComponent::OnKeyPickup(const FBsKeyData& KeyData)
+{
+	PlaySound(CharacterAudioData.KeyPickupSound);
 }

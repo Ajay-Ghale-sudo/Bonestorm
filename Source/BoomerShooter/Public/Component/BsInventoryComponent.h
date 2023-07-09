@@ -11,7 +11,7 @@ class ABsSeveredHeadBase;
 class ABsKeyBase;
 
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FBsInventoryComponentKeyAdded, EBsKeyType);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsInventoryComponentKeyAdded, const FBsKeyData& KeyData);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsInventoryComponentSeveredHeadAdded, ABsSeveredHeadBase*);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

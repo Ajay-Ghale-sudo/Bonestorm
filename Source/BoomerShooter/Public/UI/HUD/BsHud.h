@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class UBsNotificationWidget;
 class UBsDamageIndicatorWidget;
 class UBsStartMenuWidget;
 class UBsCrosshairWidget;
@@ -35,6 +36,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void ShowPlayerWidgets(bool bShow);
+
+	UFUNCTION(BlueprintCallable)
+	void AddNotification(const FText& Text, TSubclassOf<UBsNotificationWidget> NotificationClass = nullptr);
 
 protected:
 	// Called when the game starts or when spawned
@@ -91,4 +95,7 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsDamageIndicatorWidget* DamageIndicatorWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsNotificationWidget"))
+	TSubclassOf<UBsNotificationWidget> NotificationWidgetClass;
 };

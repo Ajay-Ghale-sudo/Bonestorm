@@ -152,6 +152,14 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
+void ABsCharacter::OnWalkingOffLedge_Implementation(const FVector& PreviousFloorImpactNormal,
+	const FVector& PreviousFloorContactNormal, const FVector& PreviousLocation, float TimeDelta)
+{
+	Super::OnWalkingOffLedge_Implementation(PreviousFloorImpactNormal, PreviousFloorContactNormal, PreviousLocation,
+											TimeDelta);
+	StartCoyoteTime();
+}
+
 void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 {
 	Weapon = InWeapon;
@@ -214,6 +222,13 @@ void ABsCharacter::Jump()
 	StopSliding();
 	StopGrapple();
 
+	// If the player recently walked off an edge, give them an extra time to jump.
+	if (MovementConfig.bInCoyoteTime)
+	{
+		--JumpCurrentCount;
+		MovementConfig.bInCoyoteTime = false;
+	}
+	
 	Super::Jump();
 }
 
@@ -530,6 +545,23 @@ void ABsCharacter::StopSliding()
 	}
 	
 	SlideConfig.bSliding = false;
+}
+
+void ABsCharacter::StartCoyoteTime()
+{
+	MovementConfig.bInCoyoteTime = true;
+	GetWorldTimerManager().SetTimer(
+		MovementConfig.CoyoteTimeHandle,
+		this,
+		&ABsCharacter::EndCoyoteTime,
+		MovementConfig.CoyoteTimeDuration,
+		false
+	);
+}
+
+void ABsCharacter::EndCoyoteTime()
+{
+	MovementConfig.bInCoyoteTime = false;
 }
 
 void ABsCharacter::SlideTick(float DeltaTime)

@@ -225,3 +225,29 @@ struct FBsSlideConfig
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
 	bool bSliding = false;
 };
+
+/**
+ * @brief This struct is used to represent the movement configuration.
+ */
+USTRUCT(BlueprintType)
+struct FBsMovementConfig
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief If the character has recently walked off a ledge.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Jump")
+	bool bInCoyoteTime = false;
+
+	/**
+	 * @brief The duration of the coyote time.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Jump")
+	float CoyoteTimeDuration = 0.5f;
+
+	/**
+	 * @brief Timer handle used for controlling coyote time.
+	 */
+	FTimerHandle CoyoteTimeHandle;
+};

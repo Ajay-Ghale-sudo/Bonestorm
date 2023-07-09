@@ -35,6 +35,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void OnWalkingOffLedge_Implementation(const FVector& PreviousFloorImpactNormal, const FVector& PreviousFloorContactNormal, const FVector& PreviousLocation, float TimeDelta) override;
 
 	/**
 	 * @brief Sets the Character's Weapon to the specified Weapon.
@@ -216,6 +217,18 @@ protected:
 	void StopSliding();
 
 	/**
+	 * @brief Start coyote time, allowing for an extra jump while in midair.
+	 */
+	UFUNCTION()
+	void StartCoyoteTime();
+
+	/**
+	 * @brief End coyote time.
+	 */
+	UFUNCTION()
+	void EndCoyoteTime();
+
+	/**
 	 * @brief This function handles the per-frame behavior during sliding.
 	 *
 	 * This function is called every frame and it performs several checks and operations related to sliding.
@@ -243,6 +256,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	FBsInputConfig InputConfig;
 
+	/**
+	 * @brief Movement configuration for the Character.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	FBsMovementConfig MovementConfig;
+	
 	/**
 	 * @brief The dash configuration for the Character.
 	 */

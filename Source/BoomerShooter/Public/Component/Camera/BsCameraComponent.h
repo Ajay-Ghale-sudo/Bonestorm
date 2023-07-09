@@ -34,7 +34,7 @@ protected:
 	 * @brief The +/- amount the camera can lean.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Lean")
-	float MaxRollAmount = 5.f;
+	float MaxRollAmount = 2.5f;
 
 	/**
 	 * @brief Speed of when lean is increasing.

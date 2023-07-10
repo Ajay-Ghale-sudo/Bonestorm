@@ -1,5 +1,6 @@
 #include "Component/Audio/BsCharacterAudioComponent.h"
 #include "Character/BsCharacter.h"
+#include "Component/BsHealthComponent.h"
 #include "Component/BsInventoryComponent.h"
 #include "Components/AudioComponent.h"
 
@@ -23,6 +24,11 @@ void UBsCharacterAudioComponent::BindEvents()
 	{
 		InventoryComponent->OnKeyAdded.AddUObject(this, &UBsCharacterAudioComponent::OnKeyPickup);
 	}
+
+	if (UBsHealthComponent* HealthComponent = CharacterOwner->GetHealthComponent())
+	{
+		HealthComponent->OnDeath.AddDynamic(this, &UBsCharacterAudioComponent::StopCombatMusic);
+	}
 }
 
 void UBsCharacterAudioComponent::UnbindEvents()
@@ -38,6 +44,11 @@ void UBsCharacterAudioComponent::UnbindEvents()
 	if (UBsInventoryComponent* InventoryComponent = CharacterOwner->GetInventoryComponent())
 	{
 		InventoryComponent->OnKeyAdded.RemoveAll(this);
+	}
+
+	if (UBsHealthComponent* HealthComponent = CharacterOwner->GetHealthComponent())
+	{
+		HealthComponent->OnDeath.RemoveAll(this);
 	}
 }
 
@@ -87,8 +98,8 @@ void UBsCharacterAudioComponent::StopCombatMusic()
 	if (CharacterAudioData.CombatMusicAudioComponent)
 	{
 		CharacterAudioData.CombatMusicAudioComponent->OnAudioFinished.RemoveAll(this);
-		CharacterAudioData.CombatMusicAudioComponent->Stop();
-		CharacterAudioData.CombatMusicAudioComponent->DestroyComponent();
+		CharacterAudioData.CombatMusicAudioComponent->FadeOut(1.f, 0.f);
+		CharacterAudioData.CombatMusicAudioComponent->StopDelayed(1.f);
 	}
 }
 

@@ -91,18 +91,19 @@ EAttackResult ABsRangedEnemy::RangeAttack(const ACharacter* Target)
 				const float ProjectileSpeed = ProjectileMovement->MaxSpeed;
 				if (ProjectileSpeed <= 0) return EAttackResult::EAR_None;
 				
-				// (Dist to target / bullet speed) * (target speed * target forward vec + target location)
-				const float TravelTime = FVector::Dist(AimLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
-				FVector TargetLocation = AimLocation + (Target->GetVelocity() * TravelTime);
+				FVector TargetLocation = AimLocation;
+				const bool bPredictMovement = FMath::RandRange(0.f, 1.f) <= Accuracy;
 				
-				// How Long it would take us to hit the target where it currently is, provides us a time window to calculate the target's future position
-				const float TravelDistTime = FVector::Dist(TargetLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
-				TargetLocation = AimLocation + (Target->GetVelocity() * TravelDistTime);
-
-				if (Accuracy < 1.f)
+				if (bPredictMovement)
 				{
-					FVector RandomVector = FMath::VRand() * (1.f - Accuracy) * AccuracyDeviation;
-					TargetLocation += RandomVector;
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Predicting Movement, Accuracy %f"), Accuracy));
+					// (Dist to target / bullet speed) * (target speed * target forward vec + target location)
+					const float TravelTime = FVector::Dist(AimLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
+					TargetLocation = AimLocation + (Target->GetVelocity() * TravelTime);
+					
+					// How Long it would take us to hit the target where it currently is, provides us a time window to calculate the target's future position
+					const float TravelDistTime = FVector::Dist(TargetLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
+					TargetLocation = AimLocation + (Target->GetVelocity() * TravelDistTime);
 				}
 				
 				FVector OutLaunchVelocity;
@@ -128,7 +129,6 @@ EAttackResult ABsRangedEnemy::RangeAttack(const ACharacter* Target)
 				if (bHasAimSolution)
 				{
 					ProjectileMovement->Velocity = OutLaunchVelocity;
-					
 					OnAttack();
 					return EAttackResult::EAR_Successful;
 				}

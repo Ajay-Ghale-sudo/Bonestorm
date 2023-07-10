@@ -168,7 +168,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		Weapon->SetOwner(this);
 		Weapon->Equip();
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
-		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::RefundDashCharge);
+		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::OnParry);
 		if (HealthComponent)
 		{
 			Weapon->OnHeal.AddDynamic(HealthComponent, &UBsHealthComponent::Heal);
@@ -564,6 +564,12 @@ void ABsCharacter::EndCoyoteTime()
 	MovementConfig.bInCoyoteTime = false;
 }
 
+void ABsCharacter::OnParry()
+{
+	RefundDashCharge();
+	StartHitStop();	
+}
+
 void ABsCharacter::SlideTick(float DeltaTime)
 {
 	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
@@ -654,6 +660,27 @@ void ABsCharacter::Unpause()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	OnUnpaused.Broadcast();
+}
+
+void ABsCharacter::StartHitStop()
+{
+	GetWorldTimerManager().SetTimer(
+		HitStopConfig.HitStopTimerHandle,
+		this,
+		&ABsCharacter::StopHitStop,
+		HitStopConfig.HitStopDuration,
+		false
+	);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), HitStopConfig.HitStopTimeDilation);
+
+	// Set relative time dilation to 50%
+	CustomTimeDilation = 1 / HitStopConfig.HitStopTimeDilation * .5f;
+}
+
+void ABsCharacter::StopHitStop()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	CustomTimeDilation = 1.f;
 }
 
 void ABsCharacter::FellOutOfWorld(const UDamageType& DmgType)

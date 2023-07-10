@@ -62,6 +62,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Unpause();
 
+	UFUNCTION()
+	void StartHitStop();
+
+	UFUNCTION()
+	void StopHitStop();
+
 	virtual void FellOutOfWorld(const UDamageType& DmgType) override;
 
 public:
@@ -228,6 +234,9 @@ protected:
 	UFUNCTION()
 	void EndCoyoteTime();
 
+	UFUNCTION()
+	void OnParry();
+
 	/**
 	 * @brief This function handles the per-frame behavior during sliding.
 	 *
@@ -280,6 +289,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
 	FBsInteractConfig InteractConfig;
 
+	/**
+	 * @brief Hit Stop configuration for the Character.
+	 */
+	FBsHitStopConfig HitStopConfig;
+	
 	/**
 	 * @brief The Camera Component of the Character.
 	 */

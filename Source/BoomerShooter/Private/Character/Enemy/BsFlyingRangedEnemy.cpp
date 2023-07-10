@@ -18,3 +18,8 @@ void ABsFlyingRangedEnemy::BeginPlay()
 		UCharacterMovementComponent->SetMovementMode(EMovementMode::MOVE_Flying);
 	}
 }
+
+bool ABsFlyingRangedEnemy::LocationInRange(const FVector& Location) const
+{
+	return Super::LocationInRange(Location) && FMath::Abs(GetActorLocation().Z - Location.Z) <= MaxAttackZRange;
+}

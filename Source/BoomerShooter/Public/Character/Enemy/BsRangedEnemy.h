@@ -16,7 +16,7 @@ public:
 
 	bool TargetInLOS(const AActor* Target) const;
 	bool TargetInRange(const AActor* Target) const;
-	bool LocationInRange(const FVector& Location) const;
+	virtual bool LocationInRange(const FVector& Location) const;
 
 	UFUNCTION(BlueprintCallable)
 	bool CanAttackTarget(const AActor* Target) const;

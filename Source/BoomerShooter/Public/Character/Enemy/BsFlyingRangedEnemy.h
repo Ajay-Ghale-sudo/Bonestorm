@@ -16,7 +16,15 @@ class BOOMERSHOOTER_API ABsFlyingRangedEnemy : public ABsRangedEnemy
 public:
 	ABsFlyingRangedEnemy();
 
+	virtual bool LocationInRange(const FVector& Location) const override;
 protected:
 	virtual void BeginPlay() override;
-	
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flying Ranged Enemy")
+	float MaxAttackZRange = 500.0f;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE float GetMaxAttackZRange() const { return MaxAttackZRange; }
 };

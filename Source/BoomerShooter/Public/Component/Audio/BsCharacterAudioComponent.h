@@ -26,6 +26,9 @@ struct FCharacterAudioData
 
 	UPROPERTY()
 	UAudioComponent* CombatMusicAudioComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
+	USoundBase* KeyPickupSound;
 };
 
 /**
@@ -55,6 +58,9 @@ protected:
 
 	UFUNCTION()
 	void StopCombatMusic();
+
+	UFUNCTION()
+	void OnKeyPickup(const FBsKeyData& KeyData);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Audio Component", meta = (AllowPrivateAccess = "true"))

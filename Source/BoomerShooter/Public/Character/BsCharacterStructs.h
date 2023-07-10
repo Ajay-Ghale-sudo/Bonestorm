@@ -251,3 +251,24 @@ struct FBsMovementConfig
 	 */
 	FTimerHandle CoyoteTimeHandle;
 };
+
+// A structure to hold the configuration for the hit stop mechanic.
+USTRUCT(BlueprintType)
+struct FBsHitStopConfig
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief How long for the HItStop to last. Is relative to the HitStopTimeDilation.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float HitStopDuration = 0.001f;
+
+	/**
+	 * @brief The time dilation to apply when hit stop is active.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float HitStopTimeDilation = 0.01f;
+	
+	FTimerHandle HitStopTimerHandle;
+};

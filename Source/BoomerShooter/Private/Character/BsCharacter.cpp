@@ -218,13 +218,18 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
+	if (SlideConfig.bSliding)
+	{
+		OnSlideJump.Broadcast();
+		StopSliding();
+	}
+
 	if (DashConfig.bDashing)
 	{
 		DashConfig.DepleteJumpDash();
 		StopDashing();
 	}
 	
-	StopSliding();
 	StopGrapple();
 
 	// If the player recently walked off an edge, give them an extra time to jump.

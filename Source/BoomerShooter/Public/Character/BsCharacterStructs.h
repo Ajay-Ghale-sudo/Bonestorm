@@ -87,9 +87,18 @@ struct FBsDashConfig
 	// A flag to indicate if dashing is currently enabled.
 	bool bDashEnabled = true;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	/**
+	 * @brief Cost of a Dash.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCost = 33.0f;
 
+	/**
+	 * @brief Modifier applied to DashCost when Jump Dashing.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+ 	float JumpDashMultiplier = 0.5f;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCurrentAmount;
 
@@ -139,7 +148,21 @@ struct FBsDashConfig
 	 * @brief The Velocity before the Character starting Dashing.
 	 */
 	FVector PreDashVelocity = FVector::ZeroVector;
-	
+
+	/**
+	 * @brief Adds a DashCost amount to the DashCurrentAmount.
+	 */
+	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashCost, DashMinAmount, DashMaxAmount); }
+
+	/**
+	 * @brief Decreases DashCurrentAmount by DashCost.
+	 */
+	void DepleteDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost, DashMinAmount, DashMaxAmount); }
+
+	/**
+	 * @brief Decreases DashCurrenAmount by DashCost * JumpDashMultiplier.
+	 */
+	void DepleteJumpDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount); }
 };
 
 USTRUCT(BlueprintType)

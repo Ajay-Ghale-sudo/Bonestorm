@@ -77,6 +77,7 @@ public:
 
 	FBsCharacterEvent OnSlideStart;
 	FBsCharacterEvent OnSlideStop;
+	FBsCharacterEvent OnSlideJump;
 
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;

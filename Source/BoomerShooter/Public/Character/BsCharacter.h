@@ -128,6 +128,11 @@ protected:
 	void StopDashing();
 
 	/**
+	 * @brief Revert to pre dash state.
+	 */
+	void FinishDashing();
+
+	/**
 	 * @brief Process and apply Dash Movement.
 	 * @param DeltaTime	The time passed since the last frame.
 	 */

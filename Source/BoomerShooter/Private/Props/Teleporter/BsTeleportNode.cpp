@@ -33,6 +33,23 @@ void ABsTeleportNode::BeginPlay()
 	{
 		TeleportCollision->OnComponentBeginOverlap.AddDynamic(this, &ABsTeleportNode::OnTeleportCollisionBeginOverlap);
 	}
+
+	//  Trigger default state.
+	SetActivated(bActive);
+}
+
+void ABsTeleportNode::SetActivated(bool bNewActive)
+{
+	bActive = bNewActive;
+	if (bActive)
+	{
+		OnTeleportActivated.Broadcast();
+	}
+	else
+	{
+		OnTeleportDeactivated.Broadcast();
+	}
+	SetTeleportCollisionEnabled(bActive);
 }
 
 FTransform ABsTeleportNode::GetArrivalTransform() const
@@ -63,5 +80,13 @@ void ABsTeleportNode::TeleportTarget(AActor* Target) const
 		Target->TeleportTo(Destination.GetLocation(), Target->GetActorRotation(), false, false);
 		OnTeleported.Broadcast();
 		TargetNode->OnTargetArrived.Broadcast();
+	}
+}
+
+void ABsTeleportNode::SetTeleportCollisionEnabled(const bool bNewEnabled) const
+{
+	if (TeleportCollision)
+	{
+		TeleportCollision->SetCollisionEnabled(bNewEnabled ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	}
 }

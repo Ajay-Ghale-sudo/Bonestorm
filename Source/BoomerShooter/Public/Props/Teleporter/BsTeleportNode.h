@@ -19,13 +19,22 @@ public:
 	// Sets default values for this actor's properties
 	ABsTeleportNode();
 
-	FTransform GetArrivalTransform() const; 
+	UFUNCTION(BlueprintCallable, Category = "Teleport Node")
+	void SetActivated(bool bNewActive);
+
+	FTransform GetArrivalTransform() const;
 public:
 	UPROPERTY(BlueprintAssignable, Category = "Teleport Node")
 	FBsTeleportNodeEvent OnTeleported;
 
 	UPROPERTY(BlueprintAssignable, Category = "Teleport Node")
 	FBsTeleportNodeEvent OnTargetArrived;
+
+	UPROPERTY(BlueprintAssignable, Category = "Teleport Node")
+	FBsTeleportNodeEvent OnTeleportActivated;
+
+	UPROPERTY(BlueprintAssignable, Category = "Teleport Node")
+	FBsTeleportNodeEvent OnTeleportDeactivated;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -36,6 +45,7 @@ protected:
 	                                     const FHitResult& SweepResult);
 
 	virtual void TeleportTarget(AActor* Target) const;
+	void SetTeleportCollisionEnabled(const bool bNewEnabled) const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport Node")
@@ -44,7 +54,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport Node")
 	UBoxComponent* TeleportCollision;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport Node")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Teleport Node")
 	ABsTeleportNode* TargetNode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Teleport Node")

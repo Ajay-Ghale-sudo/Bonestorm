@@ -10,9 +10,11 @@
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
+#include "UI/Widget/BsSeveredHeadWidget.h"
 #include "UI/Widget/Indicator/BsDamageIndicatorWidget.h"
 #include "UI/Widget/Menu/BsStartMenuWidget.h"
 #include "UI/Widget/Notification/BsNotificationWidget.h"
+#include "Weapon/BsWeaponBase.h"
 
 
 // Sets default values
@@ -38,6 +40,7 @@ void ABsHud::BeginPlay()
 	{
 		PlayerCharacter->OnPaused.AddDynamic(this, &ABsHud::OnPause);
 		PlayerCharacter->OnUnpaused.AddDynamic(this, &ABsHud::OnUnpause);
+		PlayerCharacter->OnWeaponChanged.AddUObject(this, &ABsHud::OnWeaponChanged);
 	}
 	
 	InitWidgets();
@@ -175,6 +178,11 @@ void ABsHud::InitWidgets()
 	{
 		DamageIndicatorWidget = CreateWidget<UBsDamageIndicatorWidget>(GetWorld(), DamageIndicatorWidgetClass);
 	}
+
+	if (SeveredHeadWidgetClass)
+	{
+		SeveredHeadWidget = CreateWidget<UBsSeveredHeadWidget>(GetWorld(), SeveredHeadWidgetClass);
+	}
 }
 
 void ABsHud::UpdateDashAmount()
@@ -197,4 +205,23 @@ void ABsHud::RefreshDashWidget()
 {
 	UpdateDashAmount();
 	UpdateDashCooldown();
+}
+
+void ABsHud::OnWeaponChanged(ABsWeaponBase* NewWeapon)
+{
+	OnWeaponChangedHandle.Reset();
+	if (NewWeapon)
+	{
+		OnWeaponChangedHandle = NewWeapon->OnWeaponHeadAttached.AddUObject(this, &ABsHud::OnWeaponHeadAttached);
+	}
+}
+
+void ABsHud::OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead)
+{
+	if (SeveredHead && SeveredHeadWidget)
+	{
+		SeveredHeadWidget->SetSeveredHead(SeveredHead);
+		SeveredHeadWidget->AddToViewport();
+		SeveredHeadWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }

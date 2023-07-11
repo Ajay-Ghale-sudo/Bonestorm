@@ -173,6 +173,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		{
 			Weapon->OnHeal.AddDynamic(HealthComponent, &UBsHealthComponent::Heal);
 		}
+		OnWeaponChanged.Broadcast(Weapon);
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{

@@ -20,6 +20,7 @@ class UBsCharacterAudioComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsCharacterWeaponEvent, ABsWeaponBase*);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -87,6 +88,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnUnpaused;
+
+	FBsCharacterWeaponEvent OnWeaponChanged;
 	
 protected:
 	// Called when the game starts or when spawned

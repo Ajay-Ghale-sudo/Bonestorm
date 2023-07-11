@@ -4,6 +4,9 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class ABsSeveredHeadBase;
+class UBsSeveredHeadWidget;
+class ABsWeaponBase;
 class UBsNotificationWidget;
 class UBsDamageIndicatorWidget;
 class UBsStartMenuWidget;
@@ -61,6 +64,11 @@ protected:
 	UFUNCTION()
 	void RefreshDashWidget();
 
+	UFUNCTION()
+	void OnWeaponChanged(ABsWeaponBase* NewWeapon);
+
+	UFUNCTION()
+	void OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
@@ -98,4 +106,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsNotificationWidget"))
 	TSubclassOf<UBsNotificationWidget> NotificationWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsSeveredHeadWidget"))
+	TSubclassOf<UBsSeveredHeadWidget> SeveredHeadWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsSeveredHeadWidget* SeveredHeadWidget;
+
+	FDelegateHandle OnWeaponChangedHandle;
 };

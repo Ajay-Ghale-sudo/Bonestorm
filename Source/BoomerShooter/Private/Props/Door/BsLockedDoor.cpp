@@ -13,11 +13,6 @@ void ABsLockedDoor::Interact(AActor* Interactor)
 			LockDoor(false);
 			Super::Interact(Interactor);
 		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, 
-				FString::Printf(TEXT("You need a %s to open this door"), *UEnum::GetValueAsString(RequiredKeyType)));
-		}
 	}
 }
 

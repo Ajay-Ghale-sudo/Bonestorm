@@ -96,7 +96,6 @@ EAttackResult ABsRangedEnemy::RangeAttack(const ACharacter* Target)
 				
 				if (bPredictMovement)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Predicting Movement, Accuracy %f"), Accuracy));
 					// (Dist to target / bullet speed) * (target speed * target forward vec + target location)
 					const float TravelTime = FVector::Dist(AimLocation, SpawnTransform.GetLocation()) / ProjectileSpeed;
 					TargetLocation = AimLocation + (Target->GetVelocity() * TravelTime);

@@ -226,6 +226,12 @@ void ABsCharacter::Jump()
 		StopSliding();
 	}
 
+	if (DashConfig.bDashing)
+	{
+		DashConfig.DepleteJumpDash();
+		StopDashing();
+	}
+	
 	StopGrapple();
 
 	// If the player recently walked off an edge, give them an extra time to jump.
@@ -271,7 +277,7 @@ void ABsCharacter::Dash()
 	DashConfig.bDashing = true;
 	DashConfig.DashElapsedTime = 0.f;
 
-	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
+	DashConfig.DepleteDash();
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;
 	OnDashEnabledChanged.Broadcast();
@@ -346,7 +352,7 @@ void ABsCharacter::AddDashCharge()
 
 void ABsCharacter::RefundDashCharge()
 {
-	DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashCost, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+	DashConfig.RefundDashCharge();
 	OnDashAmountChanged.Broadcast();
 }
 

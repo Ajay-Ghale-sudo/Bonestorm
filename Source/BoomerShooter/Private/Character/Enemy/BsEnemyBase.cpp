@@ -41,6 +41,7 @@ void ABsEnemyBase::BeginPlay()
 		HealthComponent->OnTookDamage.AddDynamic(this, &ABsEnemyBase::StartHitStun);
 		HealthComponent->OnLowHealth.AddDynamic(this, &ABsEnemyBase::IndicateLowHealth);
 		HealthComponent->OnExplosionHit.AddUObject(this, &ABsEnemyBase::ExplosionLaunch);
+		HealthComponent->OnDecapitated.AddDynamic(this, &ABsEnemyBase::SeverHead);
 	}
 
 	if (const UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
@@ -60,9 +61,8 @@ void ABsEnemyBase::Die()
 {
 	// Do nothing if we're already dead.
 	if (!bIsAlive) return;
-	
+
 	bIsAlive = false;
-	SeverHead();
 	TriggerRagdoll();
 	ClearOverlayMaterial();
 	HitStunTimerHandle.Invalidate();

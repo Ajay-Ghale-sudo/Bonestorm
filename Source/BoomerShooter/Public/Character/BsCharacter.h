@@ -20,6 +20,7 @@ class UBsCharacterAudioComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsCharacterWeaponEvent, ABsWeaponBase*);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -35,6 +36,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void OnWalkingOffLedge_Implementation(const FVector& PreviousFloorImpactNormal, const FVector& PreviousFloorContactNormal, const FVector& PreviousLocation, float TimeDelta) override;
 
 	/**
 	 * @brief Sets the Character's Weapon to the specified Weapon.
@@ -61,6 +63,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Unpause();
 
+	UFUNCTION()
+	void StartHitStop();
+
+	UFUNCTION()
+	void StopHitStop();
+
+	virtual void FellOutOfWorld(const UDamageType& DmgType) override;
+
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
@@ -68,6 +78,7 @@ public:
 
 	FBsCharacterEvent OnSlideStart;
 	FBsCharacterEvent OnSlideStop;
+	FBsCharacterEvent OnSlideJump;
 
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;
@@ -77,6 +88,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnUnpaused;
+
+	FBsCharacterWeaponEvent OnWeaponChanged;
 	
 protected:
 	// Called when the game starts or when spawned
@@ -214,6 +227,21 @@ protected:
 	void StopSliding();
 
 	/**
+	 * @brief Start coyote time, allowing for an extra jump while in midair.
+	 */
+	UFUNCTION()
+	void StartCoyoteTime();
+
+	/**
+	 * @brief End coyote time.
+	 */
+	UFUNCTION()
+	void EndCoyoteTime();
+
+	UFUNCTION()
+	void OnParry();
+
+	/**
 	 * @brief This function handles the per-frame behavior during sliding.
 	 *
 	 * This function is called every frame and it performs several checks and operations related to sliding.
@@ -242,6 +270,12 @@ protected:
 	FBsInputConfig InputConfig;
 
 	/**
+	 * @brief Movement configuration for the Character.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	FBsMovementConfig MovementConfig;
+	
+	/**
 	 * @brief The dash configuration for the Character.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
@@ -259,6 +293,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interact)
 	FBsInteractConfig InteractConfig;
 
+	/**
+	 * @brief Hit Stop configuration for the Character.
+	 */
+	FBsHitStopConfig HitStopConfig;
+	
 	/**
 	 * @brief The Camera Component of the Character.
 	 */
@@ -298,4 +337,6 @@ public:
 	FORCEINLINE bool GetDashEnabled() const { return DashConfig.bDashEnabled; }
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE bool GetIsAlive() const { return bAlive; }
+	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
+	FORCEINLINE UBsInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 };

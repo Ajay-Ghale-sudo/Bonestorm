@@ -87,9 +87,18 @@ struct FBsDashConfig
 	// A flag to indicate if dashing is currently enabled.
 	bool bDashEnabled = true;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	/**
+	 * @brief Cost of a Dash.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCost = 33.0f;
 
+	/**
+	 * @brief Modifier applied to DashCost when Jump Dashing.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+ 	float JumpDashMultiplier = 0.5f;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCurrentAmount;
 
@@ -139,7 +148,21 @@ struct FBsDashConfig
 	 * @brief The Velocity before the Character starting Dashing.
 	 */
 	FVector PreDashVelocity = FVector::ZeroVector;
-	
+
+	/**
+	 * @brief Adds a DashCost amount to the DashCurrentAmount.
+	 */
+	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashCost, DashMinAmount, DashMaxAmount); }
+
+	/**
+	 * @brief Decreases DashCurrentAmount by DashCost.
+	 */
+	void DepleteDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost, DashMinAmount, DashMaxAmount); }
+
+	/**
+	 * @brief Decreases DashCurrenAmount by DashCost * JumpDashMultiplier.
+	 */
+	void DepleteJumpDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount); }
 };
 
 USTRUCT(BlueprintType)
@@ -224,4 +247,51 @@ struct FBsSlideConfig
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
 	bool bSliding = false;
+};
+
+/**
+ * @brief This struct is used to represent the movement configuration.
+ */
+USTRUCT(BlueprintType)
+struct FBsMovementConfig
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief If the character has recently walked off a ledge.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Jump")
+	bool bInCoyoteTime = false;
+
+	/**
+	 * @brief The duration of the coyote time.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Jump")
+	float CoyoteTimeDuration = 0.5f;
+
+	/**
+	 * @brief Timer handle used for controlling coyote time.
+	 */
+	FTimerHandle CoyoteTimeHandle;
+};
+
+// A structure to hold the configuration for the hit stop mechanic.
+USTRUCT(BlueprintType)
+struct FBsHitStopConfig
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief How long for the HItStop to last. Is relative to the HitStopTimeDilation.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float HitStopDuration = 0.001f;
+
+	/**
+	 * @brief The time dilation to apply when hit stop is active.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
+	float HitStopTimeDilation = 0.01f;
+	
+	FTimerHandle HitStopTimerHandle;
 };

@@ -4,6 +4,11 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class ABsSeveredHeadBase;
+class UBsSeveredHeadWidget;
+class ABsWeaponBase;
+class UBsNotificationWidget;
+class UBsDamageIndicatorWidget;
 class UBsStartMenuWidget;
 class UBsCrosshairWidget;
 class UBsDashAmountWidget;
@@ -35,6 +40,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ShowPlayerWidgets(bool bShow);
 
+	UFUNCTION(BlueprintCallable)
+	void AddNotification(const FText& Text, TSubclassOf<UBsNotificationWidget> NotificationClass = nullptr);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,6 +64,11 @@ protected:
 	UFUNCTION()
 	void RefreshDashWidget();
 
+	UFUNCTION()
+	void OnWeaponChanged(ABsWeaponBase* NewWeapon);
+
+	UFUNCTION()
+	void OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
@@ -84,4 +97,21 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsStartMenuWidget* StartMenuWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsDamageIndicatorWidget"))
+	TSubclassOf<UBsDamageIndicatorWidget> DamageIndicatorWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsDamageIndicatorWidget* DamageIndicatorWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsNotificationWidget"))
+	TSubclassOf<UBsNotificationWidget> NotificationWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsSeveredHeadWidget"))
+	TSubclassOf<UBsSeveredHeadWidget> SeveredHeadWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsSeveredHeadWidget* SeveredHeadWidget;
+
+	FDelegateHandle OnWeaponChangedHandle;
 };

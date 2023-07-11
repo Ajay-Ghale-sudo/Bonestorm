@@ -102,6 +102,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	UStaticMeshComponent* HeadMesh;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	FText HeadName = FText::FromString("Head");
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Head")
 	bool bIsAttached = false;
 
@@ -143,6 +146,7 @@ protected:
 
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
+	FORCEINLINE FText GetHeadName() const { return HeadName; }
 	FORCEINLINE float GetCurrentCharge() const { return CurrentCharge; }
 	FORCEINLINE float GetHeadHealAmount() const { return HealingAmount; }
 	FORCEINLINE bool CanBeAttached() const { return !bIsAttached && CurrentCharge > 0.f; }

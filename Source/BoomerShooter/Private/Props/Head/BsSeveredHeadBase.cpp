@@ -15,6 +15,7 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 
 	HeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadMesh"));
 	HeadMesh->SetSimulatePhysics(true);
+	HeadMesh->SetCollisionProfileName(FName("SeveredHead"));
 	HeadMesh->SetLinearDamping(3.f);
 	SetRootComponent(HeadMesh);
 	
@@ -156,7 +157,7 @@ void ABsSeveredHeadBase::OnMeshOverlapBegin(UPrimitiveComponent* OverlappedCompo
 void ABsSeveredHeadBase::PopHead() const
 {
 	if (!HeadMesh || bIsAttached) return;
-	HeadMesh->AddImpulse(HeadPopVelocity, NAME_None, true);
+	HeadMesh->AddImpulse(FVector(0.f, 0.f, 500.f), NAME_None, true);
 }
 
 void ABsSeveredHeadBase::DepleteCharge()

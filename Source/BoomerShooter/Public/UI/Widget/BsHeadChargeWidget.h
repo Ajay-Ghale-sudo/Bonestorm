@@ -16,7 +16,8 @@ class BOOMERSHOOTER_API UBsHeadChargeWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	
+
+	UFUNCTION(BlueprintCallable)
 	void BindToSeveredHead(ABsSeveredHeadBase* SeveredHead);
 
 	UFUNCTION(BlueprintNativeEvent)

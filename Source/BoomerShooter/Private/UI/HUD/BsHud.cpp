@@ -10,7 +10,11 @@
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
+#include "UI/Widget/BsSeveredHeadWidget.h"
+#include "UI/Widget/Indicator/BsDamageIndicatorWidget.h"
 #include "UI/Widget/Menu/BsStartMenuWidget.h"
+#include "UI/Widget/Notification/BsNotificationWidget.h"
+#include "Weapon/BsWeaponBase.h"
 
 
 // Sets default values
@@ -36,6 +40,7 @@ void ABsHud::BeginPlay()
 	{
 		PlayerCharacter->OnPaused.AddDynamic(this, &ABsHud::OnPause);
 		PlayerCharacter->OnUnpaused.AddDynamic(this, &ABsHud::OnUnpause);
+		PlayerCharacter->OnWeaponChanged.AddUObject(this, &ABsHud::OnWeaponChanged);
 	}
 	
 	InitWidgets();
@@ -81,6 +86,11 @@ void ABsHud::AddPlayerWidgetsToViewport()
 	{
 		CrosshairWidget->AddToViewport();
 	}
+
+	if (DamageIndicatorWidget)
+	{
+		DamageIndicatorWidget->AddToViewport();
+	}
 }
 
 void ABsHud::ShowStartMenu(bool bShow)
@@ -107,6 +117,20 @@ void ABsHud::ShowPlayerWidgets(bool bShow)
 	if (CrosshairWidget)
 	{
 		CrosshairWidget->SetVisibility(Visibility);
+	}
+
+	if (DamageIndicatorWidget)
+	{
+		DamageIndicatorWidget->SetVisibility(Visibility);
+	}
+}
+
+void ABsHud::AddNotification(const FText& Text, TSubclassOf<UBsNotificationWidget> NotificationClass)
+{
+	if (UBsNotificationWidget* NotificationWidget = CreateWidget<UBsNotificationWidget>(GetWorld(), NotificationClass ? NotificationClass : NotificationWidgetClass))
+	{
+		NotificationWidget->AddToViewport();
+		NotificationWidget->ShowNotification(Text);
 	}
 }
 
@@ -148,10 +172,16 @@ void ABsHud::InitWidgets()
 	if (HealthAmountWidgetClass && PlayerCharacter)
 	{
 		HealthAmountWidget = CreateWidget<UBsHealthAmountWidget>(GetWorld(), HealthAmountWidgetClass);
-		if (HealthAmountWidget)
-		{
-			HealthAmountWidget->BindToHealthComponent(PlayerCharacter->FindComponentByClass<UBsHealthComponent>());
-		}
+	}
+
+	if (DamageIndicatorWidgetClass)
+	{
+		DamageIndicatorWidget = CreateWidget<UBsDamageIndicatorWidget>(GetWorld(), DamageIndicatorWidgetClass);
+	}
+
+	if (SeveredHeadWidgetClass)
+	{
+		SeveredHeadWidget = CreateWidget<UBsSeveredHeadWidget>(GetWorld(), SeveredHeadWidgetClass);
 	}
 }
 
@@ -175,4 +205,23 @@ void ABsHud::RefreshDashWidget()
 {
 	UpdateDashAmount();
 	UpdateDashCooldown();
+}
+
+void ABsHud::OnWeaponChanged(ABsWeaponBase* NewWeapon)
+{
+	OnWeaponChangedHandle.Reset();
+	if (NewWeapon)
+	{
+		OnWeaponChangedHandle = NewWeapon->OnWeaponHeadAttached.AddUObject(this, &ABsHud::OnWeaponHeadAttached);
+	}
+}
+
+void ABsHud::OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead)
+{
+	if (SeveredHead && SeveredHeadWidget)
+	{
+		SeveredHeadWidget->SetSeveredHead(SeveredHead);
+		SeveredHeadWidget->AddToViewport();
+		SeveredHeadWidget->SetVisibility(ESlateVisibility::Visible);
+	}
 }

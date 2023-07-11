@@ -152,6 +152,14 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	}
 }
 
+void ABsCharacter::OnWalkingOffLedge_Implementation(const FVector& PreviousFloorImpactNormal,
+	const FVector& PreviousFloorContactNormal, const FVector& PreviousLocation, float TimeDelta)
+{
+	Super::OnWalkingOffLedge_Implementation(PreviousFloorImpactNormal, PreviousFloorContactNormal, PreviousLocation,
+											TimeDelta);
+	StartCoyoteTime();
+}
+
 void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 {
 	Weapon = InWeapon;
@@ -160,11 +168,12 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 		Weapon->SetOwner(this);
 		Weapon->Equip();
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
-		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::RefundDashCharge);
+		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::OnParry);
 		if (HealthComponent)
 		{
 			Weapon->OnHeal.AddDynamic(HealthComponent, &UBsHealthComponent::Heal);
 		}
+		OnWeaponChanged.Broadcast(Weapon);
 	}
 	if (UBsGrappleHookComponent* GrappleHookComponent = Weapon->FindComponentByClass<UBsGrappleHookComponent>())
 	{
@@ -210,10 +219,27 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	StopDashing();
-	StopSliding();
+	if (SlideConfig.bSliding)
+	{
+		OnSlideJump.Broadcast();
+		StopSliding();
+	}
+
+	if (DashConfig.bDashing)
+	{
+		DashConfig.DepleteJumpDash();
+		StopDashing();
+	}
+	
 	StopGrapple();
 
+	// If the player recently walked off an edge, give them an extra time to jump.
+	if (MovementConfig.bInCoyoteTime)
+	{
+		--JumpCurrentCount;
+		MovementConfig.bInCoyoteTime = false;
+	}
+	
 	Super::Jump();
 }
 
@@ -250,7 +276,7 @@ void ABsCharacter::Dash()
 	DashConfig.bDashing = true;
 	DashConfig.DashElapsedTime = 0.f;
 
-	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
+	DashConfig.DepleteDash();
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;
 	OnDashEnabledChanged.Broadcast();
@@ -325,7 +351,7 @@ void ABsCharacter::AddDashCharge()
 
 void ABsCharacter::RefundDashCharge()
 {
-	DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashCost, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+	DashConfig.RefundDashCharge();
 	OnDashAmountChanged.Broadcast();
 }
 
@@ -532,6 +558,29 @@ void ABsCharacter::StopSliding()
 	SlideConfig.bSliding = false;
 }
 
+void ABsCharacter::StartCoyoteTime()
+{
+	MovementConfig.bInCoyoteTime = true;
+	GetWorldTimerManager().SetTimer(
+		MovementConfig.CoyoteTimeHandle,
+		this,
+		&ABsCharacter::EndCoyoteTime,
+		MovementConfig.CoyoteTimeDuration,
+		false
+	);
+}
+
+void ABsCharacter::EndCoyoteTime()
+{
+	MovementConfig.bInCoyoteTime = false;
+}
+
+void ABsCharacter::OnParry()
+{
+	RefundDashCharge();
+	StartHitStop();	
+}
+
 void ABsCharacter::SlideTick(float DeltaTime)
 {
 	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
@@ -622,6 +671,35 @@ void ABsCharacter::Unpause()
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), false);
 	OnUnpaused.Broadcast();
+}
+
+void ABsCharacter::StartHitStop()
+{
+	GetWorldTimerManager().SetTimer(
+		HitStopConfig.HitStopTimerHandle,
+		this,
+		&ABsCharacter::StopHitStop,
+		HitStopConfig.HitStopDuration,
+		false
+	);
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), HitStopConfig.HitStopTimeDilation);
+
+	// Set relative time dilation to 50%
+	CustomTimeDilation = 1 / HitStopConfig.HitStopTimeDilation * .5f;
+}
+
+void ABsCharacter::StopHitStop()
+{
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	CustomTimeDilation = 1.f;
+}
+
+void ABsCharacter::FellOutOfWorld(const UDamageType& DmgType)
+{
+	if (HealthComponent)
+	{
+		HealthComponent->OnDeath.Broadcast();
+	}
 }
 
 void ABsCharacter::Die()

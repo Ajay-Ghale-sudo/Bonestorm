@@ -218,8 +218,6 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	StopDashing();
-
 	if (SlideConfig.bSliding)
 	{
 		OnSlideJump.Broadcast();

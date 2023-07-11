@@ -218,7 +218,12 @@ void ABsCharacter::Look(const FInputActionValue& Value)
 
 void ABsCharacter::Jump()
 {
-	StopDashing();
+	if (DashConfig.bDashing)
+	{
+		DashConfig.DepleteJumpDash();
+		StopDashing();
+	}
+	
 	StopSliding();
 	StopGrapple();
 
@@ -265,7 +270,7 @@ void ABsCharacter::Dash()
 	DashConfig.bDashing = true;
 	DashConfig.DashElapsedTime = 0.f;
 
-	DashConfig.DashCurrentAmount -= DashConfig.DashCost;
+	DashConfig.DepleteDash();
 	OnDashAmountChanged.Broadcast();
 	DashConfig.bDashEnabled = false;
 	OnDashEnabledChanged.Broadcast();
@@ -340,7 +345,7 @@ void ABsCharacter::AddDashCharge()
 
 void ABsCharacter::RefundDashCharge()
 {
-	DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashCost, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+	DashConfig.RefundDashCharge();
 	OnDashAmountChanged.Broadcast();
 }
 

@@ -16,6 +16,7 @@ ABsSeveredHeadBase::ABsSeveredHeadBase()
 	HeadMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HeadMesh"));
 	HeadMesh->SetSimulatePhysics(true);
 	HeadMesh->SetCollisionProfileName(FName("SeveredHead"));
+	HeadMesh->SetLinearDamping(3.f);
 	SetRootComponent(HeadMesh);
 	
 	HeadWidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));

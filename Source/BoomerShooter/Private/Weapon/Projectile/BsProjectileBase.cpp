@@ -99,6 +99,7 @@ void ABsProjectileBase::ResolveImpact()
 	if (DamageDealt > 0.f)
 	{
 		OnDealtDamage.Broadcast(LastHitResult);
+		OnDamagedActor.Broadcast(LastHitResult.GetActor());
 	}
 }
 

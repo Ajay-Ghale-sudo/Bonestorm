@@ -27,7 +27,7 @@ void UBsEnemyAudioComponent::BindEvents()
 	
 	if (UBsHealthComponent* HealthComponent = EnemyOwner->GetHealthComponent())
 	{
-		HealthComponent->OnTookDamage.AddDynamic(this, &UBsEnemyAudioComponent::OnTookDamage);
+		HealthComponent->OnTookDamageEvent.AddDynamic(this, &UBsEnemyAudioComponent::OnTookDamage);
 	}
 }
 
@@ -40,7 +40,7 @@ void UBsEnemyAudioComponent::UnbindEvents()
 
 	if (UBsHealthComponent* HealthComponent = EnemyOwner->GetHealthComponent())
 	{
-		HealthComponent->OnTookDamage.RemoveAll(this);
+		HealthComponent->OnTookDamageEvent.RemoveAll(this);
 	}
 }
 

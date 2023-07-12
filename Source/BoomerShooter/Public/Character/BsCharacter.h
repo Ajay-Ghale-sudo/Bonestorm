@@ -76,9 +76,12 @@ public:
 	FBsCharacterEvent OnDashEnabledChanged;
 	FBsCharacterEvent OnDash;
 
+	FBsCharacterEvent OnJump;
+	FBsCharacterEvent OnDashJump;
+	FBsCharacterEvent OnSlideJump;
+	
 	FBsCharacterEvent OnSlideStart;
 	FBsCharacterEvent OnSlideStop;
-	FBsCharacterEvent OnSlideJump;
 
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;
@@ -117,6 +120,8 @@ protected:
 	 */
 	virtual void Jump() override;
 
+	virtual void OnJumped_Implementation() override;
+
 	/**
 	 * @brief Handles the Dash input action.
 	 */
@@ -126,6 +131,11 @@ protected:
 	 * @brief Stop Dashing.
 	 */
 	void StopDashing();
+
+	/**
+	 * @brief Revert to pre dash state.
+	 */
+	void FinishDashing();
 
 	/**
 	 * @brief Process and apply Dash Movement.

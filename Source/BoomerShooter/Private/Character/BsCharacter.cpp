@@ -227,7 +227,17 @@ void ABsCharacter::Jump()
 
 	if (DashConfig.bDashing)
 	{
-		DashConfig.DepleteJumpDash();
+		
+		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow)
+		{
+			DashConfig.DepleteJumpDash();
+			OnDashJump.Broadcast();
+		}
+		else
+		{
+			// Early call to finish dashing to apply previous velocity and prevent a DashJump.
+			FinishDashing();
+		}
 		StopDashing();
 	}
 	
@@ -241,6 +251,12 @@ void ABsCharacter::Jump()
 	}
 	
 	Super::Jump();
+}
+
+void ABsCharacter::OnJumped_Implementation()
+{
+	Super::OnJumped_Implementation();
+	OnJump.Broadcast();
 }
 
 void ABsCharacter::Dash()
@@ -304,27 +320,32 @@ void ABsCharacter::StopDashing()
 	DashConfig.bDashing = false;
 }
 
+void ABsCharacter::FinishDashing()
+{
+	DashConfig.bDashing = false;
+	DashConfig.DashElapsedTime = 0.f;
+	const FVector DashNormal = DashConfig.DashDirection.GetSafeNormal();
+	DashConfig.PreDashVelocity.Z = 0.f;
+	GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size();
+	SetCanBeDamaged(true);
+}
+
 void ABsCharacter::DashTick(const float DeltaTime)
 {
 	SetCanBeDamaged(true);
-	if (!DashConfig.bDashing || DashConfig.DashElapsedTime >= DashConfig.DashDuration)
+	if (!DashConfig.bDashing)
 	{
 		return;
 	}
 
 	DashConfig.DashElapsedTime += DeltaTime;
-	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
-	SetCanBeDamaged(false);
-
 	if (DashConfig.DashElapsedTime >= DashConfig.DashDuration)
 	{
-		DashConfig.bDashing = false;
-		DashConfig.DashElapsedTime = 0.f;
-		const FVector DashNormal = DashConfig.DashDirection.GetSafeNormal();
-		DashConfig.PreDashVelocity.Z = 0.f;
-		GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size();
-		SetCanBeDamaged(true);
+		FinishDashing();
+		return;
 	}	
+	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
+	SetCanBeDamaged(false);
 }
 
 void ABsCharacter::EnableDash()

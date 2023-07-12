@@ -141,6 +141,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
 	FVector SeveredHeadScale = FVector(0.4f, 0.4f, 0.4f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Head")
+	FVector HeadPopVelocity = FVector(0.f, 0.f, 1000.f);
+
 public:
 	FORCEINLINE UStaticMeshComponent* GetHeadMesh() const { return HeadMesh; }
 	FORCEINLINE FText GetHeadName() const { return HeadName; }

@@ -29,8 +29,10 @@ void UBsHealthComponent::BeginPlay()
 
 void UBsHealthComponent::ApplyDamage(float Damage, const UDamageType* DamageType)
 {
-	OnTookDamage.Broadcast();
-	CurrentHealth = FMath::Clamp(CurrentHealth - Damage * DamageModifier, 0.f, MaxHealth);
+	OnTookDamageEvent.Broadcast();
+	const float ActualDamage = Damage * DamageModifier;
+	OnTookDamage.Broadcast(ActualDamage);
+	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.f, MaxHealth);
 	float HealthPercentage = UKismetMathLibrary::SafeDivide(CurrentHealth, MaxHealth);
 	if (CurrentHealth <= 0.f)
 	{
@@ -122,6 +124,7 @@ void UBsHealthComponent::ProcessBleedDamage()
 void UBsHealthComponent::Heal(float Healing)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth + Healing, 0.f, MaxHealth);
+	OnHealedDamage.Broadcast(Healing); // TODO: Should this broadcast the actual amount healed?
 	OnHealthChanged.Broadcast();
 }
 

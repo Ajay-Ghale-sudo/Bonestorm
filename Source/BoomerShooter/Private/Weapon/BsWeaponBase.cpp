@@ -51,6 +51,15 @@ void ABsWeaponBase::ClearMontage(const UAnimMontage* MontageToClear /*= nullptr*
 	}
 }
 
+void ABsWeaponBase::SectionJump(const UAnimMontage* Montage, FName SectionName)
+{
+	if (!WeaponMesh) return;
+	if (UAnimInstance* AnimInstance = WeaponMesh->GetAnimInstance())
+	{
+		AnimInstance->Montage_JumpToSection(SectionName, Montage);
+	}
+}
+
 bool ABsWeaponBase::CanAttack() const
 {
 	return bCanAttack;

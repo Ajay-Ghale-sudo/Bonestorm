@@ -335,7 +335,6 @@ void ABsScythe::Throw()
 {
 	Super::Throw();
 
-	
 	PlayMontage(ThrowMontage);
 	
 	if (bThrown)

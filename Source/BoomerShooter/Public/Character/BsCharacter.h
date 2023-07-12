@@ -185,6 +185,11 @@ protected:
 	 * @brief Attacks with the weapon.
 	 */
 	void Attack();
+
+	/**
+	 * @brief Secondary attack with the weapon.
+	 */
+	void SecondaryAttack();
 	
 	/**
 	 * @brief Start blocking with a weapon.
@@ -199,7 +204,7 @@ protected:
 	/**
 	 * @brief Uses secondary attack with the weapon
 	 */
-	void SecondaryAttack();
+	void UseGrappleHook();
 
     /**
      * @brief Throws the current weapon.

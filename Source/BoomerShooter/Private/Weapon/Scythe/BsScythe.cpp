@@ -107,10 +107,15 @@ bool ABsScythe::CanAttack() const
 	
 	if (IsRangedMode())
 	{
-		return RangedConfig.bCanFire;
+		return bCanAttack && RangedConfig.bCanFire;
 	}
 	
 	return true;
+}
+
+bool ABsScythe::CanMeleeAttack() const
+{
+	return !bThrown && bCanAttack;
 }
 
 float ABsScythe::BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -201,7 +206,6 @@ void ABsScythe::MeleeAttackFinished()
 void ABsScythe::Fire()
 {
 	if (!CanAttack()) return;
-	Super::Fire();
 	
 	if (WeaponMode == EScytheWeaponMode::ESWM_Melee)
 	{
@@ -215,7 +219,7 @@ void ABsScythe::Fire()
 
 void ABsScythe::SecondaryFire()
 {
-	SecondaryAttack();
+	MeleeAttack();
 }
 
 void ABsScythe::RangeAttack()
@@ -267,11 +271,13 @@ void ABsScythe::RangeAttack()
 
 void ABsScythe::MeleeAttack()
 {
+	if (!CanMeleeAttack()) return;
+
 	OnMeleeAttack();
 	OnWeaponMeleeAttack.Broadcast();
-	PlayMontage(MeleeAttackMontage);
 	bCanAttack = false;
 	bIsAttacking = true;
+	PlayMontage(MeleeAttackMontage);
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsScythe::MeleeAttackFinished, AttackDuration, false);
 }
 

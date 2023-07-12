@@ -111,7 +111,7 @@ void UBsGameStatTracker::StopTrackingPlayer()
 	
 	for (auto& Handle : DynamicHandles)
 	{
-		Handle.Clear();
+		Handle.RemoveAll(this);
 	}
 	DynamicHandles.Empty();
 

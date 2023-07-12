@@ -192,16 +192,6 @@ protected:
 	void SecondaryAttack();
 	
 	/**
-	 * @brief Start blocking with a weapon.
-	 */
-	void StartBlock();
-
-	/**
-	 * @brief Stops blocking with a weapon.
-	 */
-	void StopBlock();
-
-	/**
 	 * @brief Uses secondary attack with the weapon
 	 */
 	void UseGrappleHook();

@@ -196,6 +196,7 @@ void ABsScythe::MeleeAttackFinished()
 {
 	bIsAttacking = false;
 	bCanAttack = true;
+	StopParry();
 
 	if (MeleeCollision)
 	{
@@ -277,7 +278,7 @@ void ABsScythe::MeleeAttack()
 	OnWeaponMeleeAttack.Broadcast();
 	bCanAttack = false;
 	bIsAttacking = true;
-	PlayMontage(MeleeAttackMontage);
+	PlayMontage(IsMeleeMode() ? MeleeAttackMontage : SecondaryAttackMontage);
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ABsScythe::MeleeAttackFinished, AttackDuration, false);
 }
 
@@ -426,8 +427,9 @@ void ABsScythe::OnMeleeOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	if (!bThrown && bIsAttacking)
 	{
 		// Only damage actors once per attack.
-		if (!MeleeHitActors.Contains(OtherActor))
+		if (!MeleeHitActors.Contains(OtherActor) && GetOwner() != OtherActor)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::Printf(TEXT("Hit %s"), *OtherActor->GetName()));
 			MeleeHitActors.Add(OtherActor);
 			OtherActor->TakeDamage(MeleeDamage, FDamageEvent(UBsMeleeScytheDamageType::StaticClass()), GetInstigatorController(), this);
 		}

@@ -17,6 +17,12 @@ class BOOMERSHOOTER_API UBsScytheAnimInstance : public UAnimInstance
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintCallable)
+	void StartParry();
+
+	UFUNCTION(BlueprintCallable)
+	void StopParry();
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Scythe)

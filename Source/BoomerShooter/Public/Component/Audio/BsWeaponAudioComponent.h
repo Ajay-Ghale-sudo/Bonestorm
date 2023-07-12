@@ -26,6 +26,9 @@ struct FWeaponAudioDate
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
 	USoundBase* WeaponThrowSound;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Audio Data")
+	UAudioComponent* WeaponThrowAudioComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
 	USoundBase* WeaponEquipSound;
 
@@ -78,6 +81,9 @@ protected:
 
 	UFUNCTION()
 	void OnWeaponThrow();
+
+	UFUNCTION()
+	void OnWeaponThrowEnd();
 
 	UFUNCTION()
 	void OnWeaponEquip();

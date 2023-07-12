@@ -38,7 +38,7 @@ void ABsEnemyBase::BeginPlay()
 	if (HealthComponent)
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &ABsEnemyBase::Die);
-		HealthComponent->OnTookDamage.AddDynamic(this, &ABsEnemyBase::StartHitStun);
+		HealthComponent->OnTookDamageEvent.AddDynamic(this, &ABsEnemyBase::StartHitStun);
 		HealthComponent->OnLowHealth.AddDynamic(this, &ABsEnemyBase::IndicateLowHealth);
 		HealthComponent->OnExplosionHit.AddUObject(this, &ABsEnemyBase::ExplosionLaunch);
 		HealthComponent->OnDecapitated.AddDynamic(this, &ABsEnemyBase::SeverHead);

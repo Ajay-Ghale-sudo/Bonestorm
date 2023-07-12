@@ -12,6 +12,7 @@ class UNiagaraSystem;
 
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsProjectileHitEvent, const FHitResult& /*HitResult*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsProjectileDamageEvent, AActor* /*TargetActor*/);
 
 USTRUCT(BlueprintType)
 struct FProjectileDamageProperties
@@ -56,6 +57,7 @@ public:
 
 public:
 	FBsProjectileHitEvent OnDealtDamage;
+	FBsProjectileDamageEvent OnDamagedActor;
 	
 protected:
 	// Called when the game starts or when spawned

@@ -12,6 +12,7 @@ class ABsSeveredHeadBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsWeaponBaseHealEvent, float, Healing);
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsWeaponHeadEvent, ABsSeveredHeadBase*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsWeaponDamageEvent, AActor*);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsWeaponBase : public AActor
@@ -68,6 +69,7 @@ public:
 	FBsWeaponBaseEvent OnWeaponParry;
 	FBsWeaponBaseEvent OnWeaponBlock;
 	FBsWeaponBaseEvent OnWeaponThrow;
+	FBsWeaponBaseEvent OnWeaponThrowEnd;
 	FBsWeaponBaseEvent OnWeaponEquip;
 	FBsWeaponBaseEvent OnWeaponModeChanged;
 	FBsWeaponBaseEvent OnWeaponFire;
@@ -75,6 +77,8 @@ public:
 	FBsWeaponBaseEvent OnWeaponHit;
 	FBsWeaponBaseEvent OnWeaponHeal;
 	FBsWeaponBaseEvent OnWeaponHeadConsumed;
+
+	FBsWeaponDamageEvent OnWeaponDamageActor;
 	
 	FBsWeaponBaseHealEvent OnHeal;
 
@@ -99,6 +103,12 @@ protected:
 	 * @param MontageToClear Montage to clear. If NULL, all Montages will be cleared.
 	 */
 	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
+
+	/**
+	 * @brief Jumps to Montage Section on the weapon.
+	 *
+	 */
+	void SectionJump(const UAnimMontage* Montage, FName SectionName);
 
 	/**
 	 * @brief Get if the Weapon can attack.

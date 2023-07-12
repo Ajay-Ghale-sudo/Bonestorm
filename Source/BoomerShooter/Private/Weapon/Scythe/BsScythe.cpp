@@ -76,7 +76,8 @@ void ABsScythe::ThrowTick(float DeltaTime)
 			bThrown = false;
 			bReturningToOwner = false;
 			OnWeaponCaught.Broadcast();
-			ClearMontage();
+			ClearMontage(ThrowMontage);
+			OnWeaponThrowEnd.Broadcast();
 			bCanAttack = true;
 			return;			
 		}
@@ -246,6 +247,7 @@ void ABsScythe::RangeAttack()
 		{
 			Projectile->SetOwner(GetOwner());
 			Projectile->SetInstigator(GetInstigator());
+			OnCreateProjectileEvent.Broadcast(Projectile);
 			PlayMontage(RangedAttackMontage);
 			OnRangedAttack();
 			OnWeaponFire.Broadcast();
@@ -390,7 +392,8 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			AttachToComponent(GrapplePointComponent, FAttachmentTransformRules::KeepWorldTransform);
 			bAttachedToGrapplePoint = true;
 			GrappleHookComponent->AttachToGrapplePoint(GrapplePointComponent);
-			ClearMontage();
+			ClearMontage(ThrowMontage);
+			OnWeaponThrowEnd.Broadcast();
 
 			return;
 		}

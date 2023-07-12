@@ -231,6 +231,7 @@ void ABsCharacter::Jump()
 		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow)
 		{
 			DashConfig.DepleteJumpDash();
+			OnDashJump.Broadcast();
 		}
 		else
 		{
@@ -250,6 +251,12 @@ void ABsCharacter::Jump()
 	}
 	
 	Super::Jump();
+}
+
+void ABsCharacter::OnJumped_Implementation()
+{
+	Super::OnJumped_Implementation();
+	OnJump.Broadcast();
 }
 
 void ABsCharacter::Dash()

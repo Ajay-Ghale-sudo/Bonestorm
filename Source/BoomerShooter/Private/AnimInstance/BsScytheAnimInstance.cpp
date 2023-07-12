@@ -26,3 +26,19 @@ void UBsScytheAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bThrown = Scythe->IsThrown();
 	bAttachedToGrapplePoint = Scythe->IsAttachedToGrapplePoint();
 }
+
+void UBsScytheAnimInstance::StartParry()
+{
+	if (Scythe)
+	{
+		Scythe->StartParry();
+	}
+}
+
+void UBsScytheAnimInstance::StopParry()
+{
+	if (Scythe)
+	{
+		Scythe->StopParry();
+	}
+}

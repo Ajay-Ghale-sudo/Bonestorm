@@ -47,7 +47,7 @@ struct FBsScytheBlockConfig
 	FTimerHandle ParryCooldownHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
-	float ParryDuration = 0.2f;
+	float ParryDuration = 0.25f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Block|Parry")
 	float ParryCooldown = 1.5f;
@@ -84,6 +84,7 @@ class BOOMERSHOOTER_API ABsScythe : public ABsWeaponBase, public IDecapitator
 {
 	GENERATED_BODY()
 
+	friend class UBsScytheAnimInstance;
 public:
 	ABsScythe();
 	
@@ -147,11 +148,16 @@ protected:
 	virtual float BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void StartBlock() override;
 	virtual void StopBlock() override;
+
+	UFUNCTION(BlueprintCallable)
 	void StartParry();
-	UFUNCTION()
+	
+	UFUNCTION(BlueprintCallable)
 	void StopParry();
+	
 	UFUNCTION()
 	void EnableParry();
+	
 	void EnableRangedFire();
 
 	void MeleeAttackFinished();
@@ -199,6 +205,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
 	UAnimMontage* MeleeAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
+	UAnimMontage* SecondaryAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Montage")
 	UAnimMontage* RangedAttackMontage;

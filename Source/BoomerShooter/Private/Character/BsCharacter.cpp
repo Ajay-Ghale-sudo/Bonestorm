@@ -139,10 +139,6 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			// Throw
 			EnhancedInputComponent->BindAction(InputConfig.ThrowAction, ETriggerEvent::Started, this, &ABsCharacter::ThrowWeapon);
 
-			// Block
-			EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Started, this, &ABsCharacter::StartBlock);
-			EnhancedInputComponent->BindAction(InputConfig.BlockAction, ETriggerEvent::Completed, this, &ABsCharacter::StopBlock);
-
 			// Detach head from weapon
 			EnhancedInputComponent->BindAction(InputConfig.DetachHeadAction, ETriggerEvent::Started, this, &ABsCharacter::DetachHead);
 
@@ -447,22 +443,6 @@ void ABsCharacter::SecondaryAttack()
 	if (Weapon)
 	{
 		Weapon->SecondaryFire();
-	}
-}
-
-void ABsCharacter::StartBlock()
-{
-	if (Weapon)
-	{
-		Weapon->StartBlock();
-	}
-}
-
-void ABsCharacter::StopBlock()
-{
-	if (Weapon)
-	{
-		Weapon->StopBlock();
 	}
 }
 

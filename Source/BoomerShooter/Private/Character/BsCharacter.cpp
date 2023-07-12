@@ -122,7 +122,10 @@ void ABsCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 			EnhancedInputComponent->BindAction(InputConfig.AttackAction, ETriggerEvent::Triggered, this, &ABsCharacter::Attack);
 
 			// Secondary Attack
-			EnhancedInputComponent->BindAction(InputConfig.SecondaryAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+			EnhancedInputComponent->BindAction(InputConfig.SecondaryAttackAction, ETriggerEvent::Started, this, &ABsCharacter::SecondaryAttack);
+
+			// Grapple Hook
+			EnhancedInputComponent->BindAction(InputConfig.GrappleAction, ETriggerEvent::Started, this, &ABsCharacter::UseGrappleHook);
 
 			// Switch weapon attack mode
 			EnhancedInputComponent->BindAction(InputConfig.AttackModeSwitchAction, ETriggerEvent::Started, this, &ABsCharacter::NextWeaponMode);
@@ -439,6 +442,14 @@ void ABsCharacter::Attack()
 	}
 }
 
+void ABsCharacter::SecondaryAttack()
+{
+	if (Weapon)
+	{
+		Weapon->SecondaryFire();
+	}
+}
+
 void ABsCharacter::StartBlock()
 {
 	if (Weapon)
@@ -455,7 +466,7 @@ void ABsCharacter::StopBlock()
 	}
 }
 
-void ABsCharacter::SecondaryAttack()
+void ABsCharacter::UseGrappleHook()
 {
 	if (bGrappleAttached && Weapon)
 	{

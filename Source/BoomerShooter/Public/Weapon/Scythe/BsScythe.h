@@ -143,6 +143,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void ThrowTick(float DeltaTime);
 	virtual bool CanAttack() const override;
+	bool CanMeleeAttack() const;
 	virtual float BlockIncomingDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void StartBlock() override;
 	virtual void StopBlock() override;

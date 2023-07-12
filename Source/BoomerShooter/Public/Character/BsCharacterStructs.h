@@ -130,6 +130,12 @@ struct FBsDashConfig
 	float DashElapsedTime = 0.f;
 
 	/**
+	 * @brief The time window after dashing to allow a dash jump.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashJumpTimeWindow = 0.09f;
+
+	/**
 	 * @brief Timer Handle for Dash Charging
 	 */
 	FTimerHandle DashChargeTimerHandle;

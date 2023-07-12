@@ -69,6 +69,7 @@ public:
 	FBsWeaponBaseEvent OnWeaponParry;
 	FBsWeaponBaseEvent OnWeaponBlock;
 	FBsWeaponBaseEvent OnWeaponThrow;
+	FBsWeaponBaseEvent OnWeaponThrowEnd;
 	FBsWeaponBaseEvent OnWeaponEquip;
 	FBsWeaponBaseEvent OnWeaponModeChanged;
 	FBsWeaponBaseEvent OnWeaponFire;
@@ -102,6 +103,12 @@ protected:
 	 * @param MontageToClear Montage to clear. If NULL, all Montages will be cleared.
 	 */
 	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
+
+	/**
+	 * @brief Jumps to Montage Section on the weapon.
+	 *
+	 */
+	void SectionJump(const UAnimMontage* Montage, FName SectionName);
 
 	/**
 	 * @brief Get if the Weapon can attack.

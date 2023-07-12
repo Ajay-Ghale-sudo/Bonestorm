@@ -1,7 +1,5 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Component/Audio/BsWeaponAudioComponent.h"
+﻿#include "Component/Audio/BsWeaponAudioComponent.h"
+#include "Components/AudioComponent.h"
 #include "Weapon/BsWeaponBase.h"
 
 // Sets default values for this component's properties
@@ -27,6 +25,7 @@ void UBsWeaponAudioComponent::BindEvents()
 	WeaponOwner->OnWeaponCaught.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponCaught);
 	WeaponOwner->OnWeaponBlock.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponBlock);
 	WeaponOwner->OnWeaponThrow.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponThrow);
+	WeaponOwner->OnWeaponThrowEnd.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponThrowEnd);
 	WeaponOwner->OnWeaponEquip.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponEquip);
 	WeaponOwner->OnWeaponModeChanged.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponModeChanged);
 	WeaponOwner->OnWeaponFire.AddUObject(this, &UBsWeaponAudioComponent::OnWeaponFire);
@@ -55,6 +54,7 @@ void UBsWeaponAudioComponent::UnbindEvents()
 
 void UBsWeaponAudioComponent::OnWeaponCaught()
 {
+	OnWeaponThrowEnd();
 	PlaySound(WeaponAudioData.WeaponCaughtSound);
 }
 
@@ -70,7 +70,25 @@ void UBsWeaponAudioComponent::OnWeaponBlock()
 
 void UBsWeaponAudioComponent::OnWeaponThrow()
 {
-	PlaySound(WeaponAudioData.WeaponThrowSound);
+	if (!WeaponAudioData.WeaponThrowAudioComponent)
+	{
+		WeaponAudioData.WeaponThrowAudioComponent = PlaySound(WeaponAudioData.WeaponThrowSound);
+	}
+
+	if (WeaponAudioData.WeaponThrowAudioComponent && !WeaponAudioData.WeaponThrowAudioComponent->IsPlaying())
+	{
+		WeaponAudioData.WeaponThrowAudioComponent->Play();
+	}
+}
+
+void UBsWeaponAudioComponent::OnWeaponThrowEnd()
+{
+	if (WeaponAudioData.WeaponThrowAudioComponent)
+	{
+		WeaponAudioData.WeaponThrowAudioComponent->Stop();
+		WeaponAudioData.WeaponThrowAudioComponent->DestroyComponent();
+		WeaponAudioData.WeaponThrowAudioComponent = nullptr;
+	}
 }
 
 void UBsWeaponAudioComponent::OnWeaponEquip()

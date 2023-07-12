@@ -10,6 +10,7 @@ class UBsBleedDamageType;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsHealthComponentEvent);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsHealthComponentExplosionEvent, FVector LaunchVector);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsHealthComponentDamagedByEvent, AActor* DamagedBy);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsHealthComponentHealthChangedEvent, float Damage);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class BOOMERSHOOTER_API UBsHealthComponent : public UActorComponent
@@ -35,7 +36,9 @@ public:
 	FBsHealthComponentEvent OnDecapitated;
 
 	UPROPERTY(BlueprintAssignable)
-	FBsHealthComponentEvent OnTookDamage;
+	FBsHealthComponentEvent OnTookDamageEvent;
+	FBsHealthComponentHealthChangedEvent OnTookDamage;
+	FBsHealthComponentHealthChangedEvent OnHealedDamage;
 
 	UPROPERTY(BlueprintAssignable)
 	FBsHealthComponentEvent OnHealthChanged;

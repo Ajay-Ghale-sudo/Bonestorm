@@ -246,6 +246,7 @@ void ABsScythe::RangeAttack()
 		{
 			Projectile->SetOwner(GetOwner());
 			Projectile->SetInstigator(GetInstigator());
+			OnCreateProjectileEvent.Broadcast(Projectile);
 			PlayMontage(RangedAttackMontage);
 			OnRangedAttack();
 			OnWeaponFire.Broadcast();

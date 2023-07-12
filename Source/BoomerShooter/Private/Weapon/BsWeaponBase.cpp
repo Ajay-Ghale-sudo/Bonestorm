@@ -39,7 +39,6 @@ void ABsWeaponBase::PlayMontage(UAnimMontage* MontageToPlay) const
 	if (UAnimInstance* AnimInstance = WeaponMesh->GetAnimInstance())
 	{
 		AnimInstance->Montage_Play(MontageToPlay);
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, TEXT("Creating montage"));
 	}
 }
 

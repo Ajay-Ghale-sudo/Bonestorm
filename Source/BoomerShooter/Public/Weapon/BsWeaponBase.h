@@ -12,6 +12,7 @@ class ABsSeveredHeadBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsWeaponBaseHealEvent, float, Healing);
 DECLARE_MULTICAST_DELEGATE(FBsWeaponBaseEvent);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsWeaponHeadEvent, ABsSeveredHeadBase*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsWeaponDamageEvent, AActor*);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsWeaponBase : public AActor
@@ -75,6 +76,8 @@ public:
 	FBsWeaponBaseEvent OnWeaponHit;
 	FBsWeaponBaseEvent OnWeaponHeal;
 	FBsWeaponBaseEvent OnWeaponHeadConsumed;
+
+	FBsWeaponDamageEvent OnWeaponDamageActor;
 	
 	FBsWeaponBaseHealEvent OnHeal;
 

@@ -73,7 +73,9 @@ struct FBsScytheBlockConfig
 	bool bParrying = false;
 };
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheBlockEvent, float Damage)
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheBlockEvent, float Damage);
+DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheCreateProjectileEvent, ABsProjectileBase* Projectile);
+
 /**
  * 
  */
@@ -87,7 +89,7 @@ public:
 	
 	virtual void Fire() override;
 	virtual void SecondaryFire() override;
-	
+
 	void RangeAttack();
 	void MeleeAttack();
 	void SecondaryAttack();
@@ -133,6 +135,8 @@ public:
 public:
 	FBsScytheBlockEvent OnScytheParryEvent;
 	FBsScytheBlockEvent OnScytheBlockEvent;
+
+	FBsScytheCreateProjectileEvent OnCreateProjectileEvent;
 
 protected:
 	virtual void BeginPlay() override;

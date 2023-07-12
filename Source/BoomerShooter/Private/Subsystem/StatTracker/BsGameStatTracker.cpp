@@ -15,11 +15,6 @@ void UBsGameStatTracker::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 }
 
-void UBsGameStatTracker::OnPostWorldInitialization(UWorld* World, const UWorld::InitializationValues IVS)
-{
-	// StartTrackingPlayer();
-}
-
 void UBsGameStatTracker::IncrementStat(EBsPlayerStats Stat)
 {
 	if (Stat == Unknown || Stat == Max)
@@ -90,21 +85,41 @@ void UBsGameStatTracker::StartTrackingPlayer()
 		}
 	}
 
-	PlayerCharacter->OnDash.AddUFunction(this, IncrementStatFunctionName, Dashes);
-	PlayerCharacter->OnSlideStart.AddUFunction(this, IncrementStatFunctionName, Slides);
-	PlayerCharacter->OnWeaponChanged.AddUObject(this, &UBsGameStatTracker::BindToWeapon);
-	PlayerCharacter->OnJump.AddUFunction(this, IncrementStatFunctionName, Jumps);
-	PlayerCharacter->OnSlideJump.AddUFunction(this, IncrementStatFunctionName, SlideJumps);
-	PlayerCharacter->OnDashJump.AddUFunction(this, IncrementStatFunctionName, DashJumps);
+	CharacterHandles.Add(PlayerCharacter->OnDash.AddUFunction(this, IncrementStatFunctionName, Dashes));
+	CharacterHandles.Add(PlayerCharacter->OnSlideStart.AddUFunction(this, IncrementStatFunctionName, Slides));
+	CharacterHandles.Add(PlayerCharacter->OnWeaponChanged.AddUObject(this, &UBsGameStatTracker::BindToWeapon));
+	CharacterHandles.Add(PlayerCharacter->OnJump.AddUFunction(this, IncrementStatFunctionName, Jumps));
+	CharacterHandles.Add(PlayerCharacter->OnSlideJump.AddUFunction(this, IncrementStatFunctionName, SlideJumps));
+	CharacterHandles.Add(PlayerCharacter->OnDashJump.AddUFunction(this, IncrementStatFunctionName, DashJumps));
 
 	if (UBsHealthComponent* HealthComponent = PlayerCharacter->GetHealthComponent())
 	{
 		HealthComponent->OnDeath.AddDynamic(this, &UBsGameStatTracker::IncrementDeaths);
-		HealthComponent->OnTookDamage.AddUObject(this, &UBsGameStatTracker::AddToDamageTaken);
-		HealthComponent->OnHealedDamage.AddUObject(this, &UBsGameStatTracker::AddToHealthRestored);
+		DynamicHandles.Add(HealthComponent->OnDeath);
+		CharacterHandles.Add(HealthComponent->OnTookDamage.AddUObject(this, &UBsGameStatTracker::AddToDamageTaken));
+		CharacterHandles.Add(HealthComponent->OnHealedDamage.AddUObject(this, &UBsGameStatTracker::AddToHealthRestored));
 	}
 }
 
 void UBsGameStatTracker::StopTrackingPlayer()
 {
+	for (auto& Handle : CharacterHandles)
+	{
+		Handle.Reset();
+	}
+	CharacterHandles.Empty();
+	
+	for (auto& Handle : DynamicHandles)
+	{
+		Handle.Clear();
+	}
+	DynamicHandles.Empty();
+
+	for (auto& Handle : WeaponHandles)
+	{
+		Handle.Reset();
+	}
+	WeaponHandles.Empty();
+
+	PlayerCharacter.Reset();
 }

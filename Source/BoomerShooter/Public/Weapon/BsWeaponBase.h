@@ -69,6 +69,7 @@ public:
 	FBsWeaponBaseEvent OnWeaponParry;
 	FBsWeaponBaseEvent OnWeaponBlock;
 	FBsWeaponBaseEvent OnWeaponThrow;
+	FBsWeaponBaseEvent OnWeaponThrowEnd;
 	FBsWeaponBaseEvent OnWeaponEquip;
 	FBsWeaponBaseEvent OnWeaponModeChanged;
 	FBsWeaponBaseEvent OnWeaponFire;

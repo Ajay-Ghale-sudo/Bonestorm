@@ -76,7 +76,8 @@ void ABsScythe::ThrowTick(float DeltaTime)
 			bThrown = false;
 			bReturningToOwner = false;
 			OnWeaponCaught.Broadcast();
-			SectionJump(ThrowMontage, FName("End"));
+			ClearMontage(ThrowMontage);
+			OnWeaponThrowEnd.Broadcast();
 			bCanAttack = true;
 			return;			
 		}
@@ -334,6 +335,7 @@ void ABsScythe::Throw()
 {
 	Super::Throw();
 
+	
 	PlayMontage(ThrowMontage);
 	
 	if (bThrown)
@@ -383,7 +385,6 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (OtherActor == GetOwner())
 		{
-			SectionJump(ThrowMontage, FName("End"));
 			return;
 		}
 		
@@ -392,7 +393,8 @@ void ABsScythe::OnScytheOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			AttachToComponent(GrapplePointComponent, FAttachmentTransformRules::KeepWorldTransform);
 			bAttachedToGrapplePoint = true;
 			GrappleHookComponent->AttachToGrapplePoint(GrapplePointComponent);
-			SectionJump(ThrowMontage, FName("End"));
+			ClearMontage(ThrowMontage);
+			OnWeaponThrowEnd.Broadcast();
 
 			return;
 		}

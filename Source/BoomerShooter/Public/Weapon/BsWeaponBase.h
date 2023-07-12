@@ -101,6 +101,12 @@ protected:
 	void ClearMontage(const UAnimMontage* MontageToClear = nullptr) const;
 
 	/**
+	 * @brief Jumps to Montage Section on the weapon.
+	 *
+	 */
+	void SectionJump(const UAnimMontage* Montage, FName SectionName);
+
+	/**
 	 * @brief Get if the Weapon can attack.
 	 * @return Returns True if the Weapon can attack.
 	 */

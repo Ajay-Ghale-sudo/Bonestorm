@@ -33,7 +33,7 @@ void UBsHealthComponent::ApplyDamage(float Damage, const UDamageType* DamageType
 	const float ActualDamage = Damage * DamageModifier;
 	OnTookDamage.Broadcast(ActualDamage);
 	CurrentHealth = FMath::Clamp(CurrentHealth - ActualDamage, 0.f, MaxHealth);
-	float HealthPercentage = UKismetMathLibrary::SafeDivide(CurrentHealth, MaxHealth);
+
 	if (CurrentHealth <= 0.f)
 	{
 		if (DamageType && DamageType->IsA(UBsDecapitateDamageType::StaticClass()))
@@ -45,7 +45,7 @@ void UBsHealthComponent::ApplyDamage(float Damage, const UDamageType* DamageType
 		BleedTimerHandle.Invalidate();
 		CurrentBleedDamageType = nullptr;
 	}
-	else if (HealthPercentage < LowHealthThreshold)
+	else if (IsLowHealth())
 	{
 		OnLowHealth.Broadcast();
 	}

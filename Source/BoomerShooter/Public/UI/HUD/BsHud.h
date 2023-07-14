@@ -4,6 +4,7 @@
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
+class UBsLowHealthIndicatorWidget;
 class ABsSeveredHeadBase;
 class UBsSeveredHeadWidget;
 class ABsWeaponBase;
@@ -112,6 +113,12 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
 	UBsSeveredHeadWidget* SeveredHeadWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsLowHealthIndicatorWidget"))
+	TSubclassOf<UBsLowHealthIndicatorWidget> LowHealthIndicatorWidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "HUD")
+	UBsLowHealthIndicatorWidget* LowHealthIndicatorWidget;
 
 	FDelegateHandle OnWeaponChangedHandle;
 };

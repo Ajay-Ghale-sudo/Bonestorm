@@ -12,6 +12,7 @@
 #include "UI/Widget/BsHealthAmountWidget.h"
 #include "UI/Widget/BsSeveredHeadWidget.h"
 #include "UI/Widget/Indicator/BsDamageIndicatorWidget.h"
+#include "UI/Widget/Indicator/BsLowHealthIndicatorWidget.h"
 #include "UI/Widget/Menu/BsStartMenuWidget.h"
 #include "UI/Widget/Notification/BsNotificationWidget.h"
 #include "Weapon/BsWeaponBase.h"
@@ -91,6 +92,11 @@ void ABsHud::AddPlayerWidgetsToViewport()
 	{
 		DamageIndicatorWidget->AddToViewport();
 	}
+
+	if (LowHealthIndicatorWidget)
+	{
+		LowHealthIndicatorWidget->AddToViewport(-1);
+	}
 }
 
 void ABsHud::ShowStartMenu(bool bShow)
@@ -122,6 +128,11 @@ void ABsHud::ShowPlayerWidgets(bool bShow)
 	if (DamageIndicatorWidget)
 	{
 		DamageIndicatorWidget->SetVisibility(Visibility);
+	}
+
+	if (LowHealthIndicatorWidget)
+	{
+		LowHealthIndicatorWidget->SetVisibility(Visibility);
 	}
 }
 
@@ -182,6 +193,11 @@ void ABsHud::InitWidgets()
 	if (SeveredHeadWidgetClass)
 	{
 		SeveredHeadWidget = CreateWidget<UBsSeveredHeadWidget>(GetWorld(), SeveredHeadWidgetClass);
+	}
+
+	if (LowHealthIndicatorWidgetClass)
+	{
+		LowHealthIndicatorWidget = CreateWidget<UBsLowHealthIndicatorWidget>(GetWorld(), LowHealthIndicatorWidgetClass);
 	}
 }
 

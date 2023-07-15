@@ -91,6 +91,10 @@ public:
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE AActor* GetLastDamagedBy() const { return LastDamagedBy.Get(); }
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE float GetHealthPercentage() const { return (MaxHealth != 0.f ? CurrentHealth / MaxHealth : 0.f); }
+
+	UFUNCTION(BlueprintCallable)
 	FORCEINLINE bool IsLowHealth() const { return  GetHealthPercentage() < LowHealthThreshold; }
 };

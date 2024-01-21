@@ -231,8 +231,11 @@ void ABsCharacter::Jump()
 		
 		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow)
 		{
-			DashConfig.DepleteJumpDash();
-			OnDashJump.Broadcast();
+			if (DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0)
+			{
+				DashConfig.DepleteJumpDash();
+				OnDashJump.Broadcast();
+			}
 		}
 		else
 		{

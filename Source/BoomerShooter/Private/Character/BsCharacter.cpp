@@ -94,6 +94,9 @@ void ABsCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	SlideTick(DeltaTime);
 	DashTick(DeltaTime);
+
+	// TODO: We should move this to a timer. Not good to be putting everything into tick.
+	ApplyWeaponSway(DeltaTime);
 }
 
 // Called to bind functionality to input
@@ -193,11 +196,10 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		Rotation.Pitch = 0.f;
 		const FVector FacingDirection = Rotation.GetNormalized().Vector();
 
-		float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
+		const float MovementScale = SlideConfig.bSliding ? 0.3f : 1.f;
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
-
 		if (CameraComponent)
 		{
 			CameraComponent->AddToRoll(MovementVector.X);
@@ -475,6 +477,30 @@ void ABsCharacter::NextWeaponMode()
 	}
 }
 
+void ABsCharacter::ApplyWeaponSway(const float DeltaTime)
+{
+	const UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
+	if (CharacterMovementComponent && WeaponSpringArmComponent && Weapon)
+	{
+		const float SwayAmount = CharacterMovementComponent->GetLastInputVector().X;
+		const FVector WeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
+		if (FMath::IsNearlyZero(SwayAmount) && !FMath::IsNearlyEqual(WeaponLocation.Y, MovementConfig.InitialWeaponLocation.Y))
+		{
+			// Lerp back to initial location
+			MovementConfig.CurrentWeaponSwayAmount = FMath::FInterpTo(MovementConfig.CurrentWeaponSwayAmount, 0.f, DeltaTime, MovementConfig.WeaponSwaySpeed);
+		}
+
+		
+		if (FMath::Abs(MovementConfig.CurrentWeaponSwayAmount + SwayAmount) <  MovementConfig.MaxWeaponSwayAmount)
+		{
+			MovementConfig.CurrentWeaponSwayAmount += SwayAmount;
+		}
+		const FVector DesiredLocation = MovementConfig.InitialWeaponLocation + FVector(0.f, MovementConfig.CurrentWeaponSwayAmount, 0.f);
+		const FVector NewLocation = FMath::VInterpTo(WeaponLocation, DesiredLocation, DeltaTime, MovementConfig.WeaponSwaySpeed);
+		WeaponSpringArmComponent->SetRelativeLocation(NewLocation);
+	}
+}
+
 void ABsCharacter::DetachHead()
 {
 	if (Weapon)
@@ -739,5 +765,6 @@ void ABsCharacter::GrabCurrentWeapon()
 		Weapon->SetActorRelativeRotation(FRotator(0.f, 180.f, 0.f));
 		Weapon->SetActorRelativeLocation(FVector::ZeroVector);
 		Weapon->Equip();
+		MovementConfig.InitialWeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
 	}
 }

@@ -207,6 +207,13 @@ protected:
 	void NextWeaponMode();
 
 	/**
+	 * @brief Moves the spring arm that the weapon is attached to.
+	 *  Meant to be used when the character is strafing.
+	 * @param DeltaTime The time passed since the last frame.
+	 */
+	void ApplyWeaponSway(const float DeltaTime);
+
+	/**
 	 * @brief Detach head from weapon
 	 */
 	void DetachHead();
@@ -328,7 +335,7 @@ protected:
 	 * @brief Currently Equipped Weapon.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
-	ABsWeaponBase* Weapon;
+	TObjectPtr<ABsWeaponBase> Weapon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory|Weapon")
 	USpringArmComponent* WeaponSpringArmComponent;

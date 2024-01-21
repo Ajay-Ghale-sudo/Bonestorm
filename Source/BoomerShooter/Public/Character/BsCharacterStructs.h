@@ -282,6 +282,30 @@ struct FBsMovementConfig
 	 * @brief Timer handle used for controlling coyote time.
 	 */
 	FTimerHandle CoyoteTimeHandle;
+
+	/**
+	 * @brief The current amount of weapon sway.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float CurrentWeaponSwayAmount = 0.f;
+	
+	/**
+	 * @brief How much the weapon should sway when moving.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float MaxWeaponSwayAmount = 3.f;
+
+	/**
+	 * @brief How fast the weapon should sway when moving.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float WeaponSwaySpeed = 15.f;
+
+	/**
+	 * @brief The initial location of the weapon. Used to offset the weapon sway.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	FVector InitialWeaponLocation = FVector::ZeroVector;
 };
 
 // A structure to hold the configuration for the hit stop mechanic.

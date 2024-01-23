@@ -31,24 +31,7 @@ void UBsCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 	
 	CurrentRollAmount = FMath::FInterpTo(CurrentRollAmount, Target, DeltaTime, Speed);
-}
-
-void UBsCameraComponent::GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView)
-{
-	Super::GetCameraView(DeltaTime, DesiredView);
-
-	// Override the Controller roll to match the player's lean
-	const APawn* OwningPawn = Cast<APawn>(GetOwner());
-	const AController* OwningController = OwningPawn ? OwningPawn->GetController() : nullptr;
-	if (OwningController && OwningController->IsLocalPlayerController())
-	{
-		FRotator PawnViewRotation = OwningPawn->GetViewRotation();
-		PawnViewRotation.Roll = CurrentRollAmount;
-		if (!PawnViewRotation.Equals(GetComponentRotation()))
-		{
-			SetWorldRotation(PawnViewRotation);
-		}
-	}
+	SetRelativeRotation(FRotator(0.f, 0.f, CurrentRollAmount));
 }
 
 void UBsCameraComponent::AddToRoll(float Amount)

@@ -286,6 +286,12 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement")
 	FBsMovementConfig MovementConfig;
+
+	/**
+	 * @brief Weapon sway configuration.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon Sway")
+	FBsWeaponSwayConfig WeaponSwayConfig;
 	
 	/**
 	 * @brief The dash configuration for the Character.
@@ -309,6 +315,12 @@ protected:
 	 * @brief Hit Stop configuration for the Character.
 	 */
 	FBsHitStopConfig HitStopConfig;
+
+	/**
+	 * @brief Camera Arm of the Character's perspective camera.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
+	USpringArmComponent* CameraArmComponent;
 	
 	/**
 	 * @brief The Camera Component of the Character.

@@ -18,6 +18,7 @@ public class BoomerShooter : ModuleRules
 			"SlateCore",
 			"Niagara",
 			"PhysicsCore",
+			"GameplayTags"
 			
 		});
 

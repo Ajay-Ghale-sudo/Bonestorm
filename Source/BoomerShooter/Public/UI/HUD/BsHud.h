@@ -1,6 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
+#include "GameplayTagContainer.h"
 #include "GameFramework/HUD.h"
 #include "BsHud.generated.h"
 
@@ -16,6 +17,19 @@ class UBsDashAmountWidget;
 class UBsHealthAmountWidget;
 class ABsCharacter;
 class UUserWidget;
+
+
+USTRUCT(BlueprintType)
+struct FBsGameplayWidgetConfig
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<UUserWidget> WidgetClass;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "UI")
+	TObjectPtr<UUserWidget> WidgetInstance;	
+};
 
 UCLASS()
 class BOOMERSHOOTER_API ABsHud : public AHUD
@@ -71,9 +85,30 @@ protected:
 	UFUNCTION()
 	void OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead);
 
+	/**
+	 * @brief Called when a UI event is triggered
+	 * @param EventTag A tag that identifies the event
+	 */
+	UFUNCTION()
+	void OnUIEventTriggered(const FGameplayTag& EventTag);
+
+
+	/**
+	 * @brief Called when a UI event is ended
+	 * @param EventTag A tag that identifies the event
+	 */
+	UFUNCTION()
+	void OnUIEventEnded(const FGameplayTag& EventTag);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "HUD")
 	ABsCharacter* PlayerCharacter;
+
+	/**
+	 * @brief Map of GameplayTags to Widget configurations.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD")
+	TMap<FGameplayTag, FBsGameplayWidgetConfig> UIMessageWidgetMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "HUD", meta = (AllowedClasses = "BsDashAmountWidget"))
 	TSubclassOf<UUserWidget> DashAmountWidgetClass;

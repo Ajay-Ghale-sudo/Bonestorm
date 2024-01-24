@@ -7,6 +7,7 @@
 #include "Character/BsCharacter.h"
 #include "Component/BsHealthComponent.h"
 #include "Controller/BsPlayerController.h"
+#include "Subsystem/UI/BsUISubsystem.h"
 #include "UI/Widget/BsCrosshairWidget.h"
 #include "UI/Widget/BsDashAmountWidget.h"
 #include "UI/Widget/BsHealthAmountWidget.h"
@@ -47,6 +48,12 @@ void ABsHud::BeginPlay()
 	InitWidgets();
 	AddPlayerWidgetsToViewport();
 	ShowPlayerWidgets(true);
+
+	if (UBsUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UBsUISubsystem>())
+	{
+		UISubsystem->OnUIEventTriggered.AddUObject(this, &ABsHud::OnUIEventTriggered);
+		UISubsystem->OnUIEventEnded.AddUObject(this, &ABsHud::OnUIEventEnded);
+	}
 }
 
 void ABsHud::OnPause()
@@ -239,5 +246,31 @@ void ABsHud::OnWeaponHeadAttached(ABsSeveredHeadBase* SeveredHead)
 		SeveredHeadWidget->SetSeveredHead(SeveredHead);
 		SeveredHeadWidget->AddToViewport();
 		SeveredHeadWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void ABsHud::OnUIEventTriggered(const FGameplayTag& EventTag)
+{
+	if (UIMessageWidgetMap.Contains(EventTag))
+	{
+		auto& [WidgetClass, WidgetInstance] = UIMessageWidgetMap[EventTag];
+		WidgetInstance = WidgetInstance ? WidgetInstance : CreateWidget(GetWorld(), WidgetClass);
+		if (WidgetInstance) 
+		{
+			WidgetInstance->AddToViewport();
+		}
+		
+	}
+}
+
+void ABsHud::OnUIEventEnded(const FGameplayTag& EventTag)
+{
+	if (UIMessageWidgetMap.Contains(EventTag))
+	{
+		if (auto& [WidgetClass, WidgetInstance] = UIMessageWidgetMap[EventTag]; WidgetInstance)
+		{
+			WidgetInstance->RemoveFromParent();
+			WidgetInstance = nullptr;
+		}
 	}
 }

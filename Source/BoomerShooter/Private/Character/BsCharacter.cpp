@@ -236,18 +236,10 @@ void ABsCharacter::Jump()
 
 	if (DashConfig.bDashing)
 	{
-		
-		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow)
+		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow && DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0 && JumpCurrentCount < JumpMaxCount)
 		{
-			if (DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0 && JumpCurrentCount < JumpMaxCount)
-			{
-				DashConfig.DepleteJumpDash();
-				OnDashJump.Broadcast();
-			}
-			else
-			{
-				return;
-			}
+			DashConfig.DepleteJumpDash();
+			OnDashJump.Broadcast();
 		}
 		else
 		{

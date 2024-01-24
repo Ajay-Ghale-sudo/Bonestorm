@@ -79,6 +79,10 @@ void ABsCharacter::BeginPlay()
 	{
 		SlideConfig.PreSlideGroundFriction = CharMovement->GroundFriction;
 	}
+	if (CameraComponent)
+	{
+		HeadBobConfig.InitialRelativeLocation = CameraComponent->GetRelativeLocation();
+	}
 }
 
 float ABsCharacter::TakeDamage(float Damage, FDamageEvent const& DamageEvent, AController* EventInstigator,
@@ -206,7 +210,6 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
-		
 		if (CameraComponent)
 		{
 			CameraComponent->AddToRoll(MovementVector.X);
@@ -514,6 +517,11 @@ void ABsCharacter::ApplyWeaponSway(const float DeltaTime)
 	}
 }
 
+void ABsCharacter::ApplyHeadBob_Implementation()
+{
+	
+}
+
 void ABsCharacter::DetachHead()
 {
 	if (Weapon)
@@ -780,5 +788,14 @@ void ABsCharacter::GrabCurrentWeapon()
 		Weapon->Equip();
 		WeaponSwayConfig.InitialWeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
 		WeaponSwayConfig.InitialWeaponRotation = WeaponSpringArmComponent->GetRelativeRotation();
+	}
+}
+
+void ABsCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	if (HeadBobConfig.MinimumVelocityThreshold < FMath::Abs(GetVelocity().Z))
+	{
+		ApplyHeadBob();
 	}
 }

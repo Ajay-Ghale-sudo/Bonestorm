@@ -430,3 +430,24 @@ struct FBsHitStopConfig
 	
 	FTimerHandle HitStopTimerHandle;
 };
+
+USTRUCT(BlueprintType)
+struct FBsHeadBobConfig
+{
+	GENERATED_BODY()
+	/**
+	 * @brief Initial relative location of the camera to headbob from (set on Begin Play)
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement|Head Bob")
+	FVector InitialRelativeLocation;
+	/**
+	 * @brief Maximum amount of head bob that can be applied
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Head Bob")
+	float MaxHeadBobAmount = -55.0f;
+
+	/**
+	 * @brief Minimum velocity required to trigger head bob upon falling
+	 */
+	float MinimumVelocityThreshold = 450.f;
+};

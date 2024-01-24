@@ -267,6 +267,16 @@ struct FBsMovementConfig
 	GENERATED_BODY()
 
 	/**
+	 * @brief LastMovementVector of the Character. Based off input action not relative direction. (I.E Keyboard WASD)
+	 */
+	FVector2D LastMovementVector = FVector2D::ZeroVector;
+
+	/**
+	 * @brief Last Look input vector of the Character. Based off input action not relative rotation. (I.E Mouse movement)
+	 */
+	FVector2D LastLookVector = FVector2D::ZeroVector;
+	
+	/**
 	 * @brief If the character has recently walked off a ledge.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Jump")
@@ -282,6 +292,15 @@ struct FBsMovementConfig
 	 * @brief Timer handle used for controlling coyote time.
 	 */
 	FTimerHandle CoyoteTimeHandle;
+};
+
+/**
+ * @brief This struct is used to represent the weapon sway configuration.
+ */
+USTRUCT(BlueprintType)
+struct FBsWeaponSwayConfig
+{
+	GENERATED_BODY()
 
 	/**
 	 * @brief The current amount of weapon sway.
@@ -290,22 +309,105 @@ struct FBsMovementConfig
 	float CurrentWeaponSwayAmount = 0.f;
 	
 	/**
-	 * @brief How much the weapon should sway when moving.
+	 * @brief How much the weapon should sway horizontally when moving.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
-	float MaxWeaponSwayAmount = 3.f;
+	float MaxHorizontalWeaponSwayAmount = 3.f;
+
+	/**
+	 * @brief How much the weapon should sway vertically when moving.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float MaxVerticalWeaponSwayAmount = 1.5f;
+
+	/**
+	 * @brief Max amount of roll sway.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float MaxRollWeaponSwayAmount = 15.f;
+
+	/**
+	 * @brief Max amount of pitch sway.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float MaxPitchWeaponSwayAmount = 15.f;
 
 	/**
 	 * @brief How fast the weapon should sway when moving.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
-	float WeaponSwaySpeed = 15.f;
+	float WeaponMoveSwaySpeed = 15.f;
+
+	/**
+	 * @brief How fast the weapon should sway when Looking/Turning
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	float WeaponLookSwaySpeed = 5.f;
 
 	/**
 	 * @brief The initial location of the weapon. Used to offset the weapon sway.
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
 	FVector InitialWeaponLocation = FVector::ZeroVector;
+
+	/**
+	 * @brief The initial rotation of the weapon. Used to offset the weapon sway.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Weapon")
+	FRotator InitialWeaponRotation = FRotator::ZeroRotator;
+
+	/**
+	 * @brief Calculate the vertical sway amount.
+	 * @param DeltaTime The time since last frame
+	 * @param CurrentAmount The current value of the sway amount
+	 * @param AmountToAdd The amount to add to the sway amount
+	 * @return The new sway amount
+	 */
+	FORCEINLINE float CalculateVerticalSwayAmount(const float DeltaTime, const float CurrentAmount, const float AmountToAdd) const
+	{
+		return CalculateSwayAmount(DeltaTime, CurrentAmount, AmountToAdd, MaxPitchWeaponSwayAmount, InitialWeaponRotation.Pitch, WeaponLookSwaySpeed);
+	}
+
+	/**
+	 * @brief Calculate the horizontal sway amount.
+	 * @param DeltaTime The time since last frame
+	 * @param CurrentAmount The current value of the sway amount
+	 * @param AmountToAdd The amount to add to the sway amount
+	 * @return The new sway amount
+	 */
+	FORCEINLINE float CalculateHorizontalSwayAmount(const float DeltaTime, const float CurrentAmount, const float AmountToAdd) const
+	{
+		return CalculateSwayAmount(DeltaTime, CurrentAmount, AmountToAdd, MaxRollWeaponSwayAmount, InitialWeaponRotation.Roll, WeaponLookSwaySpeed);
+	}
+
+	/**
+	 * @brief Calculate the sway amount based on the current amount, amount to add, max amount, initial amount and speed.
+	 * @param DeltaTime The time since last frame
+	 * @param CurrentAmount The current amount of sway
+	 * @param AmountToAdd The amount to add to the sway
+	 * @param MaxAmount The max amount of sway
+	 * @param InitialAmount The initial amount of sway, typically the starting position.
+	 * @param Speed The speed of the sway
+	 * @return The new sway amount
+	 */
+	FORCEINLINE float CalculateSwayAmount(const float DeltaTime, const float CurrentAmount, const float AmountToAdd, const float MaxAmount, const float InitialAmount, const float Speed) const
+	{
+		float NewAmount;
+		if (FMath::IsNearlyZero(AmountToAdd) && !FMath::IsNearlyEqual(CurrentAmount, InitialAmount))
+		{
+			// Lerp back to initial rotation
+			NewAmount = InitialAmount;
+		} else
+		{
+			NewAmount =  FMath::Clamp(
+				CurrentAmount + AmountToAdd,
+				InitialAmount - MaxAmount,
+				InitialAmount + MaxAmount
+			);
+		}
+
+		return FMath::FInterpTo(CurrentAmount, NewAmount, DeltaTime, Speed);
+	}
 };
 
 // A structure to hold the configuration for the hit stop mechanic.

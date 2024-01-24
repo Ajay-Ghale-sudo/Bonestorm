@@ -25,10 +25,13 @@ ABsCharacter::ABsCharacter()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	
+	CameraArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
+	CameraArmComponent->SetupAttachment(GetCapsuleComponent());
+	CameraArmComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
+	
 	CameraComponent = CreateDefaultSubobject<UBsCameraComponent>(TEXT("Camera"));
-	CameraComponent->SetupAttachment(GetCapsuleComponent());
-	CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 50.f));
-	CameraComponent->bUsePawnControlRotation = false;
+	CameraComponent->SetupAttachment(CameraArmComponent);
 
 	WeaponSpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("WeaponSpringArm"));
 	WeaponSpringArmComponent->SetupAttachment(CameraComponent);
@@ -97,6 +100,8 @@ void ABsCharacter::Tick(float DeltaTime)
 
 	// TODO: We should move this to a timer. Not good to be putting everything into tick.
 	ApplyWeaponSway(DeltaTime);
+	MovementConfig.LastMovementVector = FVector2D::Zero();
+	MovementConfig.LastLookVector = FVector2D::Zero();
 }
 
 // Called to bind functionality to input
@@ -190,6 +195,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 void ABsCharacter::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementVector = Value.Get<FVector2D>();
+	MovementConfig.LastMovementVector = MovementVector;
 	if (Controller)
 	{
 		FRotator Rotation = GetActorRotation();
@@ -200,6 +206,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 		
 		AddMovementInput(FacingDirection, MovementVector.Y * MovementScale);
 		AddMovementInput(GetActorRightVector(), MovementVector.X * MovementScale);
+		
 		if (CameraComponent)
 		{
 			CameraComponent->AddToRoll(MovementVector.X);
@@ -210,6 +217,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 void ABsCharacter::Look(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
+	MovementConfig.LastLookVector = LookAxisVector;
 
 	if (Controller)
 	{
@@ -434,7 +442,6 @@ void ABsCharacter::PullGrapple(FVector Vector)
 	}
 }
 
-
 void ABsCharacter::Attack()
 {
 	if (Weapon)
@@ -482,25 +489,28 @@ void ABsCharacter::NextWeaponMode()
 
 void ABsCharacter::ApplyWeaponSway(const float DeltaTime)
 {
-	const UCharacterMovementComponent* CharacterMovementComponent = GetCharacterMovement();
-	if (CharacterMovementComponent && WeaponSpringArmComponent && Weapon)
+	if (WeaponSpringArmComponent && Weapon)
 	{
-		const float SwayAmount = CharacterMovementComponent->GetLastInputVector().X;
+		// Movement sway
+		const float HorizontalSwayAmount = MovementConfig.LastMovementVector.X;
 		const FVector WeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
-		if (FMath::IsNearlyZero(SwayAmount) && !FMath::IsNearlyEqual(WeaponLocation.Y, MovementConfig.InitialWeaponLocation.Y))
-		{
-			// Lerp back to initial location
-			MovementConfig.CurrentWeaponSwayAmount = FMath::FInterpTo(MovementConfig.CurrentWeaponSwayAmount, 0.f, DeltaTime, MovementConfig.WeaponSwaySpeed);
-		}
+		WeaponSwayConfig.CurrentWeaponSwayAmount = WeaponSwayConfig.CalculateSwayAmount(DeltaTime,
+			WeaponLocation.Y, HorizontalSwayAmount,
+			WeaponSwayConfig.MaxHorizontalWeaponSwayAmount,
+			WeaponSwayConfig.InitialWeaponLocation.Y,
+			WeaponSwayConfig.WeaponMoveSwaySpeed
+		);
+		const FVector DesiredLocation = FVector(WeaponSwayConfig.InitialWeaponLocation.X, WeaponSwayConfig.CurrentWeaponSwayAmount, WeaponSwayConfig.InitialWeaponLocation.Z);
+		WeaponSpringArmComponent->SetRelativeLocation(DesiredLocation);
 
-		
-		if (FMath::Abs(MovementConfig.CurrentWeaponSwayAmount + SwayAmount) <  MovementConfig.MaxWeaponSwayAmount)
-		{
-			MovementConfig.CurrentWeaponSwayAmount += SwayAmount;
-		}
-		const FVector DesiredLocation = MovementConfig.InitialWeaponLocation + FVector(0.f, MovementConfig.CurrentWeaponSwayAmount, 0.f);
-		const FVector NewLocation = FMath::VInterpTo(WeaponLocation, DesiredLocation, DeltaTime, MovementConfig.WeaponSwaySpeed);
-		WeaponSpringArmComponent->SetRelativeLocation(NewLocation);
+		// Look sway
+		const float VerticalSwayAmount = MovementConfig.LastLookVector.Y;
+		const float RollSwayAmount = MovementConfig.LastLookVector.X;
+		FRotator WeaponRotation = WeaponSpringArmComponent->GetRelativeRotation();
+
+		WeaponRotation.Pitch = WeaponSwayConfig.CalculateHorizontalSwayAmount(DeltaTime, WeaponRotation.Pitch, VerticalSwayAmount);
+		WeaponRotation.Roll = WeaponSwayConfig.CalculateVerticalSwayAmount(DeltaTime, WeaponRotation.Roll, RollSwayAmount);
+		WeaponSpringArmComponent->SetRelativeRotation(WeaponRotation);		
 	}
 }
 
@@ -768,6 +778,7 @@ void ABsCharacter::GrabCurrentWeapon()
 		Weapon->SetActorRelativeRotation(FRotator(0.f, 180.f, 0.f));
 		Weapon->SetActorRelativeLocation(FVector::ZeroVector);
 		Weapon->Equip();
-		MovementConfig.InitialWeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
+		WeaponSwayConfig.InitialWeaponLocation = WeaponSpringArmComponent->GetRelativeLocation();
+		WeaponSwayConfig.InitialWeaponRotation = WeaponSpringArmComponent->GetRelativeRotation();
 	}
 }

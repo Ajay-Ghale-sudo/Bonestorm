@@ -17,8 +17,6 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType,
 							   FActorComponentTickFunction* ThisTickFunction) override;
 	
-	virtual void GetCameraView(float DeltaTime, FMinimalViewInfo& DesiredView) override;
-
 	/**
 	 * @brief Add roll to the Camera
 	 * @param Amount Amount of roll to add.

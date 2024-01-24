@@ -214,6 +214,12 @@ protected:
 	void ApplyWeaponSway(const float DeltaTime);
 
 	/**
+	 * @brief Apply head bob
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	void ApplyHeadBob();
+
+	/**
 	 * @brief Detach head from weapon
 	 */
 	void DetachHead();
@@ -273,6 +279,8 @@ protected:
 
 	UFUNCTION()
 	void GrabCurrentWeapon();
+
+	virtual void Landed(const FHitResult& Hit) override;
 	
 protected:
 	/**
@@ -292,6 +300,12 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon Sway")
 	FBsWeaponSwayConfig WeaponSwayConfig;
+
+	/**
+	 * @brief Head bob configuration.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Weapon Sway")
+	FBsHeadBobConfig HeadBobConfig;
 	
 	/**
 	 * @brief The dash configuration for the Character.

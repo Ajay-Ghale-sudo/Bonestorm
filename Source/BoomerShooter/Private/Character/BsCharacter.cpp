@@ -239,19 +239,14 @@ void ABsCharacter::Jump()
 
 	if (DashConfig.bDashing)
 	{
-		
-		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow)
+		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow && DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0 && JumpCurrentCount < JumpMaxCount)
 		{
-			if (DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0)
-			{
-				DashConfig.DepleteJumpDash();
-				OnDashJump.Broadcast();
-			}
+			DashConfig.DepleteJumpDash();
+			OnDashJump.Broadcast();
 		}
 		else
 		{
-			// Early call to finish dashing to apply previous velocity and prevent a DashJump.
-			FinishDashing();
+			return;
 		}
 		StopDashing();
 	}
@@ -264,7 +259,6 @@ void ABsCharacter::Jump()
 		--JumpCurrentCount;
 		MovementConfig.bInCoyoteTime = false;
 	}
-	
 	Super::Jump();
 }
 
@@ -341,7 +335,9 @@ void ABsCharacter::FinishDashing()
 	DashConfig.DashElapsedTime = 0.f;
 	const FVector DashNormal = DashConfig.DashDirection.GetSafeNormal();
 	DashConfig.PreDashVelocity.Z = 0.f;
-	GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size();
+	GetCharacterMovement()->Velocity = DashNormal * GetCharacterMovement()->MaxWalkSpeed;
+	/* Allows continued momentum after slide/dash jump. Leaving here in case we change our minds later.
+	GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size(); */
 	SetCanBeDamaged(true);
 }
 

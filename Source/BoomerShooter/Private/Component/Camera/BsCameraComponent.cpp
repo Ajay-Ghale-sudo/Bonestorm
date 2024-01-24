@@ -12,6 +12,9 @@ UBsCameraComponent::UBsCameraComponent()
 void UBsCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitialFOV = FieldOfView;
+	TargetFOV = InitialFOV;
 }
 
 // Called every frame
@@ -19,6 +22,7 @@ void UBsCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 									   FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	FOVTick(DeltaTime);
 
 	float Target = 0.f;
 	float Speed = LeanOutSpeed;
@@ -41,4 +45,32 @@ void UBsCameraComponent::AddToRoll(float Amount)
 	
 	TargetRollAmount =  FMath::Clamp(CurrentRollAmount + Amount, -MaxRollAmount, MaxRollAmount); 
 	bRecentlyLeaned = true;
+}
+
+void UBsCameraComponent::StartDashFOV()
+{
+	SetTargetFOV(DashFOV);
+}
+
+void UBsCameraComponent::StartSlideFOV()
+{
+	SetTargetFOV(SlideFOV);
+}
+
+void UBsCameraComponent::ResetFOV()
+{
+	SetTargetFOV(InitialFOV);
+}
+
+void UBsCameraComponent::SetTargetFOV(const float InTargetFOV)
+{
+	TargetFOV = InTargetFOV;
+}
+
+void UBsCameraComponent::FOVTick(const float DeltaTime)
+{
+	if (!FMath::IsNearlyEqual(FieldOfView, TargetFOV,  0.01f))
+	{
+		FieldOfView = FMath::FInterpTo(FieldOfView, TargetFOV, DeltaTime, FOVSpeed);
+	}
 }

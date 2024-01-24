@@ -75,6 +75,7 @@ public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
 	FBsCharacterEvent OnDash;
+	FBsCharacterEvent OnDashFinished;
 
 	FBsCharacterEvent OnJump;
 	FBsCharacterEvent OnDashJump;

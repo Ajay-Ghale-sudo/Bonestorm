@@ -22,11 +22,41 @@ public:
 	 * @param Amount Amount of roll to add.
 	 */
 	void AddToRoll(float Amount);
+
+	/**
+	 * @brief Sets TargetFOV to DashFOV.
+	 */
+	UFUNCTION()
+	void StartDashFOV();
+
+	/**
+	 * @brief Sets TargetFOV to SlideFOV.
+	 */
+	UFUNCTION()
+	void StartSlideFOV();
+
+	/**
+	 * @brief Resets TargetFOV to InitialFOV.
+	 */
+	UFUNCTION()
+	void ResetFOV();
+
+	/**
+	 * @brief Sets TargetFOV to InTargetFOV.
+	 * @param InTargetFOV The new TargetFOV.
+	 */
+	void SetTargetFOV(const float InTargetFOV);
 	
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	/**
+	 * @brief Tick function for FOV. Interpolates FOV to TargetFOV.
+	 * @param DeltaTime The time since the last tick.
+	 */
+	UFUNCTION()
+	void FOVTick(const float DeltaTime);
 protected:
 	/**
 	 * @brief The +/- amount the camera can lean.
@@ -49,4 +79,33 @@ protected:
 	float CurrentRollAmount = 0.f;
 	float TargetRollAmount = 0.f;
 	bool bRecentlyLeaned = false;
+
+	/**
+	 * @brief The initial FOV of the camera.
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Camera|FOV")
+	float InitialFOV;
+
+	/**
+	 * @brief The target FOV of the camera.
+	 */
+	float TargetFOV;
+
+	/**
+	 * @brief The FOV when sliding.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
+	float SlideFOV = 95.f;
+
+	/**
+	 * @brief The FOV when dashing.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
+	float DashFOV = 100.f;
+
+	/**
+	 * @brief The speed of the FOV interpolation.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
+	float FOVSpeed = 5.f;
 };

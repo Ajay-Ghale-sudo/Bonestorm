@@ -82,6 +82,11 @@ void ABsCharacter::BeginPlay()
 	if (CameraComponent)
 	{
 		HeadBobConfig.InitialRelativeLocation = CameraComponent->GetRelativeLocation();
+		OnDash.AddUObject(CameraComponent, &UBsCameraComponent::StartDashFOV);
+		OnDashFinished.AddUObject(CameraComponent, &UBsCameraComponent::ResetFOV);
+
+		OnSlideStart.AddUObject(CameraComponent, &UBsCameraComponent::StartSlideFOV);
+		OnSlideStop.AddUObject(CameraComponent, &UBsCameraComponent::ResetFOV);
 	}
 }
 
@@ -339,6 +344,7 @@ void ABsCharacter::FinishDashing()
 	/* Allows continued momentum after slide/dash jump. Leaving here in case we change our minds later.
 	GetCharacterMovement()->Velocity = DashNormal * DashConfig.PreDashVelocity.Size(); */
 	SetCanBeDamaged(true);
+	OnDashFinished.Broadcast();
 }
 
 void ABsCharacter::DashTick(const float DeltaTime)

@@ -407,6 +407,7 @@ void ABsCharacter::StartGrapple()
 	StopSliding();
 	StopJumping();
 	bGrappleAttached = true;
+	GetWorldTimerManager().SetTimerForNextTick(this, &ABsCharacter::UseGrappleHook);
 }
 
 void ABsCharacter::StopGrapple()

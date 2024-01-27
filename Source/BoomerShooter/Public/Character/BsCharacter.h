@@ -386,4 +386,5 @@ public:
 	FORCEINLINE bool GetIsAlive() const { return bAlive; }
 	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	FORCEINLINE UBsInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	FORCEINLINE ABsWeaponBase* GetWeapon() const { return Weapon; }
 };

@@ -6,13 +6,16 @@ UBsCameraComponent::UBsCameraComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	PostProcessSettings.AutoExposureMethod = EAutoExposureMethod::AEM_Manual;
+	PostProcessSettings.bOverride_AutoExposureMethod = true;
+	PostProcessSettings.bOverride_AutoExposureBias = true;
+	PostProcessSettings.AutoExposureBias = ManualExposureCompensation;
 }
 
 // Called when the game starts
 void UBsCameraComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	InitialFOV = FieldOfView;
 	TargetFOV = InitialFOV;
 }

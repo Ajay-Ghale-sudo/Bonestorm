@@ -245,7 +245,7 @@ void ABsCharacter::Jump()
 
 	if (DashConfig.bDashing)
 	{
-		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow && DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0 && JumpCurrentCount < JumpMaxCount)
+		if (DashConfig.CanDashJump() && JumpCurrentCount < JumpMaxCount)
 		{
 			DashConfig.DepleteJumpDash();
 			OnDashJump.Broadcast();
@@ -330,6 +330,7 @@ void ABsCharacter::Dash()
 	}
 }
 
+// TODO: We probably don't need StopDashing and FinishDashing. We can probably just use FinishDashing.
 void ABsCharacter::StopDashing()
 {
 	DashConfig.bDashing = false;
@@ -801,5 +802,11 @@ void ABsCharacter::Landed(const FHitResult& Hit)
 	if (HeadBobConfig.MinimumVelocityThreshold < FMath::Abs(GetVelocity().Z))
 	{
 		ApplyHeadBob();
+	}
+
+	if (DashConfig.bDashJumped)
+	{
+		DashConfig.bDashJumped = false;
+		OnDashFinished.Broadcast();
 	}
 }

@@ -105,6 +105,9 @@ struct FBsDashConfig
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCurrentAmount;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	bool bDashJumped = false;
+
 	// Maximum dash "stamina"
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashMaxAmount = 100.f;
@@ -171,7 +174,16 @@ struct FBsDashConfig
 	/**
 	 * @brief Decreases DashCurrenAmount by DashCost * JumpDashMultiplier.
 	 */
-	void DepleteJumpDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount); }
+	FORCEINLINE void DepleteJumpDash()
+	{
+		DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount);
+		bDashJumped = true;
+	}
+
+	FORCEINLINE bool CanDashJump() const
+	{
+		return DashElapsedTime <= DashJumpTimeWindow && DashCurrentAmount - DashCost * JumpDashMultiplier >= 0;
+	}
 };
 
 USTRUCT(BlueprintType)

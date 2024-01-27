@@ -46,6 +46,18 @@ public:
 	 * @param InTargetFOV The new TargetFOV.
 	 */
 	void SetTargetFOV(const float InTargetFOV);
+
+	/**
+	 * @brief Apply the Speed Lines Post Process effect.
+	 */
+	UFUNCTION()
+	void ApplySpeedLines();
+
+	/**
+	 * @brief Remove the Speed Lines Post Process effect.
+	 */
+	UFUNCTION()
+	void RemoveSpeedLines();
 	
 protected:
 	// Called when the game starts
@@ -108,4 +120,16 @@ protected:
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
 	float FOVSpeed = 5.f;
+
+	/**
+	 * @brief Post Process Material to apply when Dash/Sliding.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	TObjectPtr<UMaterialInstance> Material_SpeedLines;
+
+	/**
+	 * @brief The weight of the Speed Lines Post Process effect.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float SpeedLinesWeight = 1.f;
 };

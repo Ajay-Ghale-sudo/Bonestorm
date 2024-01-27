@@ -49,22 +49,41 @@ void UBsCameraComponent::AddToRoll(float Amount)
 
 void UBsCameraComponent::StartDashFOV()
 {
+	ApplySpeedLines();
 	SetTargetFOV(DashFOV);
 }
 
 void UBsCameraComponent::StartSlideFOV()
 {
+	ApplySpeedLines();
 	SetTargetFOV(SlideFOV);
 }
 
 void UBsCameraComponent::ResetFOV()
 {
+	RemoveSpeedLines();
 	SetTargetFOV(InitialFOV);
 }
 
 void UBsCameraComponent::SetTargetFOV(const float InTargetFOV)
 {
 	TargetFOV = InTargetFOV;
+}
+
+void UBsCameraComponent::ApplySpeedLines()
+{
+	// Add Material Instance to the Cameras Post Process Materials array
+	if (!Material_SpeedLines) return;
+
+	PostProcessSettings.AddBlendable(Material_SpeedLines, SpeedLinesWeight);
+	
+}
+
+void UBsCameraComponent::RemoveSpeedLines()
+{
+	if (!Material_SpeedLines) return;
+
+	PostProcessSettings.RemoveBlendable(Material_SpeedLines);
 }
 
 void UBsCameraComponent::FOVTick(const float DeltaTime)

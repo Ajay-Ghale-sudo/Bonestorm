@@ -86,7 +86,13 @@ protected:
 	 * @brief Speed of lean returning to rest position.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Lean")
-	float LeanOutSpeed = 5.f;
+	float LeanOutSpeed = 5;
+
+	/**
+	 * @brief Float to control the exposure of the camera
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera")
+	float ManualExposureCompensation = 8.5;
 	
 	float CurrentRollAmount = 0.f;
 	float TargetRollAmount = 0.f;

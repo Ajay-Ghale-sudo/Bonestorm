@@ -21,6 +21,8 @@ class UBsCharacterAudioComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsCharacterWeaponEvent, ABsWeaponBase*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsCharacterMovementEvent, float, Amount);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FBsCharacterSwayEvent, float HorizontalAmount, float VerticalAmount);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -94,6 +96,12 @@ public:
 	FBsCharacterInputEvent OnUnpaused;
 
 	FBsCharacterWeaponEvent OnWeaponChanged;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintCallable)
+	FBsCharacterMovementEvent OnHeadBob;
+
+	FBsCharacterSwayEvent OnCharacterSway;
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -378,4 +386,5 @@ public:
 	FORCEINLINE bool GetIsAlive() const { return bAlive; }
 	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	FORCEINLINE UBsInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	FORCEINLINE ABsWeaponBase* GetWeapon() const { return Weapon; }
 };

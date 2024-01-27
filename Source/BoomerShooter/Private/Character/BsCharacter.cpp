@@ -220,6 +220,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 			CameraComponent->AddToRoll(MovementVector.X);
 		}
 	}
+	OnCharacterSway.Broadcast(MovementConfig.LastMovementVector.X, MovementConfig.LastMovementVector.Y);
 }
 
 void ABsCharacter::Look(const FInputActionValue& Value)
@@ -516,7 +517,7 @@ void ABsCharacter::ApplyWeaponSway(const float DeltaTime)
 
 		WeaponRotation.Pitch = WeaponSwayConfig.CalculateHorizontalSwayAmount(DeltaTime, WeaponRotation.Pitch, VerticalSwayAmount);
 		WeaponRotation.Roll = WeaponSwayConfig.CalculateVerticalSwayAmount(DeltaTime, WeaponRotation.Roll, RollSwayAmount);
-		WeaponSpringArmComponent->SetRelativeRotation(WeaponRotation);		
+		WeaponSpringArmComponent->SetRelativeRotation(WeaponRotation);
 	}
 }
 

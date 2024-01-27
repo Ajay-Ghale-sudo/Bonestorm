@@ -316,11 +316,14 @@ void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 
 void ABsScythe::NextWeaponMode()
 {
+	// Disabled until more weapon modes have been added
+	return;
+	
 	// TODO: State, this should be a CanChangeWeaponMode() check
-	if (!bThrown)
-	{
-		SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
-	}
+	// if (!bThrown)
+	// {
+	// 	SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
+	// }
 }
 
 void ABsScythe::SetAttacking(bool bNewAttacking)
@@ -368,6 +371,9 @@ void ABsScythe::Equip()
 	Super::Equip();
 
 	SetActorRelativeLocation(FVector::ZeroVector);
+
+	// Can replace this with a default mode config eventually
+	SetWeaponMode(EScytheWeaponMode::ESWM_Range);
 }
 
 void ABsScythe::DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead)

@@ -18,6 +18,11 @@ void UBsCameraComponent::BeginPlay()
 	Super::BeginPlay();
 	InitialFOV = FieldOfView;
 	TargetFOV = InitialFOV;
+
+	if (Material_SpeedLines)
+	{
+		MaterialInstance_SpeedLines = UMaterialInstanceDynamic::Create(Material_SpeedLines, this);
+	}
 }
 
 // Called every frame
@@ -26,6 +31,7 @@ void UBsCameraComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	FOVTick(DeltaTime);
+	PostProcessTick(DeltaTime);
 
 	float Target = 0.f;
 	float Speed = LeanOutSpeed;
@@ -76,16 +82,19 @@ void UBsCameraComponent::SetTargetFOV(const float InTargetFOV)
 void UBsCameraComponent::ApplySpeedLines()
 {
 	// Add Material Instance to the Cameras Post Process Materials array
-	if (!Material_SpeedLines) return;
+	if (!MaterialInstance_SpeedLines) return;
 
-	PostProcessSettings.AddBlendable(Material_SpeedLines, SpeedLinesWeight);
-	
+	SpeedLineOpacity = StartingSpeedLineOpacity; // Start quick but fade off
+	TargetSpeedLineOpacity = 1.f;
+	PostProcessSettings.AddBlendable(MaterialInstance_SpeedLines, SpeedLinesWeight);
+	MaterialInstance_SpeedLines->SetScalarParameterValue(TEXT("Opacity"), SpeedLineOpacity);
 }
 
 void UBsCameraComponent::RemoveSpeedLines()
 {
-	if (!Material_SpeedLines) return;
+	if (!MaterialInstance_SpeedLines) return;
 
+	TargetSpeedLineOpacity = 0.f;
 	PostProcessSettings.RemoveBlendable(Material_SpeedLines);
 }
 
@@ -94,5 +103,20 @@ void UBsCameraComponent::FOVTick(const float DeltaTime)
 	if (!FMath::IsNearlyEqual(FieldOfView, TargetFOV,  0.01f))
 	{
 		FieldOfView = FMath::FInterpTo(FieldOfView, TargetFOV, DeltaTime, FOVSpeed);
+	}
+}
+
+void UBsCameraComponent::PostProcessTick(const float DeltaTime)
+{
+	if (TargetSpeedLineOpacity < 0.01f && SpeedLineOpacity < 0.01f)
+	{
+		PostProcessSettings.RemoveBlendable(MaterialInstance_SpeedLines);
+		return;
+	}
+	
+	if (!FMath::IsNearlyEqual(SpeedLineOpacity, TargetSpeedLineOpacity, 0.01f))
+	{
+		SpeedLineOpacity = FMath::FInterpTo(SpeedLineOpacity, TargetSpeedLineOpacity, DeltaTime, SpeedLineOpacitySpeed);
+		MaterialInstance_SpeedLines->SetScalarParameterValue(TEXT("Opacity"), SpeedLineOpacity);
 	}
 }

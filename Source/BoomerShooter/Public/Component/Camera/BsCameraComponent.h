@@ -69,6 +69,12 @@ protected:
 	 */
 	UFUNCTION()
 	void FOVTick(const float DeltaTime);
+
+	/**
+	 * @brief Tick function for applying post process effects.
+	 * @param DeltaTime The time since last tick.
+	 */
+	void PostProcessTick(const float DeltaTime);
 protected:
 	/**
 	 * @brief The +/- amount the camera can lean.
@@ -134,8 +140,37 @@ protected:
 	TObjectPtr<UMaterialInstance> Material_SpeedLines;
 
 	/**
+	 * @brief Dynamic Instance of SpeedLines material.
+	 */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera|Effects")
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance_SpeedLines;
+
+	/**
 	 * @brief The weight of the Speed Lines Post Process effect.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
 	float SpeedLinesWeight = 1.f;
+
+	/**
+	 * @brief The desired value of SpeedLineOpacity.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float TargetSpeedLineOpacity = 1.f;
+
+	/**
+	 * @brief Current Opacity value to set the SpeedLines material.
+	 */
+	float SpeedLineOpacity = 0.f;
+
+	/**
+	 * @brief The value to start the SpeedLineOpacity at. Used in ApplySpeedLines()
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float StartingSpeedLineOpacity = 0.5f; 
+
+	/**
+	 * @brief The speed at which the SpeedLine opacity should change. 
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float SpeedLineOpacitySpeed = 5.f;
 };

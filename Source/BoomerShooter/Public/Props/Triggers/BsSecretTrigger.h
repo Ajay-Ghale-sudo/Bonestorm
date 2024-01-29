@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BsBaseTrigger.h"
+#include "GameplayTagContainer.h"
 #include "BsSecretTrigger.generated.h"
 
 UCLASS()
@@ -17,4 +18,11 @@ public:
 
 protected:
 	virtual void StartTrigger(AActor* TriggeredActor) override;
+
+protected:
+	/**
+	 * @brief GameplayTag to send to the UI Subsystem when the secret is triggered.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Triggers|Secret")
+	FGameplayTag SecretTag;
 };

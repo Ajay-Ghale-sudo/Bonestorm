@@ -3,6 +3,7 @@
 
 #include "Props/Triggers/BsSecretTrigger.h"
 #include "Character/BsCharacter.h"
+#include "Subsystem/UI/BsUISubsystem.h"
 
 
 // Sets default values
@@ -22,5 +23,10 @@ void ABsSecretTrigger::StartTrigger(AActor* TriggeredActor)
 	if (const ABsCharacter* Character = Cast<ABsCharacter>(TriggeredActor))
 	{
 		Character->TriggerSecret();
+
+		if (const UBsUISubsystem* UISubsystem = GetGameInstance()->GetSubsystem<UBsUISubsystem>())
+		{
+			UISubsystem->OnUIEventTriggered.Broadcast(SecretTag);
+		}
 	}
 }

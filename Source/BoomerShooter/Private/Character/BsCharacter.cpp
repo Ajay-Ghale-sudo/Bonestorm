@@ -252,6 +252,8 @@ void ABsCharacter::Jump()
 		}
 		else
 		{
+			FinishDashing();
+			Super::Jump();
 			return;
 		}
 		StopDashing();

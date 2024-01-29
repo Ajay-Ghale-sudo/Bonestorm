@@ -766,6 +766,11 @@ void ABsCharacter::FellOutOfWorld(const UDamageType& DmgType)
 	}
 }
 
+void ABsCharacter::TriggerSecret() const
+{
+	OnSecretTriggered.Broadcast();
+}
+
 void ABsCharacter::Die()
 {
 	bAlive = false;

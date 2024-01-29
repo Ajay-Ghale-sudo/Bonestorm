@@ -73,6 +73,11 @@ public:
 
 	virtual void FellOutOfWorld(const UDamageType& DmgType) override;
 
+	/**
+	 * @brief Notifies the Character that they triggered a Secret.
+	 */
+	void TriggerSecret() const;
+
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
@@ -88,6 +93,11 @@ public:
 
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;
+
+	/**
+	 * @brief Triggered when the Character triggers a secret.
+	 */
+	FBsCharacterEvent OnSecretTriggered;
 
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnPaused;

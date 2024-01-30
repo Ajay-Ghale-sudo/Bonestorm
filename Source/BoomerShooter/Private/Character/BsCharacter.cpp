@@ -400,7 +400,7 @@ void ABsCharacter::RefundDashCharge()
 float ABsCharacter::CalculateDashCharge()
 {
 	if (DashConfig.bDashing) return 0;
-	float Modifier = GetCharacterMovement()->IsFalling() || SlideConfig.bSliding ? DashConfig.DashChargeAmountModifier : 1.0f;
+	float Modifier = GetCharacterMovement()->IsFalling() || SlideConfig.bSliding ? DashConfig.DashChargeModifier : 1.0f;
 	return DashConfig.DashChargeAmount * Modifier;
 }
 

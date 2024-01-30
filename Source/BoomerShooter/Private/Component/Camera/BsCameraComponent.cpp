@@ -18,6 +18,8 @@ void UBsCameraComponent::BeginPlay()
 	Super::BeginPlay();
 	InitialFOV = FieldOfView;
 	TargetFOV = InitialFOV;
+	SlideFOV = InitialFOV + FOVSlideOffset;
+	DashFOV = InitialFOV + FOVDashOffset;
 
 	if (Material_SpeedLines)
 	{
@@ -108,6 +110,7 @@ void UBsCameraComponent::FOVTick(const float DeltaTime)
 
 void UBsCameraComponent::PostProcessTick(const float DeltaTime)
 {
+	if (!MaterialInstance_SpeedLines) return;
 	if (TargetSpeedLineOpacity < 0.01f && SpeedLineOpacity < 0.01f)
 	{
 		PostProcessSettings.RemoveBlendable(MaterialInstance_SpeedLines);

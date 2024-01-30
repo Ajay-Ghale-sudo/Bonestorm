@@ -126,7 +126,7 @@ struct FBsDashConfig
 
 	// Modifier to change the amount of dash recharged on a per second basis.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	float DashChargeModifier = 0.25f;
+	float DashChargeModifier = 0.4f;
 	
 	/**
 	 * @brief How long to dash for.

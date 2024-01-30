@@ -59,13 +59,13 @@ void UBsCameraComponent::AddToRoll(float Amount)
 void UBsCameraComponent::StartDashFOV()
 {
 	ApplySpeedLines();
-	SetTargetFOV(DashFOV);
+	SetTargetFOV(InitialFOV + FOVDashOffset);
 }
 
 void UBsCameraComponent::StartSlideFOV()
 {
 	ApplySpeedLines();
-	SetTargetFOV(SlideFOV);
+	SetTargetFOV(InitialFOV + FOVSlideOffset);
 }
 
 void UBsCameraComponent::ResetFOV()
@@ -108,6 +108,7 @@ void UBsCameraComponent::FOVTick(const float DeltaTime)
 
 void UBsCameraComponent::PostProcessTick(const float DeltaTime)
 {
+	if (!MaterialInstance_SpeedLines) return;
 	if (TargetSpeedLineOpacity < 0.01f && SpeedLineOpacity < 0.01f)
 	{
 		PostProcessSettings.RemoveBlendable(MaterialInstance_SpeedLines);

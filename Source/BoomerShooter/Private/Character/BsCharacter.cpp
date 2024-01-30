@@ -381,7 +381,7 @@ void ABsCharacter::AddDashCharge()
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
 		const float DeltaTime = GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
-		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * DeltaTime, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + CalculateDashCharge() * DeltaTime, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 
 		DashConfig.DashChargeTimerHandle = GetWorldTimerManager().SetTimerForNextTick(	
@@ -395,6 +395,13 @@ void ABsCharacter::RefundDashCharge()
 {
 	DashConfig.RefundDashCharge();
 	OnDashAmountChanged.Broadcast();
+}
+
+float ABsCharacter::CalculateDashCharge()
+{
+	if (DashConfig.bDashing) return 0;
+	float Modifier = GetCharacterMovement()->IsFalling() || SlideConfig.bSliding ? DashConfig.DashChargeModifier : 1.0f;
+	return DashConfig.DashChargeAmount * Modifier;
 }
 
 bool ABsCharacter::CanDash()
@@ -643,8 +650,9 @@ void ABsCharacter::EndCoyoteTime()
 
 void ABsCharacter::OnParry()
 {
-	RefundDashCharge();
-	StartHitStop();	
+	DashConfig.FillDashCharge();
+	OnDashAmountChanged.Broadcast();
+	StartHitStop();
 }
 
 void ABsCharacter::SlideTick(float DeltaTime)

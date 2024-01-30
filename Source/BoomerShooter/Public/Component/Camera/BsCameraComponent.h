@@ -116,16 +116,16 @@ protected:
 	float TargetFOV;
 
 	/**
-	 * @brief The FOV when sliding.
+	 * @brief Adjustable offset for the FOV while dashing. 
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
-	float SlideFOV = 95.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera|FOV")
+	float FOVDashOffset = 25.0f;
 
 	/**
-	 * @brief The FOV when dashing.
+	 * @brief Adjustable offset for the FOV while sliding.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
-	float DashFOV = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera|FOV")
+	float FOVSlideOffset = 15.0f;
 
 	/**
 	 * @brief The speed of the FOV interpolation.

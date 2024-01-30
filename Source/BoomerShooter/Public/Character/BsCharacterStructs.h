@@ -124,6 +124,14 @@ struct FBsDashConfig
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashChargeAmount = 25.f;
 
+	// Modifier to change the amount of dash recharged on a per second basis while movement is impaired/altered.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeAmountModifier = 0.65f;
+	
+	// Modifiable dash recharge amount per second
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float ModdableDashChargeAmount = 25.f;
+
 	/**
 	 * @brief How long to dash for.
 	 */
@@ -150,7 +158,7 @@ struct FBsDashConfig
 	 * @brief If the Character is dashing or not.
 	 */
 	bool bDashing = false;
-
+	
 	/**
 	 * @brief The Direction the Character is dashing in.
 	 */
@@ -164,7 +172,7 @@ struct FBsDashConfig
 	/**
 	 * @brief Adds a DashCost amount to the DashCurrentAmount.
 	 */
-	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashCost, DashMinAmount, DashMaxAmount); }
+	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashMaxAmount, DashMinAmount, DashMaxAmount); }
 
 	/**
 	 * @brief Decreases DashCurrentAmount by DashCost.

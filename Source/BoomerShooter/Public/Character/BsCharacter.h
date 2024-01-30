@@ -178,6 +178,11 @@ protected:
 	void RefundDashCharge();
 
 	/**
+	 * @brief Calculate how much dash charge should be regained.
+	 */
+	float CalculateDashCharge();
+
+	/**
 	 * @brief Checks if the player can dash
 	 */
 	bool CanDash();

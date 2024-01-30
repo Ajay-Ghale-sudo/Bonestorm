@@ -18,8 +18,6 @@ void UBsCameraComponent::BeginPlay()
 	Super::BeginPlay();
 	InitialFOV = FieldOfView;
 	TargetFOV = InitialFOV;
-	SlideFOV = InitialFOV + FOVSlideOffset;
-	DashFOV = InitialFOV + FOVDashOffset;
 
 	if (Material_SpeedLines)
 	{
@@ -61,13 +59,13 @@ void UBsCameraComponent::AddToRoll(float Amount)
 void UBsCameraComponent::StartDashFOV()
 {
 	ApplySpeedLines();
-	SetTargetFOV(DashFOV);
+	SetTargetFOV(InitialFOV + FOVDashOffset);
 }
 
 void UBsCameraComponent::StartSlideFOV()
 {
 	ApplySpeedLines();
-	SetTargetFOV(SlideFOV);
+	SetTargetFOV(InitialFOV + FOVSlideOffset);
 }
 
 void UBsCameraComponent::ResetFOV()

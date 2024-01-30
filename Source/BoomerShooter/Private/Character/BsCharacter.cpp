@@ -664,8 +664,9 @@ void ABsCharacter::EndCoyoteTime()
 
 void ABsCharacter::OnParry()
 {
-	RefundDashCharge();
-	StartHitStop();	
+	DashConfig.FillDashCharge();
+	OnDashAmountChanged.Broadcast();
+	StartHitStop();
 }
 
 void ABsCharacter::SlideTick(float DeltaTime)

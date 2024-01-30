@@ -168,7 +168,9 @@ struct FBsDashConfig
 	/**
 	 * @brief Adds a DashCost amount to the DashCurrentAmount.
 	 */
-	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashMaxAmount, DashMinAmount, DashMaxAmount); }
+	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashCost, DashMinAmount, DashMaxAmount); }
+
+	void FillDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashMaxAmount, DashMinAmount, DashMaxAmount); }
 
 	/**
 	 * @brief Decreases DashCurrentAmount by DashCost.

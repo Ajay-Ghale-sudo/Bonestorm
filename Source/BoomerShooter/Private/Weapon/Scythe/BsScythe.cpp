@@ -190,6 +190,7 @@ void ABsScythe::EnableParry()
 void ABsScythe::EnableRangedFire()
 {
 	RangedConfig.bCanFire = true;
+	ShotgunConfig.bCanFire = true;
 }
 
 void ABsScythe::MeleeAttackFinished()
@@ -207,14 +208,17 @@ void ABsScythe::MeleeAttackFinished()
 void ABsScythe::Fire()
 {
 	if (!CanAttack()) return;
-	
-	if (WeaponMode == EScytheWeaponMode::ESWM_Melee)
+
+	switch (WeaponMode)
 	{
-		MeleeAttack();
-	}
-	else if (WeaponMode == EScytheWeaponMode::ESWM_Range)
-	{
-		RangeAttack();
+		case EScytheWeaponMode::ESWM_Melee:
+			MeleeAttack();
+			break;
+		case EScytheWeaponMode::ESWM_Shotgun:
+		case EScytheWeaponMode::ESWM_Range:
+			RangeAttack();
+		default:
+			break;
 	}
 }
 
@@ -227,44 +231,51 @@ void ABsScythe::RangeAttack()
 {
 	// Spawn Projectile
 	UWorld* World = GetWorld();
-	if (RangedConfig.ProjectileClass && World && RangedConfig.bCanFire)
+	auto& [FireRate, ProjectileClass, bCanFire, FireRateTimerHandle] = WeaponMode == EScytheWeaponMode::ESWM_Shotgun ? ShotgunConfig : RangedConfig;
+	if (ProjectileClass && World && bCanFire)
 	{
-		const FTransform SpawnTransform = GetProjectileSpawnTransform();
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.Owner = GetOwner();
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnParams.Instigator = GetInstigator();
-		ABsProjectileBase* Projectile = nullptr;
-		
-		if (AttachedSeveredHead)
+
+		const int32 MaxProjectiles = WeaponMode == EScytheWeaponMode::ESWM_Shotgun ? ShotgunConfig.PelletCount : 1;
+		for (int32 SpawnedProjectiles = 0; SpawnedProjectiles < MaxProjectiles; ++SpawnedProjectiles)
 		{
-			// TODO: Attached Severed Head mechanics
-			// Add effect to Projectile?
-			// Change the projectile that is spawned?
-			Projectile = AttachedSeveredHead->CreateProjectile(RangedConfig.ProjectileClass, SpawnTransform, SpawnParams);
-		}
-		if (!Projectile)
-		{
-			Projectile = Cast<ABsProjectileBase>(World->SpawnActor(RangedConfig.ProjectileClass, &SpawnTransform, SpawnParams));
-		}
-		
-		if (Projectile)
-		{
-			Projectile->SetOwner(GetOwner());
-			Projectile->SetInstigator(GetInstigator());
-			OnCreateProjectileEvent.Broadcast(Projectile);
-			PlayMontage(RangedAttackMontage);
-			OnRangedAttack();
-			OnWeaponFire.Broadcast();
+			ABsProjectileBase* Projectile = nullptr;
+			const FTransform SpawnTransform = GetProjectileSpawnTransform();
+			
+			if (AttachedSeveredHead)
+			{
+				// TODO: Attached Severed Head mechanics
+				// Add effect to Projectile?
+				// Change the projectile that is spawned?
+				Projectile = AttachedSeveredHead->CreateProjectile(ProjectileClass, SpawnTransform, SpawnParams);
+			}
+			if (!Projectile)
+			{
+				Projectile = Cast<ABsProjectileBase>(World->SpawnActor(ProjectileClass, &SpawnTransform, SpawnParams));
+			}
+			
+			if (Projectile)
+			{
+				Projectile->SetOwner(GetOwner());
+				Projectile->SetInstigator(GetInstigator());
+				OnCreateProjectileEvent.Broadcast(Projectile);
+			}
 		}
 
-		RangedConfig.bCanFire = false;
+		PlayMontage(RangedAttackMontage);
+		OnRangedAttack();
+		OnWeaponFire.Broadcast();
+		bCanFire = false;
+
 		World->GetTimerManager()
 			.SetTimer(
-				RangedConfig.FireRateTimerHandle,
+				FireRateTimerHandle,
 				this,
 				&ABsScythe::EnableRangedFire,
-				RangedConfig.FireRate,
+				FireRate,
 				false
 		);
 	}
@@ -317,13 +328,14 @@ void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 void ABsScythe::NextWeaponMode()
 {
 	// Disabled until more weapon modes have been added
-	return;
+	// return;
 	
 	// TODO: State, this should be a CanChangeWeaponMode() check
-	// if (!bThrown)
-	// {
-	// 	SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
-	// }
+	if (!bThrown)
+	{
+		SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Range ? EScytheWeaponMode::ESWM_Shotgun : EScytheWeaponMode::ESWM_Range);
+	}
+	
 }
 
 void ABsScythe::SetAttacking(bool bNewAttacking)
@@ -464,12 +476,22 @@ FTransform ABsScythe::GetProjectileSpawnTransform() const
 		CollisionParams.AddIgnoredActor(GetOwner());
 
 		World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, CollisionParams);
-		SpawnTransform.SetRotation((HitResult.Location - SpawnTransform.GetLocation()).Rotation().Quaternion());
+		const FVector TargetLocation = HitResult.bBlockingHit ? HitResult.Location : EndLocation;
+		SpawnTransform.SetRotation((TargetLocation- SpawnTransform.GetLocation()).Rotation().Quaternion());
 	}
 	else
 	{
 		SpawnTransform.SetRotation(GetActorRotation().Quaternion());
-	}	
+	}
+
+	// Apply spread if needed
+	if (WeaponMode == EScytheWeaponMode::ESWM_Shotgun)
+	{
+		FRotator SpreadRotation = SpawnTransform.GetRotation().Rotator();
+		SpreadRotation.Yaw += FMath::RandRange(-ShotgunConfig.PelletSpread, ShotgunConfig.PelletSpread);
+		SpreadRotation.Pitch += FMath::RandRange(-ShotgunConfig.PelletSpread, ShotgunConfig.PelletSpread);
+		SpawnTransform.SetRotation(SpreadRotation.Quaternion());
+	}
 
 	return SpawnTransform;
 }

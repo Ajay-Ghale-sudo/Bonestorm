@@ -126,7 +126,7 @@ struct FBsDashConfig
 
 	// Modifier to change the amount of dash recharged on a per second basis.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
-	float DashChargeModifier = 0.25f;
+	float DashChargeModifier = 0.4f;
 	
 	/**
 	 * @brief How long to dash for.
@@ -214,14 +214,14 @@ struct FBsSlideConfig
 	 * If the character's speed surpasses this value, the character will start to slide.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float VelocityToStartSlide = 1500.f;
+	float VelocityToStartSlide = 850.f;
 
 	/**
 	 * @brief The velocity required to stop sliding. 
 	 * If the character's speed falls below this value, the character will stop sliding.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float VelocityToStopSlide = 1200.f;
+	float VelocityToStopSlide = 975.f;
 
 	/**
 	 * @brief The character's ground friction before the slide starts.
@@ -233,13 +233,13 @@ struct FBsSlideConfig
 	 * @brief The friction applied when the character is sliding.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideFriction = 0.1f;
+	float SlideFriction = 0.125f;
 
 	/**
 	 * @brief The strength of the slide, which could be used to determine how far the character slides.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideStrength = 1000.f;
+	float SlideStrength = 1050.f;
 
 	/**
 	 * @brief The strength of a downward impulse when the character is on a slope.
@@ -267,7 +267,7 @@ struct FBsSlideConfig
 	 * @brief The character's height during the slide.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideHeight = 44.f;
+	float SlideHeight = 27.f;
 
 	/**
 	 * @brief A flag indicating whether the character is currently sliding or not.

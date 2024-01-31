@@ -15,6 +15,7 @@ ABsUITrigger::ABsUITrigger()
 	PrimaryActorTick.bCanEverTick = false;
 
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
+	TriggerBox->SetCollisionProfileName("Trigger");
 	SetRootComponent(TriggerBox);
 }
 

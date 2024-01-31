@@ -16,7 +16,7 @@ enum class EScytheWeaponMode : uint8
 {
 	ESWM_Melee UMETA(DisplayName = "Melee"),
 	ESWM_Range UMETA(DisplayName = "Range"),
-	ESWM_Thrown UMETA(DisplayName = "Thrown"),
+	ESWM_Shotgun UMETA(DisplayName = "Shotgun"),
 
 	ESWM_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -71,6 +71,24 @@ struct FBsScytheBlockConfig
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Block|Parry")
 	bool bParrying = false;
+};
+
+USTRUCT(BlueprintType)
+struct FScytheShotgunConfig : public FScytheRangedConfig
+{
+	GENERATED_BODY()
+
+	/**
+	 * @brief The number of pellets to fire per shot.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Shotgun Config")
+	int32 PelletCount = 5;
+
+	/**
+	 * @brief The spread of the pellets in degrees.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe|Shotgun Config")
+	float PelletSpread = 2.5f;
 };
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsScytheBlockEvent, float Damage);
@@ -183,9 +201,6 @@ protected:
 	EScytheWeaponMode WeaponMode = EScytheWeaponMode::ESWM_Melee;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
-	EScytheWeaponMode RangedWeaponMode = EScytheWeaponMode::ESWM_Range;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	float MeleeDamage = 10.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Scythe")
@@ -239,6 +254,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	FScytheRangedConfig RangedConfig;
 
+	/**
+	 * @brief Config for the shotgun mode. 
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
+	FScytheShotgunConfig ShotgunConfig;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scythe")
 	FBsScytheBlockConfig BlockConfig;
 
@@ -251,6 +272,6 @@ public:
 	FORCEINLINE bool IsReturningToOwner() const { return bReturningToOwner; }
 	FORCEINLINE bool IsAttachedToGrapplePoint() const { return bAttachedToGrapplePoint; }
 	FORCEINLINE bool IsMeleeMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Melee; }
-	FORCEINLINE bool IsRangedMode() const { return WeaponMode == EScytheWeaponMode::ESWM_Range; }
+	FORCEINLINE bool IsRangedMode() const { return  !IsMeleeMode(); }
 	FORCEINLINE EScytheWeaponMode GetWeaponMode() const { return WeaponMode; }
 };

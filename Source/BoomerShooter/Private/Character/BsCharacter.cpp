@@ -182,6 +182,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (Weapon)
 	{
 		Weapon->SetOwner(this);
+		Weapon->SetProjectileAimComponent(CameraComponent);
 		Weapon->Equip();
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::OnParry);

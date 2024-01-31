@@ -8,6 +8,8 @@ void UBsCharacterAudioComponent::BeginPlay()
 {
 	CharacterOwner = Cast<ABsCharacter>(GetOwner());
 	Super::BeginPlay();
+
+	PlayAmbientSound(); // TODO: Should be triggered by a level event
 }
 
 void UBsCharacterAudioComponent::BindEvents()
@@ -100,6 +102,14 @@ void UBsCharacterAudioComponent::StopCombatMusic()
 		CharacterAudioData.CombatMusicAudioComponent->OnAudioFinished.RemoveAll(this);
 		CharacterAudioData.CombatMusicAudioComponent->FadeOut(1.f, 0.f);
 		CharacterAudioData.CombatMusicAudioComponent->StopDelayed(1.f);
+	}
+}
+
+void UBsCharacterAudioComponent::PlayAmbientSound()
+{
+	if (CharacterAudioData.AmbientSound)
+	{
+		PlaySound(CharacterAudioData.AmbientSound);
 	}
 }
 

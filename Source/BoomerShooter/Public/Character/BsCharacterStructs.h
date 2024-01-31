@@ -105,6 +105,9 @@ struct FBsDashConfig
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashCurrentAmount;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	bool bDashJumped = false;
+
 	// Maximum dash "stamina"
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashMaxAmount = 100.f;
@@ -121,6 +124,10 @@ struct FBsDashConfig
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
 	float DashChargeAmount = 25.f;
 
+	// Modifier to change the amount of dash recharged on a per second basis.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement|Dash")
+	float DashChargeModifier = 0.4f;
+	
 	/**
 	 * @brief How long to dash for.
 	 */
@@ -147,7 +154,7 @@ struct FBsDashConfig
 	 * @brief If the Character is dashing or not.
 	 */
 	bool bDashing = false;
-
+	
 	/**
 	 * @brief The Direction the Character is dashing in.
 	 */
@@ -163,6 +170,8 @@ struct FBsDashConfig
 	 */
 	void RefundDashCharge() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount + DashCost, DashMinAmount, DashMaxAmount); }
 
+	void FillDashCharge() { DashCurrentAmount = DashMaxAmount; }
+
 	/**
 	 * @brief Decreases DashCurrentAmount by DashCost.
 	 */
@@ -171,7 +180,16 @@ struct FBsDashConfig
 	/**
 	 * @brief Decreases DashCurrenAmount by DashCost * JumpDashMultiplier.
 	 */
-	void DepleteJumpDash() { DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount); }
+	FORCEINLINE void DepleteJumpDash()
+	{
+		DashCurrentAmount = FMath::Clamp(DashCurrentAmount - DashCost * JumpDashMultiplier, DashMinAmount, DashMaxAmount);
+		bDashJumped = true;
+	}
+
+	FORCEINLINE bool CanDashJump() const
+	{
+		return DashElapsedTime <= DashJumpTimeWindow && DashCurrentAmount - DashCost * JumpDashMultiplier >= 0;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -196,14 +214,14 @@ struct FBsSlideConfig
 	 * If the character's speed surpasses this value, the character will start to slide.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float VelocityToStartSlide = 1500.f;
+	float VelocityToStartSlide = 850.f;
 
 	/**
 	 * @brief The velocity required to stop sliding. 
 	 * If the character's speed falls below this value, the character will stop sliding.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float VelocityToStopSlide = 1200.f;
+	float VelocityToStopSlide = 975.f;
 
 	/**
 	 * @brief The character's ground friction before the slide starts.
@@ -215,13 +233,13 @@ struct FBsSlideConfig
 	 * @brief The friction applied when the character is sliding.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideFriction = 0.1f;
+	float SlideFriction = 0.125f;
 
 	/**
 	 * @brief The strength of the slide, which could be used to determine how far the character slides.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideStrength = 1000.f;
+	float SlideStrength = 1050.f;
 
 	/**
 	 * @brief The strength of a downward impulse when the character is on a slope.
@@ -249,7 +267,7 @@ struct FBsSlideConfig
 	 * @brief The character's height during the slide.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Slide")
-	float SlideHeight = 44.f;
+	float SlideHeight = 27.f;
 
 	/**
 	 * @brief A flag indicating whether the character is currently sliding or not.

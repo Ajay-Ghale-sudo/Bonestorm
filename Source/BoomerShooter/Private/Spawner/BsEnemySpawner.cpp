@@ -46,7 +46,7 @@ ABsEnemyBase* ABsEnemySpawner::SpawnEnemy()
 	if (World)
 	{
 		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 		FTransform SpawnTransform = GetTransform();
 		SpawnedEnemy = Cast<ABsEnemyBase>(World->SpawnActor(SpawnEnemyClass, &SpawnTransform));
 		if (SpawnedEnemy)

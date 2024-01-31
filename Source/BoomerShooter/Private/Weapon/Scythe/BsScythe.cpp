@@ -316,11 +316,14 @@ void ABsScythe::SetWeaponMode(EScytheWeaponMode NewMode)
 
 void ABsScythe::NextWeaponMode()
 {
+	// Disabled until more weapon modes have been added
+	return;
+	
 	// TODO: State, this should be a CanChangeWeaponMode() check
-	if (!bThrown)
-	{
-		SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
-	}
+	// if (!bThrown)
+	// {
+	// 	SetWeaponMode(WeaponMode == EScytheWeaponMode::ESWM_Melee ? EScytheWeaponMode::ESWM_Range : EScytheWeaponMode::ESWM_Melee);
+	// }
 }
 
 void ABsScythe::SetAttacking(bool bNewAttacking)
@@ -368,6 +371,9 @@ void ABsScythe::Equip()
 	Super::Equip();
 
 	SetActorRelativeLocation(FVector::ZeroVector);
+
+	// Can replace this with a default mode config eventually
+	SetWeaponMode(EScytheWeaponMode::ESWM_Range);
 }
 
 void ABsScythe::DecapitatedActor(ABsSeveredHeadBase* DecapitatedHead)
@@ -444,7 +450,26 @@ FTransform ABsScythe::GetProjectileSpawnTransform() const
 	}
 	
 	SpawnTransform.SetScale3D(FVector(1.0f, 1.0f, 1.0f));
-	SpawnTransform.SetRotation(GetActorRotation().Quaternion());
+
+	// Calculate the rotation of the projectile
+	UWorld* World = GetWorld();
+	if (ProjectileAimComponent && World)
+	{
+		// Calculate the end location of the projectile and set the rotation to face it
+		FHitResult HitResult;
+		const FVector StartLocation = ProjectileAimComponent->GetComponentLocation();
+		const FVector EndLocation = StartLocation + (ProjectileAimComponent->GetForwardVector() * 10000.0f);
+		FCollisionQueryParams CollisionParams;
+		CollisionParams.AddIgnoredActor(this);
+		CollisionParams.AddIgnoredActor(GetOwner());
+
+		World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECollisionChannel::ECC_Visibility, CollisionParams);
+		SpawnTransform.SetRotation((HitResult.Location - SpawnTransform.GetLocation()).Rotation().Quaternion());
+	}
+	else
+	{
+		SpawnTransform.SetRotation(GetActorRotation().Quaternion());
+	}	
 
 	return SpawnTransform;
 }

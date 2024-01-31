@@ -21,6 +21,8 @@ class UBsCharacterAudioComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FBsCharacterInputEvent);
 DECLARE_MULTICAST_DELEGATE(FBsCharacterEvent);
 DECLARE_MULTICAST_DELEGATE_OneParam(FBsCharacterWeaponEvent, ABsWeaponBase*);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FBsCharacterMovementEvent, float, Amount);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FBsCharacterSwayEvent, float HorizontalAmount, float VerticalAmount);
 
 UCLASS()
 class BOOMERSHOOTER_API ABsCharacter : public ACharacter
@@ -71,6 +73,11 @@ public:
 
 	virtual void FellOutOfWorld(const UDamageType& DmgType) override;
 
+	/**
+	 * @brief Notifies the Character that they triggered a Secret.
+	 */
+	void TriggerSecret() const;
+
 public:
 	FBsCharacterEvent OnDashAmountChanged;
 	FBsCharacterEvent OnDashEnabledChanged;
@@ -87,6 +94,11 @@ public:
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;
 
+	/**
+	 * @brief Triggered when the Character triggers a secret.
+	 */
+	FBsCharacterEvent OnSecretTriggered;
+
 	UPROPERTY(BlueprintReadOnly, BlueprintAssignable)
 	FBsCharacterInputEvent OnPaused;
 
@@ -94,6 +106,12 @@ public:
 	FBsCharacterInputEvent OnUnpaused;
 
 	FBsCharacterWeaponEvent OnWeaponChanged;
+
+	UPROPERTY(BlueprintReadOnly, BlueprintCallable)
+	FBsCharacterMovementEvent OnHeadBob;
+
+	FBsCharacterSwayEvent OnCharacterSway;
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -158,6 +176,11 @@ protected:
 	 * @brief Temp, refund dash charge
 	 */
 	void RefundDashCharge();
+
+	/**
+	 * @brief Calculate how much dash charge should be regained.
+	 */
+	float CalculateDashCharge();
 
 	/**
 	 * @brief Checks if the player can dash
@@ -378,4 +401,5 @@ public:
 	FORCEINLINE bool GetIsAlive() const { return bAlive; }
 	FORCEINLINE UBsHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	FORCEINLINE UBsInventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	FORCEINLINE ABsWeaponBase* GetWeapon() const { return Weapon; }
 };

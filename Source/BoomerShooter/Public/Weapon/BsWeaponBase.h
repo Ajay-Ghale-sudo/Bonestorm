@@ -140,8 +140,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	ABsSeveredHeadBase* AttachedSeveredHead;
 
+	/**
+	 * @brief The Component to use for aiming projectiles. Typically used with a Camera Component.
+	 */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Weapon")
+	TObjectPtr<USceneComponent> ProjectileAimComponent;
+
 public:
 	FORCEINLINE bool IsAttacking() const { return bIsAttacking; }
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE bool HasAttachedHead() const { return AttachedSeveredHead != nullptr; }
+	FORCEINLINE void SetProjectileAimComponent(USceneComponent* Component) { ProjectileAimComponent = Component; }
 };

@@ -182,6 +182,7 @@ void ABsCharacter::SetWeapon(ABsWeaponBase* InWeapon)
 	if (Weapon)
 	{
 		Weapon->SetOwner(this);
+		Weapon->SetProjectileAimComponent(CameraComponent);
 		Weapon->Equip();
 		Weapon->OnWeaponCaught.AddUObject(this, &ABsCharacter::GrabCurrentWeapon);
 		Weapon->OnWeaponParry.AddUObject(this, &ABsCharacter::OnParry);
@@ -220,6 +221,7 @@ void ABsCharacter::Move(const FInputActionValue& Value)
 			CameraComponent->AddToRoll(MovementVector.X);
 		}
 	}
+	OnCharacterSway.Broadcast(MovementConfig.LastMovementVector.X, MovementConfig.LastMovementVector.Y);
 }
 
 void ABsCharacter::Look(const FInputActionValue& Value)
@@ -244,13 +246,15 @@ void ABsCharacter::Jump()
 
 	if (DashConfig.bDashing)
 	{
-		if (DashConfig.DashElapsedTime <= DashConfig.DashJumpTimeWindow && DashConfig.DashCurrentAmount - DashConfig.DashCost * DashConfig.JumpDashMultiplier >= 0 && JumpCurrentCount < JumpMaxCount)
+		if (DashConfig.CanDashJump() && JumpCurrentCount < JumpMaxCount)
 		{
 			DashConfig.DepleteJumpDash();
 			OnDashJump.Broadcast();
 		}
 		else
 		{
+			FinishDashing();
+			Super::Jump();
 			return;
 		}
 		StopDashing();
@@ -329,6 +333,7 @@ void ABsCharacter::Dash()
 	}
 }
 
+// TODO: We probably don't need StopDashing and FinishDashing. We can probably just use FinishDashing.
 void ABsCharacter::StopDashing()
 {
 	DashConfig.bDashing = false;
@@ -377,7 +382,7 @@ void ABsCharacter::AddDashCharge()
 	if (DashConfig.DashCurrentAmount < DashConfig.DashMaxAmount)
 	{
 		const float DeltaTime = GetWorld() ? GetWorld()->GetDeltaSeconds() : 0.f;
-		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + DashConfig.DashChargeAmount * DeltaTime, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
+		DashConfig.DashCurrentAmount = FMath::Clamp(DashConfig.DashCurrentAmount + CalculateDashCharge() * DeltaTime, DashConfig.DashMinAmount, DashConfig.DashMaxAmount);
 		OnDashAmountChanged.Broadcast();
 
 		DashConfig.DashChargeTimerHandle = GetWorldTimerManager().SetTimerForNextTick(	
@@ -391,6 +396,13 @@ void ABsCharacter::RefundDashCharge()
 {
 	DashConfig.RefundDashCharge();
 	OnDashAmountChanged.Broadcast();
+}
+
+float ABsCharacter::CalculateDashCharge()
+{
+	if (DashConfig.bDashing) return 0;
+	float Modifier = GetCharacterMovement()->IsFalling() || SlideConfig.bSliding ? DashConfig.DashChargeModifier : 1.0f;
+	return DashConfig.DashChargeAmount * Modifier;
 }
 
 bool ABsCharacter::CanDash()
@@ -516,7 +528,7 @@ void ABsCharacter::ApplyWeaponSway(const float DeltaTime)
 
 		WeaponRotation.Pitch = WeaponSwayConfig.CalculateHorizontalSwayAmount(DeltaTime, WeaponRotation.Pitch, VerticalSwayAmount);
 		WeaponRotation.Roll = WeaponSwayConfig.CalculateVerticalSwayAmount(DeltaTime, WeaponRotation.Roll, RollSwayAmount);
-		WeaponSpringArmComponent->SetRelativeRotation(WeaponRotation);		
+		WeaponSpringArmComponent->SetRelativeRotation(WeaponRotation);
 	}
 }
 
@@ -639,8 +651,9 @@ void ABsCharacter::EndCoyoteTime()
 
 void ABsCharacter::OnParry()
 {
-	RefundDashCharge();
-	StartHitStop();	
+	DashConfig.FillDashCharge();
+	OnDashAmountChanged.Broadcast();
+	StartHitStop();
 }
 
 void ABsCharacter::SlideTick(float DeltaTime)
@@ -764,6 +777,11 @@ void ABsCharacter::FellOutOfWorld(const UDamageType& DmgType)
 	}
 }
 
+void ABsCharacter::TriggerSecret() const
+{
+	OnSecretTriggered.Broadcast();
+}
+
 void ABsCharacter::Die()
 {
 	bAlive = false;
@@ -800,5 +818,11 @@ void ABsCharacter::Landed(const FHitResult& Hit)
 	if (HeadBobConfig.MinimumVelocityThreshold < FMath::Abs(GetVelocity().Z))
 	{
 		ApplyHeadBob();
+	}
+
+	if (DashConfig.bDashJumped)
+	{
+		DashConfig.bDashJumped = false;
+		OnDashFinished.Broadcast();
 	}
 }

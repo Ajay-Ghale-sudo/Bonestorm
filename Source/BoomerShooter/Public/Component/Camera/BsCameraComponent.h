@@ -46,6 +46,18 @@ public:
 	 * @param InTargetFOV The new TargetFOV.
 	 */
 	void SetTargetFOV(const float InTargetFOV);
+
+	/**
+	 * @brief Apply the Speed Lines Post Process effect.
+	 */
+	UFUNCTION()
+	void ApplySpeedLines();
+
+	/**
+	 * @brief Remove the Speed Lines Post Process effect.
+	 */
+	UFUNCTION()
+	void RemoveSpeedLines();
 	
 protected:
 	// Called when the game starts
@@ -57,6 +69,12 @@ protected:
 	 */
 	UFUNCTION()
 	void FOVTick(const float DeltaTime);
+
+	/**
+	 * @brief Tick function for applying post process effects.
+	 * @param DeltaTime The time since last tick.
+	 */
+	void PostProcessTick(const float DeltaTime);
 protected:
 	/**
 	 * @brief The +/- amount the camera can lean.
@@ -74,7 +92,13 @@ protected:
 	 * @brief Speed of lean returning to rest position.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Lean")
-	float LeanOutSpeed = 5.f;
+	float LeanOutSpeed = 5;
+
+	/**
+	 * @brief Float to control the exposure of the camera
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera")
+	float ManualExposureCompensation = 8.5;
 	
 	float CurrentRollAmount = 0.f;
 	float TargetRollAmount = 0.f;
@@ -92,20 +116,61 @@ protected:
 	float TargetFOV;
 
 	/**
-	 * @brief The FOV when sliding.
+	 * @brief Adjustable offset for the FOV while dashing. 
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
-	float SlideFOV = 95.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera|FOV")
+	float FOVDashOffset = 25.0f;
 
 	/**
-	 * @brief The FOV when dashing.
+	 * @brief Adjustable offset for the FOV while sliding.
 	 */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
-	float DashFOV = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera|FOV")
+	float FOVSlideOffset = 15.0f;
 
 	/**
 	 * @brief The speed of the FOV interpolation.
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|FOV")
 	float FOVSpeed = 5.f;
+
+	/**
+	 * @brief Post Process Material to apply when Dash/Sliding.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	TObjectPtr<UMaterialInstance> Material_SpeedLines;
+
+	/**
+	 * @brief Dynamic Instance of SpeedLines material.
+	 */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Camera|Effects")
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance_SpeedLines;
+
+	/**
+	 * @brief The weight of the Speed Lines Post Process effect.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float SpeedLinesWeight = 1.f;
+
+	/**
+	 * @brief The desired value of SpeedLineOpacity.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float TargetSpeedLineOpacity = 1.f;
+
+	/**
+	 * @brief Current Opacity value to set the SpeedLines material.
+	 */
+	float SpeedLineOpacity = 0.f;
+
+	/**
+	 * @brief The value to start the SpeedLineOpacity at. Used in ApplySpeedLines()
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float StartingSpeedLineOpacity = 0.5f; 
+
+	/**
+	 * @brief The speed at which the SpeedLine opacity should change. 
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Camera|Effects")
+	float SpeedLineOpacitySpeed = 5.f;
 };

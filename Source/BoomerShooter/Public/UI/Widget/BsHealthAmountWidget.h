@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Blueprint/UserWidget.h"
+#include "BsSwayWidget.h"
 #include "BsHealthAmountWidget.generated.h"
 
 class UBsHealthComponent;
@@ -9,7 +9,7 @@ class UBsHealthComponent;
  * 
  */
 UCLASS()
-class BOOMERSHOOTER_API UBsHealthAmountWidget : public UUserWidget
+class BOOMERSHOOTER_API UBsHealthAmountWidget : public UBsSwayWidget
 {
 	GENERATED_BODY()
 

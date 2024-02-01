@@ -91,6 +91,9 @@ public:
 	FBsCharacterEvent OnSlideStart;
 	FBsCharacterEvent OnSlideStop;
 
+	FBsCharacterEvent OnFootstep;
+	FBsCharacterEvent OnLanded;
+
 	FBsCharacterEvent OnArenaStarted;
 	FBsCharacterEvent OnArenaEnded;
 
@@ -161,6 +164,12 @@ protected:
 	 * @param DeltaTime	The time passed since the last frame.
 	 */
 	void DashTick(const float DeltaTime);
+
+	/**
+	 * @brief Process if a footstep has occured.
+	 * @param DeltaTime The time passed since the last frame,
+	 */
+	void FootstepTick(const float DeltaTime);
 
 	/**
 	 * @brief Enables dashing.

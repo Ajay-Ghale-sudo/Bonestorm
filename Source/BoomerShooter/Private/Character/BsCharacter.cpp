@@ -107,6 +107,9 @@ void ABsCharacter::Tick(float DeltaTime)
 	SlideTick(DeltaTime);
 	DashTick(DeltaTime);
 
+	// TODO: This will not need to exist once we have anim notifies.
+	FootstepTick(DeltaTime);
+
 	// TODO: We should move this to a timer. Not good to be putting everything into tick.
 	ApplyWeaponSway(DeltaTime);
 	MovementConfig.LastMovementVector = FVector2D::Zero();
@@ -368,6 +371,26 @@ void ABsCharacter::DashTick(const float DeltaTime)
 	}	
 	GetCharacterMovement()->Velocity = DashConfig.DashDirection;
 	SetCanBeDamaged(false);
+}
+
+void ABsCharacter::FootstepTick(const float DeltaTime)
+{
+	if (DashConfig.bDashing || SlideConfig.bSliding || !GetCharacterMovement()->IsMovingOnGround())
+	{
+		MovementConfig.CurrentStrideDistance = 0;
+		return;
+	}
+
+	const float Speed = GetVelocity().Size();
+	if (Speed > 0)
+	{
+		MovementConfig.CurrentStrideDistance += Speed * DeltaTime;
+		if (MovementConfig.CurrentStrideDistance >= MovementConfig.StrideLength)
+		{
+			MovementConfig.CurrentStrideDistance = 0;
+			OnFootstep.Broadcast();
+		}
+	}
 }
 
 void ABsCharacter::EnableDash()
@@ -818,6 +841,7 @@ void ABsCharacter::Landed(const FHitResult& Hit)
 	if (HeadBobConfig.MinimumVelocityThreshold < FMath::Abs(GetVelocity().Z))
 	{
 		ApplyHeadBob();
+		OnLanded.Broadcast();
 	}
 
 	if (DashConfig.bDashJumped)

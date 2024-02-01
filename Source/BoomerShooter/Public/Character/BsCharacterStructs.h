@@ -307,6 +307,17 @@ struct FBsMovementConfig
 	float CoyoteTimeDuration = 0.5f;
 
 	/**
+	 * @brief Current footstep travel distance.
+	 */
+	float CurrentStrideDistance = 0.f;
+
+	/**
+	 * @brief How much walking distance to move before triggering a footstep.
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Movement|Footsteps")
+	float StrideLength = 350.f;
+
+	/**
 	 * @brief Timer handle used for controlling coyote time.
 	 */
 	FTimerHandle CoyoteTimeHandle;

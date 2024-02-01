@@ -32,6 +32,12 @@ struct FCharacterAudioData
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
 	USoundBase* AmbientSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
+	USoundBase* FootstepSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio Data")
+	USoundBase* LandedSound;
 };
 
 /**
@@ -65,6 +71,12 @@ protected:
 	UFUNCTION()
 	void PlayAmbientSound();
 
+	UFUNCTION()
+	void PlayFootstepSound();
+
+	UFUNCTION()
+	void PlayLandedSound();
+	
 	UFUNCTION()
 	void OnKeyPickup(const FBsKeyData& KeyData);
 

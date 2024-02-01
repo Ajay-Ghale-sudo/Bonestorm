@@ -21,6 +21,8 @@ void UBsCharacterAudioComponent::BindEvents()
 	CharacterOwner->OnSlideStop.AddUObject(this, &UBsCharacterAudioComponent::OnSlideStop);
 	CharacterOwner->OnArenaStarted.AddUObject(this, &UBsCharacterAudioComponent::PlayCombatMusic);
 	CharacterOwner->OnArenaEnded.AddUObject(this, &UBsCharacterAudioComponent::StopCombatMusic);
+	CharacterOwner->OnFootstep.AddUObject(this, &UBsCharacterAudioComponent::PlayFootstepSound);
+	CharacterOwner->OnLanded.AddUObject(this, &UBsCharacterAudioComponent::PlayLandedSound);
 
 	if (UBsInventoryComponent* InventoryComponent = CharacterOwner->GetInventoryComponent())
 	{
@@ -42,6 +44,9 @@ void UBsCharacterAudioComponent::UnbindEvents()
 	CharacterOwner->OnSlideStop.RemoveAll(this);
 	CharacterOwner->OnArenaStarted.RemoveAll(this);
 	CharacterOwner->OnArenaEnded.RemoveAll(this);
+	CharacterOwner->OnFootstep.RemoveAll(this);
+	CharacterOwner->OnLanded.RemoveAll(this);
+
 
 	if (UBsInventoryComponent* InventoryComponent = CharacterOwner->GetInventoryComponent())
 	{
@@ -107,10 +112,17 @@ void UBsCharacterAudioComponent::StopCombatMusic()
 
 void UBsCharacterAudioComponent::PlayAmbientSound()
 {
-	if (CharacterAudioData.AmbientSound)
-	{
-		PlaySound(CharacterAudioData.AmbientSound);
-	}
+	PlaySound(CharacterAudioData.AmbientSound);
+}
+
+void UBsCharacterAudioComponent::PlayFootstepSound()
+{
+	PlaySound(CharacterAudioData.FootstepSound);
+}
+
+void UBsCharacterAudioComponent::PlayLandedSound()
+{
+	PlaySound(CharacterAudioData.LandedSound);
 }
 
 void UBsCharacterAudioComponent::OnKeyPickup(const FBsKeyData& KeyData)

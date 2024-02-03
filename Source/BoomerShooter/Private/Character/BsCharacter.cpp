@@ -841,7 +841,11 @@ void ABsCharacter::Landed(const FHitResult& Hit)
 	if (HeadBobConfig.MinimumVelocityThreshold < FMath::Abs(GetVelocity().Z))
 	{
 		ApplyHeadBob();
-		OnLanded.Broadcast();
+
+		if (!SlideConfig.bSliding && !DashConfig.bDashing)
+		{
+			OnLanded.Broadcast();
+		}
 	}
 
 	if (DashConfig.bDashJumped)

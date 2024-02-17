@@ -81,17 +81,26 @@ void ABsProjectileBase::CheckProjectilePath()
 			if (HitResult.GetActor())
 			{
 				const float TravelDistance = (HitResult.ImpactPoint - GetActorLocation()).Size();
-				const float TravelTime = UKismetMathLibrary::SafeDivide(TravelDistance, ProjectileSpeed);
+				float TravelTime = UKismetMathLibrary::SafeDivide(TravelDistance, ProjectileSpeed);
 				
 				LastHitResult = HitResult;
-				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::Impact, TravelTime, false);
-				GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ResolveImpactTimerHandle, this, &ABsProjectileBase::ResolveImpact, TravelTime, false);
+				if (TravelTime <= 0.f)
+				{
+					GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::Impact);
+					GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::ResolveImpact);
+				}
+				else
+				{
+					GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ResolveImpactTimerHandle, this, &ABsProjectileBase::ResolveImpact, TravelTime, false);
+					GetWorldTimerManager().SetTimer(ProjectileDamageProperties.ImpactTimerHandle, this, &ABsProjectileBase::Impact, TravelTime, false);
+				}
 				ApplyDamageToActor(HitResult.GetActor());
 				SetProjectileCollision(ECollisionEnabled::NoCollision);
-				break;
+				return;
 			}
 		}
 	}
+	GetWorldTimerManager().SetTimerForNextTick(this, &ABsProjectileBase::CheckProjectilePath);
 }
 
 void ABsProjectileBase::ResolveImpact()
